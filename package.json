@@ -1,0 +1,26 @@
+{
+  "name": "whatsapp-site-builder",
+  "version": "1.0.0",
+  "description": "WhatsApp-based AI Website Generator and Subscription platform",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts"
+  },
+  "dependencies": {
+    "@fastify/formbody": "^7.4.0",
+    "@fastify/static": "^6.10.2",
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.108.2",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}
