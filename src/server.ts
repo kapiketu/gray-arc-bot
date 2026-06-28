@@ -1,5 +1,7 @@
 import fastify from 'fastify';
 import dotenv from 'dotenv';
+import path from 'path';
+import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
 import webhookRoutes from './routes/webhook';
 import viewerRoutes from './routes/viewer';
@@ -10,6 +12,10 @@ const server = fastify({ logger: true });
 
 // Register plugins
 server.register(formbody);
+server.register(fastifyStatic, {
+  root: path.join(__dirname, '../public'),
+  prefix: '/public/',
+});
 
 // Register application routes
 server.register(webhookRoutes);

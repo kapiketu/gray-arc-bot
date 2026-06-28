@@ -252,19 +252,19 @@ function renderPremiumWebsite(site) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
     <!--Favicon-->
-    <link rel="shortcut icon" href="http://www.shapingrain.com/downloads/demos/namari/images/favicon.ico" title="Favicon">
+    <link rel="shortcut icon" href="https://onepagelove.com/favicon.ico" title="Favicon">
 
     <!-- Main CSS Files -->
-    <link rel="stylesheet" href="http://www.shapingrain.com/downloads/demos/namari/css/style.css">
+    <link rel="stylesheet" href="/public/css/style.css">
 
     <!-- Namari Color CSS -->
-    <link rel="stylesheet" href="http://www.shapingrain.com/downloads/demos/namari/css/namari-color.css">
+    <link rel="stylesheet" href="/public/css/namari-color.css">
 
     <!--Icon Fonts - Font Awesome Icons-->
-    <link rel="stylesheet" href="http://www.shapingrain.com/downloads/demos/namari/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
 
     <!-- Animate CSS-->
-    <link href="http://www.shapingrain.com/downloads/demos/namari/css/animate.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" type="text/css">
 
     <!--Google Webfonts-->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css">
@@ -290,7 +290,7 @@ function renderPremiumWebsite(site) {
 
 <div id="wrapper">
 
-    <header id="banner" class="scrollto clearfix" data-enllax-ratio=".5">
+    <header id="banner" class="scrollto clearfix" data-enllax-ratio=".5" style="background: url('${images.hero}') no-repeat center top; background-size: cover;">
         <div id="header" class="nav-collapse">
             <div class="row clearfix">
                 <div class="col-1">
@@ -327,19 +327,7 @@ function renderPremiumWebsite(site) {
                                 <a href="#about">About</a>
                             </li>
                             <li>
-                                <a href="#gallery">Gallery</a>
-                            </li>
-                            <li>
                                 <a href="#services">Services</a>
-                            </li>
-                            <li>
-                                <a href="#testimonials">Testimonials</a>
-                            </li>
-                            <li>
-                                <a href="#clients">Clients</a>
-                            </li>
-                            <li>
-                                <a href="#pricing">Pricing</a>
                             </li>
                         </ul>
                     </nav>
@@ -377,8 +365,7 @@ function renderPremiumWebsite(site) {
             <div class="row clearfix">
 
                 <div class="col-3">
-                    <div class="section-heading">${site.storyTitle || "Our Story"}</div>
-
+                    <img src="${images.about}" alt="About Image" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%;">
                 </div>
 
                 <div class="col-2-3">
@@ -423,59 +410,7 @@ function renderPremiumWebsite(site) {
         <!--End of Gallery-->
 
 
-        <!--Content Section-->
-        <div id="services" class="scrollto clearfix">
 
-            <div class="row no-padding-bottom clearfix">
-
-
-                <!--Content Left Side-->
-                <div class="col-3">
-                    <!--User Testimonial-->
-                    <blockquote class="testimonial text-right bigtest">
-                        <q>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore
-                            et dolore magna aliqua</q>
-                        <footer>— John Doe, Happy Customer</footer>
-                    </blockquote>
-                    <!-- End of Testimonial-->
-
-                </div>
-                <!--End Content Left Side-->
-
-                <!--Content of the Right Side-->
-                <div class="col-3">
-                    <div class="section-heading">
-                        <h3>BELIEVING</h3>
-                        <h2 class="section-title">Focusing On What Matters Most</h2>
-                        <p class="section-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam!</p>
-                    </div>
-                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-                        totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
-                        dicta sunt explicabo.
-                    </p>
-                    <p>
-                        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
-                        consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-                        Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet!
-                    </p>
-                    <!-- Just replace the Video ID "UYJ5IjBRlW8" with the ID of your video on YouTube (Found within the URL) -->
-                    <a href="#" data-videoid="UYJ5IjBRlW8" data-videosite="youtube" class="button video link-lightbox">
-                        WATCH VIDEO <i class="fa fa-play" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <!--End Content Right Side-->
-
-                <div class="col-3">
-                    <img src="http://www.shapingrain.com/downloads/demos/namari/images/dancer.jpg" alt="Dancer">
-                </div>
-
-            </div>
-
-
-        </div>
-        <!--End of Content Section-->
 
         <!--Testimonials-->
         
@@ -507,21 +442,18 @@ function renderPremiumWebsite(site) {
 </div>
 
 <!-- Include JavaScript resources -->
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.1.8.3.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/wow.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/featherlight.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/featherlight.gallery.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.enllax.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.scrollUp.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.easing.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.stickyNavbar.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/jquery.waypoints.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/images-loaded.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/lightbox.min.js"></script>
-<script src="http://www.shapingrain.com/downloads/demos/namari/js/site.js"></script>
-
-
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a12d367798259c5d',t:'MTc4MjY1NTE3NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script src="/public/js/jquery.1.8.3.min.js"></script>
+<script src="/public/js/wow.min.js"></script>
+<script src="/public/js/featherlight.min.js"></script>
+<script src="/public/js/featherlight.gallery.min.js"></script>
+<script src="/public/js/jquery.enllax.min.js"></script>
+<script src="/public/js/jquery.scrollUp.min.js"></script>
+<script src="/public/js/jquery.easing.min.js"></script>
+<script src="/public/js/jquery.stickyNavbar.min.js"></script>
+<script src="/public/js/jquery.waypoints.min.js"></script>
+<script src="/public/js/images-loaded.min.js"></script>
+<script src="/public/js/lightbox.min.js"></script>
+<script src="/public/js/site.js"></script>
 </body></html>
     `;
 }
