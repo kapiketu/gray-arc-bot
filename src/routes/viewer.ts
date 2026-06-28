@@ -445,35 +445,35 @@ function renderPremiumWebsite(site: SiteConfig): string {
     <div class="md:col-span-5 relative">
       <div class="absolute inset-0 bg-gradient-to-tr from-${theme.primary}-500 to-indigo-500 rounded-3xl rotate-3 scale-95 blur-2xl opacity-20 animate-pulse"></div>
       <div class="relative bg-white p-4 rounded-3xl shadow-xl border border-slate-100">
-        <img src="${images.hero}" alt="${site.businessName} Hero Image" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-inner">
+        <img src="${images.hero}" alt="${site.businessName} Hero Image" class="w-full h-full aspect-[4/5] object-cover rounded-2xl shadow-inner">
       </div>
     </div>
   </header>
 
-  <!-- Moving Text Ticker Section (Left to Right) -->
-  <div class="w-full bg-${theme.primaryHex} text-white py-3.5 overflow-hidden shadow-inner border-y border-${theme.primary}-700 relative z-10">
+  <!-- Moving Text Ticker Section (Left to Right, Styled as premium charcoal black strip) -->
+  <div class="w-full bg-[#18181b] text-zinc-100 py-3.5 overflow-hidden shadow-inner border-y border-[#27272a] relative z-10">
     <div class="flex whitespace-nowrap min-w-full">
       <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>⚡ Premium Services</span>
+        <span>Premium Services</span>
         <span>•</span>
-        <span>💬 Direct WhatsApp Booking</span>
+        <span>Direct WhatsApp Booking</span>
         <span>•</span>
-        <span>⭐ Client Satisfaction Guaranteed</span>
+        <span>Client Satisfaction Guaranteed</span>
         <span>•</span>
-        <span>🎯 Professional Expert Care</span>
+        <span>Professional Expert Care</span>
         <span>•</span>
-        <span>💼 Trusted Local Solutions</span>
+        <span>Trusted Local Solutions</span>
       </div>
       <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>⚡ Premium Services</span>
+        <span>Premium Services</span>
         <span>•</span>
-        <span>💬 Direct WhatsApp Booking</span>
+        <span>Direct WhatsApp Booking</span>
         <span>•</span>
-        <span>⭐ Client Satisfaction Guaranteed</span>
+        <span>Client Satisfaction Guaranteed</span>
         <span>•</span>
-        <span>🎯 Professional Expert Care</span>
+        <span>Professional Expert Care</span>
         <span>•</span>
-        <span>💼 Trusted Local Solutions</span>
+        <span>Trusted Local Solutions</span>
       </div>
     </div>
   </div>
