@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import { db } from './db';
+import { sendTextMessage } from './whatsapp';
 
 dotenv.config();
 
@@ -106,6 +107,13 @@ export async function processPaymentWebhook(payload: any): Promise<boolean> {
         site.domainStatus = 'paid';
         await db.saveSite(site);
         console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" marked as PAID for site "${siteId}".`);
+        
+        // Send DNS instructions to the user
+        await sendTextMessage(
+          site.phoneNumber,
+          `🎉 *Domain Purchase Successful!*\n\nYour custom domain *${domain}* is now unlocked for your website.\n\n*Final Step (DNS Setup):*\nPlease log into your domain provider (GoDaddy, Hostinger, etc.) and add this record to your DNS settings:\n\n*Type:* CNAME\n*Name:* @ (or www)\n*Value:* gray-arc-bot-production.up.railway.app\n\nOnce added, it can take up to 24 hours for your website to appear on your custom domain!`
+        );
+
         return true;
       }
     }
