@@ -718,6 +718,26 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1d4ed8',
+            'box-bg': 'rgb(var(--color-box))',
+            'box-border': 'rgb(var(--box-border))',
+            'heading-1': 'rgb(var(--heading-1))',
+            'heading-2': 'rgb(var(--heading-2))',
+            'heading-3': 'rgb(var(--heading-3))',
+          },
+          screens: {
+            midmd: '880px',
+          }
+        }
+      }
+    }
+  </script>
   <style>
     :root {
       --color-bg: 255 255 255;
@@ -727,7 +747,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       --heading-1: 23 37 84;
       --heading-2: 31 41 55;
       --heading-3: 55 65 81;
-      --color-primary: #1d4ed8; /* Hardcoded blue primary to match original AgenceX */
+      --color-primary: #1d4ed8;
     }
 
     .dark {
@@ -767,7 +787,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
               <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
             </div>
             <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              AgenceX
+              ${site.businessName}
             </div>
           </a>
         </div>
@@ -802,7 +822,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         </div>
 
         <!-- Mobile Navigation Panel -->
-        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50">
+        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50 animate-fade-in">
           <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
           <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
           <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
@@ -880,7 +900,38 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
     </div>
   </section>
 
-  <!-- Services / Products Section (100% Identical to original AgenceX Card Layout) -->
+  <!-- Trusted By Section -->
+  <section class="pb-20">
+    <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 md:px-14 lg:px-5 space-y-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-[rgb(var(--heading-1))] font-semibold text-2xl sm:text-3xl md:text-4xl">
+          Trusted by companies like
+        </h2>
+      </div>
+      <div class="flex justify-center flex-wrap gap-4">
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
+          <img src="/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services / Products Section -->
   <section id="services" class="py-24 relative">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -897,7 +948,6 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
           return `<a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" 
              class="p-5 sm:p-6 lg:p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg shadow-box-shadow relative overflow-hidden flex flex-col justify-between hover:scale-[1.01] hover:shadow-xl transition-all duration-300 group">
             <div>
-              <!-- Paper Plane SVG Icon matching the original GitHub mockup exactly -->
               <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -912,7 +962,6 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
                 </p>
               </div>
             </div>
-            <!-- Absolute circular decoration at the bottom-right corner -->
             <span class="absolute w-32 aspect-square -bottom-16 -right-16 bg-[var(--color-primary)]/10 rounded-full"></span>
           </a>`;
         }).join('')}
@@ -945,24 +994,24 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         <!-- Mission / Vision Cards -->
         <div class="pt-8 w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
-            <div class="rounded-xl bg-slate-100 dark:bg-slate-900 p-2 text-[var(--color-primary)] w-max mb-4">
+            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
               </svg>
             </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Mission</h4>
-            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
+            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Mission</h4>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
           </div>
 
           <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
-            <div class="rounded-xl bg-slate-100 dark:bg-slate-900 p-2 text-[var(--color-primary)] w-max mb-4">
+            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Vision</h4>
-            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
+            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Vision</h4>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
           </div>
         </div>
       </div>
@@ -975,7 +1024,8 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       <!-- Left content -->
       <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
         <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">We provide Important Features for Digital Marketing</h2>
-        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio dignissimos consequatur?</p>
+        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
+        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
         
         <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-3))] w-full">
           <li class="flex items-center gap-3">
@@ -1135,7 +1185,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       <div class="w-full h-px bg-[rgb(var(--box-border))] my-8"></div>
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">
         <div>
-          &copy; <span id="year">2026</span> AgenceX. All rights reserved.
+          &copy; 2026 AgenceX. All rights reserved.
         </div>
         <div>
           Proudly made by John Kat.
