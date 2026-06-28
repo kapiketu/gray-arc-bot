@@ -359,6 +359,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="${theme.fontFamilyImport}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body { font-family: 'Inter', sans-serif; }
     h1, h2, h3, .theme-font-title { font-family: ${theme.fontFamilyTitle}; }
@@ -555,17 +556,13 @@ function renderPremiumWebsite(site: SiteConfig): string {
     <!-- WhatsApp Sticky Button -->
     <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
        class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
-        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.588 1.977 14.12 1.95 12.009 1.95 6.58 1.95 2.155 6.321 2.152 11.75c-.001 1.758.469 3.475 1.362 5.012l-.999 3.65 3.731-.973c1.558.85 3.112 1.295 4.75 1.295l.061-.005zm7.25-12.515c-.173-.385-.357-.393-.521-.4l-.443-.005c-.154 0-.405.058-.617.288-.212.23-.81.792-.81 1.932 0 1.14.829 2.242.944 2.399.116.157 1.6 2.454 3.88 3.44 2.28.986 2.28.657 2.684.618.404-.039 1.3-.53 1.484-1.04.184-.51.184-.949.129-1.04-.055-.09-.202-.144-.423-.255-.22-.11-1.3-.642-1.502-.715-.202-.073-.346-.11-.491.11-.144.22-.559.715-.684.859-.125.144-.25.163-.47.052-.221-.11-.935-.345-1.78-1.107-.658-.587-1.102-1.312-1.232-1.53-.13-.22-.013-.339.097-.449.1-.099.22-.256.33-.384.11-.127.147-.218.22-.364.074-.146.037-.272-.018-.382-.056-.11-.522-1.26-.716-1.73z"/>
-      </svg>
+      <i class="fab fa-whatsapp text-3xl"></i>
       <span class="absolute right-16 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
     </a>
     <!-- Call Sticky Button -->
     <a href="tel:${site.phoneNumber}" 
-       class="w-14 h-14 bg-[#10b981] hover:bg-[#059669] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-        <path d="M21.384,17.752a2.108,2.108,0,0,1-.522,3.359,7.543,7.543,0,0,1-5.476.955c-4.822-1.172-9.485-5.835-10.657-10.657a7.545,7.545,0,0,1,.955-5.476,2.108,2.108,0,0,1,3.359-.522L10.3,6.666a2.09,2.09,0,0,1,.228,2.248l-.946,1.892a12.551,12.551,0,0,0,5.611,5.611l1.892-.946a2.09,2.09,0,0,1,2.248.228Z"/>
-      </svg>
+       class="w-14 h-14 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
+      <i class="fas fa-phone text-2xl"></i>
       <span class="absolute right-16 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
     </a>
   </div>
