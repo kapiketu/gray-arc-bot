@@ -767,7 +767,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
               <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
             </div>
             <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              ${site.businessName}
+              AgenceX
             </div>
           </a>
         </div>
@@ -802,7 +802,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         </div>
 
         <!-- Mobile Navigation Panel -->
-        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50 animate-fade-in">
+        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50">
           <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
           <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
           <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
@@ -849,7 +849,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         </div>
       </div>
 
-      <!-- Image (Original AgenceX Hero WebP Image illustration) -->
+      <!-- Image -->
       <div class="flex flex-1 lg:w-1/2 lg:h-auto relative lg:max-w-none lg:mx-0 mx-auto max-w-3xl w-full">
         <img src="/images/image1.webp" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
       </div>
@@ -880,12 +880,12 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
     </div>
   </section>
 
-  <!-- Services / Products Section -->
+  <!-- Services / Products Section (100% Identical to original AgenceX Card Layout) -->
   <section id="services" class="py-24 relative">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">What we offer</h2>
-        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Select any of our services below to connect directly with us and order instantly via WhatsApp.</p>
+        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -894,28 +894,27 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
           if (desc.length < 80) {
             desc = `${desc} We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals.`;
           }
-          return `<div class="p-6 sm:p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg relative overflow-hidden flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+          return `<a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" 
+             class="p-5 sm:p-6 lg:p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg shadow-box-shadow relative overflow-hidden flex flex-col justify-between hover:scale-[1.01] hover:shadow-xl transition-all duration-300 group">
             <div>
-              <div class="rounded-xl bg-slate-100 dark:bg-slate-900 p-3 text-[var(--color-primary)] w-max relative">
-                <i class="fas ${i % 3 === 0 ? 'fa-chart-line' : i % 3 === 1 ? 'fa-bullhorn' : 'fa-handshake'} text-xl"></i>
+              <!-- Paper Plane SVG Icon matching the original GitHub mockup exactly -->
+              <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
               </div>
               <div class="mt-6 space-y-4 relative">
-                <div class="flex justify-between items-start gap-2">
-                  <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))]">${item.name}</h3>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-primary)]/10 text-[var(--color-primary)] shrink-0">
-                    ${formatPrice(item.price)}
-                  </span>
-                </div>
-                <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">${desc}</p>
+                <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] group-hover:text-[var(--color-primary)] transition-colors">
+                  ${item.name}
+                </h3>
+                <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">
+                  ${desc}
+                </p>
               </div>
             </div>
-            <div class="mt-8">
-              <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-semibold rounded-2xl bg-[var(--color-primary)] text-white hover:opacity-90 transition-all shadow-sm">
-                Order via WhatsApp
-              </a>
-            </div>
-            <span class="absolute w-32 aspect-square -bottom-16 -right-16 bg-[var(--color-primary)]/5 rounded-full"></span>
-          </div>`;
+            <!-- Absolute circular decoration at the bottom-right corner -->
+            <span class="absolute w-32 aspect-square -bottom-16 -right-16 bg-[var(--color-primary)]/10 rounded-full"></span>
+          </a>`;
         }).join('')}
       </div>
     </div>
@@ -924,7 +923,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
   <!-- About Us Section -->
   <section id="about-us" class="py-24 border-y border-[rgb(var(--box-border))]">
     <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
-      <!-- Left image (Original AgenceX dev-with-c-1 WebP Image illustration) -->
+      <!-- Left image -->
       <div class="flex-1 flex w-full lg:w-1/2">
         <div class="w-full relative">
           <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
@@ -994,7 +993,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         </ul>
       </div>
 
-      <!-- Right image (Original AgenceX dev-with-c WebP Image illustration) -->
+      <!-- Right image -->
       <div class="flex-1 flex w-full lg:w-1/2 relative">
         <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
         <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
@@ -1004,7 +1003,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
     </div>
   </section>
 
-  <!-- Reviews / Testimonials Section (Aligned with Astro Design) -->
+  <!-- Reviews / Testimonials Section -->
   <section id="testimonials" class="py-24 bg-slate-50 dark:bg-slate-900/10 border-b border-[rgb(var(--box-border))]">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -1030,7 +1029,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
     </div>
   </section>
 
-  <!-- FAQ Section (Aligned with Astro Design) -->
+  <!-- FAQ Section -->
   <section id="faq" class="py-24">
     <div class="max-w-4xl mx-auto px-6">
       <div class="text-center mb-16 space-y-4">
@@ -1059,7 +1058,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
   <!-- CTA Section -->
   <section id="cta" class="pb-24">
     <div class="max-w-6xl mx-auto px-6">
-      <div class="w-full relative py-12 md:py-16 px-6 md:px-12 rounded-3xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent border border-[rgb(var(--box-border))] shadow-inner overflow-hidden animate-fade-in">
+      <div class="w-full relative py-12 md:py-16 px-6 md:px-12 rounded-3xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent border border-[rgb(var(--box-border))] shadow-inner overflow-hidden">
         <!-- Glows -->
         <div class="absolute right-0 top-0 h-full w-full flex justify-end pointer-events-none">
           <div class="w-28 h-28 overflow-hidden flex rounded-xl relative blur-2xl">
@@ -1144,6 +1143,22 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       </div>
     </div>
   </footer>
+
+  <!-- Floating Sticky Contact Buttons -->
+  <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+    <!-- WhatsApp Sticky Button -->
+    <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
+       class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
+      <i class="fab fa-whatsapp text-xl"></i>
+      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
+    </a>
+    <!-- Call Sticky Button -->
+    <a href="tel:${site.phoneNumber}" 
+       class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
+      <i class="fas fa-phone text-base"></i>
+      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
+    </a>
+  </div>
 
   <!-- Mobile Toggle Script & Light/Dark Theme Switcher Script -->
   <script>
