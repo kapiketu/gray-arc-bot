@@ -552,18 +552,18 @@ function renderPremiumWebsite(site: SiteConfig): string {
   </footer>
 
   <!-- Floating Sticky Contact Buttons -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+  <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
     <!-- WhatsApp Sticky Button -->
     <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
-       class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fab fa-whatsapp text-3xl"></i>
-      <span class="absolute right-16 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
+       class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
+      <i class="fab fa-whatsapp text-xl"></i>
+      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
     </a>
     <!-- Call Sticky Button -->
     <a href="tel:${site.phoneNumber}" 
-       class="w-14 h-14 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fas fa-phone text-2xl"></i>
-      <span class="absolute right-16 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
+       class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
+      <i class="fas fa-phone text-base"></i>
+      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
     </a>
   </div>
 
