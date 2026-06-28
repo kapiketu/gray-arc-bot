@@ -10,7 +10,7 @@ dotenv.config();
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
-const BASE_URL = `http://localhost:${PORT}`;
+const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
 
 // ────────────────────────────────────────────────────────
 // OFF-TOPIC DETECTION
