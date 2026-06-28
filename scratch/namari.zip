@@ -1,0 +1,19 @@
+HTTP/2 200 
+date: Sun, 28 Jun 2026 13:59:10 GMT
+content-type: application/octet-stream
+server: cloudflare
+x-robots-tag: noindex, nofollow
+set-cookie: lana_downloads_manager=eyJkb3dubG9hZF9pZCI6MzIyODl9; expires=Sun, 28 Jun 2026 14:41:05 GMT; Max-Age=3600; path=/; secure; HttpOnly
+content-description: File Transfer
+content-disposition: attachment; filename="namari-by-shapingrain.zip"
+content-transfer-encoding: binary
+expires: 0
+cache-control: no-cache, no-store, must-revalidate
+cache-control: public, max-age=3600
+pragma: no-cache
+strict-transport-security: max-age=31536000
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=nVQLqPDvArAG0RcS0fJ333NQppePXysp2UpG6InK48BxZ%2Fkdx%2F3xainxOJUZW1Z%2BEN3ujuTy3JeavjtQxxFG0lu3DFEU9DikeR9vzrKs%2BPmhn%2B%2BUHNuEB05IhmXgsy1Egg%3D%3D"}]}
+cf-ray: a12d35e28bce8af9-BOM
+
