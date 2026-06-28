@@ -152,7 +152,7 @@ export async function generateWebsiteConfig(
     - Contact Details / Address (raw input): ${contactRaw}
     
     INSTRUCTIONS:
-    1. Select an appropriate, professional, and modern theme palette based on the business type (must contain hexadecimal colors for primary, secondary, background, and text colors, and a clean Google font name like 'Inter', 'Outfit', 'Playfair Display', or 'Oswald').
+    1. Select an appropriate, highly premium "Colored Dark Theme" based on the business type. The 'bgColor' MUST be a very deep, rich, dark color (e.g., deep plum #4c0519 for a spa, dark navy #082f49 for tech, dark espresso #271c19 for a bakery). The 'textColor' MUST be white or off-white. The 'primaryColor' and 'secondaryColor' should be vibrant neon/glowing colors that contrast beautifully with the dark background. Also include a clean Google font name like 'Inter', 'Outfit', 'Playfair Display', or 'Oswald'.
     2. Write an attractive, punchy Hero Title and Subtitle.
     3. Generate a compelling "Our Story" paragraph expanding on the user's description.
     4. Parse the raw services input into a clean JSON array of products (with a name, price in Rupees e.g. "₹499" or "₹1,200", and a short description).
