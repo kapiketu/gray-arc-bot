@@ -109,9 +109,24 @@ function getMockWebsiteContent(
     customDomain: null,
     domainStatus: 'none',
     heroTitle: `Welcome to ${businessName}`,
-    heroSubtitle: about ? `${about.substring(0, 100)}...` : `We provide the best ${category} services in town.`,
+    heroSubtitle: about ? `${about.substring(0, 100)}... Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs.` : `Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time.`,
     storyTitle: 'Our Story',
-    storyContent: about || `We are proud to serve our community with premium quality ${category} services.`
+    storyContent: about ? `${about}. Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded.` : `Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded. Thank you for trusting us to be your partner; we look forward to serving you with integrity and excellence for years to come.`,
+    features: [
+      { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
+      { title: 'Experienced Specialists', description: 'Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience, specialized skills, and a committed, problem-solving focus to every single project we undertake.' },
+      { title: 'Client Centric Partnership', description: 'Your goals are our priorities. We take the time to understand your exact requirements, provide transparent progress updates, and offer tailored, flexible solutions designed to guarantee your complete satisfaction.' }
+    ],
+    faqs: [
+      { question: 'What are your operating hours?', answer: 'We are fully operational Monday through Saturday from 10:00 AM to 8:00 PM. Our team is available to assist you during these hours, and you can always send us a message via WhatsApp to schedule an appointment outside these times if needed.' },
+      { question: 'How do I book a service or order?', answer: 'Booking is incredibly easy and direct. Simply scroll to our services section, select the offering you are interested in, and click the "Order via WhatsApp" button. This will open a chat with us containing the service details so we can finalize your booking instantly.' },
+      { question: 'Where are you located and do you offer delivery?', answer: contactRaw || 'We are based in local area, India, serving clients across the region. If you need precise directions, maps, or want to check if we service your specific area, feel free to send us a message on WhatsApp and we will share our location details.' }
+    ],
+    testimonials: [
+      { name: 'Aarav Mehta', role: 'Regular Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined. I highly recommend them to anyone seeking top-tier service!' },
+      { name: 'Priya Sharma', role: 'Local Customer', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. It is rare to find a business that cares this much about its clients.' },
+      { name: 'Rohan Gupta', role: 'Business Owner', content: 'They exceeded my expectations in every possible way. The project was completed on time, within budget, and the attention to details was absolutely spectacular. Their team is knowledgeable, responsive, and incredibly dedicated to customer success. Five stars!' }
+    ]
   };
 }
 
@@ -142,7 +157,7 @@ export async function generateWebsiteConfig(
     });
 
     const prompt = `
-    You are a professional website builder and copywriter. Generate a complete structured website configuration based on the user's inputs.
+    You are an expert copywriter and premium website landing page architect. Generate a complete, highly professional, and informative website configuration based on the user's inputs.
     
     USER INPUTS:
     - Business Name: ${businessName}
@@ -151,12 +166,15 @@ export async function generateWebsiteConfig(
     - Services/Products (raw input): ${servicesRaw}
     - Contact Details / Address (raw input): ${contactRaw}
     
-    INSTRUCTIONS:
-    1. Select an appropriate, professional, and modern theme palette based on the business type (must contain hexadecimal colors for primary, secondary, background, and text colors, and a clean Google font name like 'Inter', 'Outfit', 'Playfair Display', or 'Oswald').
-    2. Write an attractive, punchy Hero Title and Subtitle.
-    3. Generate a compelling "Our Story" paragraph expanding on the user's description.
-    4. Parse the raw services input into a clean JSON array of products (with a name, price in Rupees e.g. "₹499" or "₹1,200", and a short description).
-    5. Clean the contact details into structured fields: phone, email, address, and reasonable operating hours (if not provided, create sensible defaults).
+    CRITICAL COPYWRITING DIRECTIVES FOR LENGTH AND DEPTH (VERY IMPORTANT):
+    1. WRITE EXTENSIVE AND LONG PARAGRAPHS: Even if the user provided very sparse input (e.g. description is just "best in town", or services is a short list of words), you MUST expand it heavily into rich, detailed, and highly informative marketing copy. 
+    2. HERO SUBTITLE: Must be an engaging, detailed value-proposition statement of at least 35-50 words (2-3 full sentences) explaining the values and commitment of the business.
+    3. OUR STORY CONTENT: Must be a rich, compelling brand narrative of at least 150-200 words (minimum 2 detailed paragraphs) detailing their foundation, expertise, customer-first standards, community impact, and quality dedication.
+    4. SERVICES: Parse the raw services. Ensure every service has a professional name, a price in Rupees (e.g. "₹499" or "₹1,200", default to "₹Contact Us" only if unclear), and a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
+    5. why CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
+    6. FAQs: Generate exactly 3 frequently asked questions and detailed answers (at least 35-50 words or 2-3 complete sentences per answer) providing helpful, concrete information about operating schedules, booking procedures, and locations.
+    7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be at least 45-60 words (3-4 complete sentences) explaining the client's problem, how the business solved it, and their specific satisfaction.
+    8. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
     
     Output the result EXACTLY matching this JSON structure:
     {
@@ -168,7 +186,7 @@ export async function generateWebsiteConfig(
         "textColor": "hex string"
       },
       "services": [
-        { "name": "service name", "price": "price with currency", "description": "short description" }
+        { "name": "service name", "price": "price with currency", "description": "rich description paragraph of at least 45-60 words" }
       ],
       "contactDetails": {
         "phone": "phone number",
@@ -177,9 +195,18 @@ export async function generateWebsiteConfig(
         "hours": "business hours"
       },
       "heroTitle": "highly engaging main headline",
-      "heroSubtitle": "sub-headline urging action",
+      "heroSubtitle": "sub-headline of at least 35-50 words",
       "storyTitle": "engaging subtitle for our story section",
-      "storyContent": "expanded story paragraph"
+      "storyContent": "richly expanded story narrative of at least 150-200 words",
+      "features": [
+        { "title": "feature title", "description": "feature description paragraph of at least 35-50 words" }
+      ],
+      "faqs": [
+        { "question": "faq question", "answer": "faq answer of at least 35-50 words" }
+      ],
+      "testimonials": [
+        { "name": "client name", "role": "client role", "content": "review testimonial paragraph of at least 45-60 words" }
+      ]
     }
     `;
 
@@ -209,7 +236,10 @@ export async function generateWebsiteConfig(
       heroTitle: generatedConfig.heroTitle,
       heroSubtitle: generatedConfig.heroSubtitle,
       storyTitle: generatedConfig.storyTitle,
-      storyContent: generatedConfig.storyContent
+      storyContent: generatedConfig.storyContent,
+      features: generatedConfig.features,
+      faqs: generatedConfig.faqs,
+      testimonials: generatedConfig.testimonials
     };
 
   } catch (error: any) {

@@ -393,7 +393,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
         ${site.heroTitle || site.businessName}
       </h1>
       <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
-        ${site.heroSubtitle || "Your premier partner for professional services and solutions, tailored perfectly to fit your needs."}
+        ${site.heroSubtitle || "Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time."}
       </p>
       <div class="flex flex-col sm:flex-row gap-4">
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-md ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
@@ -426,7 +426,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
         </h2>
         <div class="w-16 h-1 bg-${theme.primary}-500 mb-8 rounded-full"></div>
         <p class="text-lg text-slate-600 leading-relaxed mb-8">
-          ${site.storyContent || site.aboutText || "We are dedicated to delivering unmatched service and quality. Over the years, we have built a reputation based on trust, excellence, and complete commitment to our clients' success."}
+          ${site.storyContent || site.aboutText || "Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded. Thank you for trusting us to be your partner; we look forward to serving you with integrity and excellence for years to come."}
         </p>
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors">
           Learn More About Us
@@ -444,9 +444,9 @@ function renderPremiumWebsite(site: SiteConfig): string {
     </div>
     <div class="grid md:grid-cols-3 gap-8">
       ${(site.features || [
-        { title: 'Premium Quality', description: 'We source the best materials and use proven techniques to deliver top-notch results.' },
-        { title: 'Experienced Team', description: 'Our professionals bring years of expertise and dedication to every client request.' },
-        { title: 'Client Centric', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision.' }
+        { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
+        { title: 'Experienced Specialists', description: 'Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience, specialized skills, and a committed, problem-solving focus to every single project we undertake.' },
+        { title: 'Client Centric Partnership', description: 'Your goals are our priorities. We take the time to understand your exact requirements, provide transparent progress updates, and offer tailored, flexible solutions designed to guarantee your complete satisfaction.' }
       ]).map((feat: any) => `
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-left">
           <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center font-bold text-xl mb-6">✓</div>
@@ -478,7 +478,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
               ${formatPrice(item.price)}
             </span>
           </div>
-          <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${item.description || "Inquire to learn details about this professional service offering."}</p>
+          <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${item.description || "We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals."}</p>
           <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-2xl shadow-sm ${theme.accentBg} transition-all duration-200">
             Order via WhatsApp
           </a>
@@ -498,9 +498,9 @@ function renderPremiumWebsite(site: SiteConfig): string {
       </div>
       <div class="grid md:grid-cols-3 gap-8">
         ${(site.testimonials || [
-          { name: 'Aarav Mehta', role: 'Regular Client', content: 'Absolutely incredible service. They were highly professional and exceeded all my expectations!' },
-          { name: 'Priya Sharma', role: 'Local Customer', content: 'Highly recommended! Reliable, affordable, and top-tier quality every single time.' },
-          { name: 'Rohan Gupta', role: 'Business Owner', content: 'Superb attention to detail and outstanding customer service. I will definitely work with them again.' }
+          { name: 'Aarav Mehta', role: 'Regular Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined. I highly recommend them to anyone seeking top-tier service!' },
+          { name: 'Priya Sharma', role: 'Local Customer', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. It is rare to find a business that cares this much about its clients.' },
+          { name: 'Rohan Gupta', role: 'Business Owner', content: 'They exceeded my expectations in every possible way. The project was completed on time, within budget, and the attention to details was absolutely spectacular. Their team is knowledgeable, responsive, and incredibly dedicated to customer success. Five stars!' }
         ]).map((t: any) => `
           <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 flex flex-col justify-between text-left">
             <p class="text-sm text-slate-600 italic leading-relaxed mb-6">"${t.content}"</p>
@@ -523,9 +523,9 @@ function renderPremiumWebsite(site: SiteConfig): string {
     </div>
     <div class="space-y-6">
       ${(site.faqs || [
-        { question: 'What are your operating hours?', answer: 'We are open Monday through Saturday from 10:00 AM to 8:00 PM.' },
-        { question: 'How do I book a service?', answer: 'You can click any of the "Order via WhatsApp" buttons to message us directly and schedule your booking.' },
-        { question: 'Where are you located?', answer: 'We are located in local area, India. Feel free to contact us via WhatsApp to request directions or address details.' }
+        { question: 'What are your operating hours?', answer: 'We are fully operational Monday through Saturday from 10:00 AM to 8:00 PM. Our team is available to assist you during these hours, and you can always send us a message via WhatsApp to schedule an appointment outside these times if needed.' },
+        { question: 'How do I book a service or order?', answer: 'Booking is incredibly easy and direct. Simply scroll to our services section, select the offering you are interested in, and click the "Order via WhatsApp" button. This will open a chat with us containing the service details so we can finalize your booking instantly.' },
+        { question: 'Where are you located and do you offer delivery?', answer: 'We are based in local area, India, serving clients across the region. If you need precise directions, maps, or want to check if we service your specific area, feel free to send us a message on WhatsApp and we will share our location details.' }
       ]).map((faq: any) => `
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-left">
           <h3 class="font-bold text-lg text-slate-950 mb-2 flex items-start gap-3">
