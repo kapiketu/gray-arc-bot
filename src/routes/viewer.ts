@@ -379,7 +379,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
 <body class="bg-gradient-to-br ${theme.bgGradient} min-h-screen text-slate-800 antialiased selection:bg-${theme.primary}-100 selection:text-${theme.primary}-900">
 
   <!-- Navigation -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100/80 transition-all duration-300">
+  <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-slate-100/80 transition-all duration-300">
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
       <a href="#" class="text-2xl font-bold tracking-tight text-slate-900 theme-font-title">${site.businessName}</a>
       
@@ -399,8 +399,8 @@ function renderPremiumWebsite(site: SiteConfig): string {
       </button>
     </div>
 
-    <!-- Mobile Navigation Dropdown Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md transition-all duration-300">
+    <!-- Mobile Navigation Dropdown Menu (Positioned absolutely to overlay content instead of pushing it down) -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 border-b border-slate-100 bg-white/95 backdrop-blur-md shadow-xl transition-all duration-300">
       <div class="px-6 py-4 flex flex-col space-y-4">
         <a href="#about" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
         <a href="#features" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Why Choose Us</a>
