@@ -4,6 +4,176 @@ exports.default = viewerRoutes;
 const db_1 = require("../services/db");
 async function viewerRoutes(fastify) {
     // 1. Render the generated business websites
+    // ────────────────────────────────────────────────────────
+    // SECRET PREVIEW TEMPLATES
+    // ────────────────────────────────────────────────────────
+    fastify.get('/preview/dark', async (request, reply) => {
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Iron Edge Gym</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #09090b; color: white; }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.06); }
+    .text-glow { text-shadow: 0 0 20px rgba(239,68,68,0.5); }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 w-full z-50 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl p-4 flex justify-between items-center">
+    <div class="font-black text-xl tracking-tighter">IRON<span class="text-red-500">EDGE</span></div>
+    <div class="bg-white text-black px-4 py-2 rounded-full font-bold text-sm">Join Now</div>
+  </nav>
+  <section class="relative min-h-screen flex items-center justify-center pt-20 px-6">
+    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-40">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#09090b] to-transparent"></div>
+    <div class="relative z-10 text-center max-w-3xl">
+      <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter mb-4 uppercase">Forge Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 text-glow">Legacy</span></h1>
+      <p class="text-zinc-400 text-lg mb-8">Premium equipment, elite trainers, and a community built on sheer willpower.</p>
+      <div class="flex gap-4 justify-center">
+        <div class="bg-red-500 text-white font-bold py-4 px-8 rounded-full uppercase tracking-wider">Start Trial</div>
+      </div>
+    </div>
+  </section>
+  <section class="py-20 px-6 bg-[#09090b]">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+      <div class="glass rounded-2xl overflow-hidden group">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80&auto=format&fit=crop" class="h-48 w-full object-cover group-hover:scale-110 transition duration-500">
+        <div class="p-6">
+          <h3 class="font-bold text-xl mb-2">Personal Training</h3>
+          <p class="text-zinc-400 text-sm">1-on-1 coaching with elite athletes.</p>
+        </div>
+      </div>
+      <div class="glass rounded-2xl overflow-hidden group">
+        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80&auto=format&fit=crop" class="h-48 w-full object-cover group-hover:scale-110 transition duration-500">
+        <div class="p-6">
+          <h3 class="font-bold text-xl mb-2">Pro Equipment</h3>
+          <p class="text-zinc-400 text-sm">Top tier rogue fitness racks and weights.</p>
+        </div>
+      </div>
+      <div class="glass rounded-2xl overflow-hidden group">
+        <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&q=80&auto=format&fit=crop" class="h-48 w-full object-cover group-hover:scale-110 transition duration-500">
+        <div class="p-6">
+          <h3 class="font-bold text-xl mb-2">Recovery Zone</h3>
+          <p class="text-zinc-400 text-sm">Saunas and ice baths for optimal recovery.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>`;
+        return reply.type('text/html').send(html);
+    });
+    fastify.get('/preview/elegant', async (request, reply) => {
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Aura Beauty Spa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #292524; }
+    h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-stone-200 p-5 flex justify-between items-center text-stone-800">
+    <div class="serif text-2xl tracking-widest uppercase">Aura</div>
+    <div class="border border-stone-800 px-5 py-2 text-sm tracking-widest uppercase hover:bg-stone-800 hover:text-white transition">Book Now</div>
+  </nav>
+  <section class="min-h-[85vh] flex items-center justify-center pt-20 px-6 relative">
+    <div class="absolute inset-0 bg-[#f5ebe6]"></div>
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center relative z-10">
+      <div>
+        <div class="text-xs tracking-[0.3em] uppercase text-stone-500 mb-6">Wellness & Beauty</div>
+        <h1 class="text-5xl md:text-7xl mb-6 leading-tight text-stone-800">Discover your<br><i class="text-stone-500">inner radiance.</i></h1>
+        <p class="text-stone-600 text-lg mb-10 leading-relaxed font-light">Experience luxury treatments designed to rejuvenate your mind, body, and spirit in our tranquil sanctuary.</p>
+        <div class="bg-stone-800 text-white px-8 py-4 uppercase tracking-widest text-sm inline-block hover:bg-stone-700 transition">View Treatments</div>
+      </div>
+      <div class="relative">
+        <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" class="w-full rounded-t-full shadow-2xl">
+      </div>
+    </div>
+  </section>
+  <section class="py-24 px-6 bg-white">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl text-stone-800 mb-4">Our Signature Services</h2>
+      <div class="w-12 h-px bg-stone-300 mx-auto"></div>
+    </div>
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+      <div class="text-center group">
+        <div class="overflow-hidden mb-6"><img src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&q=80&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-105 transition duration-700"></div>
+        <h3 class="text-xl mb-2">Deep Tissue Massage</h3>
+        <p class="text-stone-500 font-light text-sm">Release tension and restore balance.</p>
+      </div>
+      <div class="text-center group">
+        <div class="overflow-hidden mb-6"><img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-105 transition duration-700"></div>
+        <h3 class="text-xl mb-2">Rejuvenating Facial</h3>
+        <p class="text-stone-500 font-light text-sm">Glow with our organic skincare line.</p>
+      </div>
+      <div class="text-center group">
+        <div class="overflow-hidden mb-6"><img src="https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&q=80&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-105 transition duration-700"></div>
+        <h3 class="text-xl mb-2">Aromatherapy Spa</h3>
+        <p class="text-stone-500 font-light text-sm">Sooth your senses with essential oils.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>`;
+        return reply.type('text/html').send(html);
+    });
+    fastify.get('/preview/corporate', async (request, reply) => {
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sterling & Co. Legal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Roboto', sans-serif; background-color: #f8fafc; color: #0f172a; } </style>
+</head>
+<body>
+  <nav class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 bg-blue-700 text-white font-bold flex items-center justify-center">S</div>
+      <div class="font-bold text-xl text-slate-800 tracking-tight">Sterling & Co.</div>
+    </div>
+    <div class="bg-blue-700 text-white px-5 py-2 text-sm font-medium hover:bg-blue-800 transition">Free Consultation</div>
+  </nav>
+  <section class="bg-slate-900 text-white py-24 px-8 relative overflow-hidden">
+    <div class="absolute right-0 top-0 w-1/2 h-full opacity-20">
+      <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=1600&q=80&auto=format&fit=crop" class="w-full h-full object-cover">
+    </div>
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="w-16 h-1 bg-blue-500 mb-8"></div>
+      <h1 class="text-5xl md:text-6xl font-bold mb-6 max-w-2xl leading-tight">Expert Legal Counsel You Can Trust.</h1>
+      <p class="text-slate-400 text-lg mb-10 max-w-xl">Over 20 years of experience protecting the rights and assets of businesses and individuals with uncompromising integrity.</p>
+      <div class="bg-blue-600 text-white px-6 py-3 font-medium inline-block hover:bg-blue-500 transition shadow-lg">Our Practice Areas</div>
+    </div>
+  </section>
+  <section class="py-20 px-8 max-w-6xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white p-8 border border-slate-200 shadow-sm hover:shadow-xl transition border-t-4 border-t-blue-600">
+        <h3 class="text-xl font-bold mb-3">Corporate Law</h3>
+        <p class="text-slate-500 text-sm mb-6 leading-relaxed">Comprehensive legal strategies for businesses, from incorporation to mergers and acquisitions.</p>
+        <div class="text-blue-600 font-bold text-sm uppercase">Learn More →</div>
+      </div>
+      <div class="bg-white p-8 border border-slate-200 shadow-sm hover:shadow-xl transition border-t-4 border-t-blue-600">
+        <h3 class="text-xl font-bold mb-3">Real Estate</h3>
+        <p class="text-slate-500 text-sm mb-6 leading-relaxed">Expert guidance on commercial and residential property transactions, zoning, and disputes.</p>
+        <div class="text-blue-600 font-bold text-sm uppercase">Learn More →</div>
+      </div>
+      <div class="bg-white p-8 border border-slate-200 shadow-sm hover:shadow-xl transition border-t-4 border-t-blue-600">
+        <h3 class="text-xl font-bold mb-3">Asset Protection</h3>
+        <p class="text-slate-500 text-sm mb-6 leading-relaxed">Safeguarding your wealth through strategic estate planning, trusts, and risk mitigation.</p>
+        <div class="text-blue-600 font-bold text-sm uppercase">Learn More →</div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>`;
+        return reply.type('text/html').send(html);
+    });
     fastify.get('/site/:siteId', async (request, reply) => {
         const { siteId } = request.params;
         const site = await db_1.db.getSite(siteId);
