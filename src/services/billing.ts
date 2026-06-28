@@ -7,7 +7,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 // In production, this would be your public URL
-const BASE_URL = `http://localhost:${PORT}`; 
+const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`; 
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
