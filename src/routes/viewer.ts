@@ -852,7 +852,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
 
       <!-- Image -->
       <div class="flex flex-1 lg:w-1/2 lg:h-auto relative lg:max-w-none lg:mx-0 mx-auto max-w-3xl w-full">
-        <img src="/images/image1.webp" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
+        <img src="/public/images/image1.webp" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
       </div>
     </div>
   </section>
@@ -891,19 +891,19 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       </div>
       <div class="flex justify-center flex-wrap gap-4">
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+          <img src="/public/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+          <img src="/public/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+          <img src="/public/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+          <img src="/public/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
+          <img src="/public/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
       </div>
     </div>
@@ -956,7 +956,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
           <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
           <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
           <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-          <img src="/images/dev-with-c-1.webp" alt="About story banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
+          <img src="/public/images/dev-with-c-1.webp" alt="About story banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
         </div>
       </div>
 
@@ -1003,7 +1003,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
         <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">We provide Important Features for Digital Marketing</h2>
         <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
-        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, font-medium text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
+        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
         
         <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-3))] w-full">
           <li class="flex items-center gap-3">
@@ -1026,7 +1026,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
         <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
         <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-        <img src="/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
+        <img src="/public/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
       </div>
     </div>
   </section>
