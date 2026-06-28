@@ -16,7 +16,8 @@ async function viewerRoutes(fastify) {
         if (trialExpired || subscriptionInactive) {
             return reply.type('text/html').send(renderSubscriptionPendingPage(site));
         }
-        return reply.type('text/html').send(renderPremiumWebsite(site));
+        const previewTheme = request.query.theme;
+        return reply.type('text/html').send(renderPremiumWebsite(site, previewTheme));
     });
     // 2. Mock Razorpay Domain Payment Page
     fastify.get('/pay/domain', async (request, reply) => {
@@ -51,7 +52,7 @@ async function viewerRoutes(fastify) {
       <meta charset="UTF-8">
       <title>Payment Successful</title>
       <script src="https://cdn.tailwindcss.com"></script>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       <style>body{font-family:'Inter',sans-serif}</style></head>
       <body class="bg-zinc-950 flex items-center justify-center min-h-screen">
         <div class="text-center p-10 bg-zinc-900 border border-zinc-800 rounded-3xl max-w-md">
@@ -67,32 +68,72 @@ async function viewerRoutes(fastify) {
 // ────────────────────────────────────────────────────────
 // PREMIUM WEBSITE TEMPLATE
 // ────────────────────────────────────────────────────────
-function renderPremiumWebsite(site) {
+function renderPremiumWebsite(site, previewTheme) {
     // Clean up category - extract only first meaningful word/phrase
     const cleanCategory = site.category.split('\n')[0].replace(/^category:\s*/i, '').trim().split(' ').slice(0, 3).join(' ');
     // Determine color palette based on category
     const palette = getSmartPalette(cleanCategory, site.theme);
     // Get category-specific dynamic images using Pollinations AI
     const images = getCategoryImages(site);
-    const bgColor = site.theme?.bgColor || '#09090b';
-    // Calculate luminance to determine light or dark theme structural elements
-    const isLight = (() => {
-        try {
-            const hex = bgColor.replace('#', '');
-            const r = parseInt(hex.substr(0, 2), 16);
-            const g = parseInt(hex.substr(2, 2), 16);
-            const b = parseInt(hex.substr(4, 2), 16);
-            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            return luma > 128;
+    // --- 5 PREMIUM THEMES DICTIONARY ---
+    const themes = {
+        'midnight_neon': {
+            bgColor: '#09090b',
+            textColor: 'white',
+            glassBgBase: 'white',
+            textMuted: 'zinc-400',
+            textMutedHover: 'white',
+            fontFamily: 'Inter',
+            gradientClass: 'from-blue-400 to-fuchsia-500'
+        },
+        'luxury_spa': {
+            bgColor: '#fff1f2',
+            textColor: 'zinc-900',
+            glassBgBase: 'black',
+            textMuted: 'zinc-600',
+            textMutedHover: 'zinc-900',
+            fontFamily: 'Playfair Display',
+            gradientClass: 'from-rose-500 to-orange-400'
+        },
+        'warm_amber': {
+            bgColor: '#271c19',
+            textColor: 'white',
+            glassBgBase: 'white',
+            textMuted: 'zinc-400',
+            textMutedHover: 'white',
+            fontFamily: 'Outfit',
+            gradientClass: 'from-amber-400 to-orange-500'
+        },
+        'ocean_breeze': {
+            bgColor: '#f0fdfa',
+            textColor: 'zinc-900',
+            glassBgBase: 'black',
+            textMuted: 'zinc-600',
+            textMutedHover: 'zinc-900',
+            fontFamily: 'Inter',
+            gradientClass: 'from-cyan-500 to-blue-500'
+        },
+        'corporate_clean': {
+            bgColor: '#ffffff',
+            textColor: 'zinc-900',
+            glassBgBase: 'black',
+            textMuted: 'zinc-600',
+            textMutedHover: 'zinc-900',
+            fontFamily: 'Oswald',
+            gradientClass: 'from-blue-700 to-slate-800'
         }
-        catch {
-            return false;
-        }
-    })();
-    const glassBgBase = isLight ? 'black' : 'white';
-    const textColor = isLight ? 'zinc-900' : 'white';
-    const textMuted = isLight ? 'zinc-600' : 'zinc-400';
-    const textMutedHover = isLight ? 'zinc-900' : 'white';
+    };
+    // Determine which theme to use (fallback to original site logic if none selected)
+    // If previewTheme is provided in the URL, force it. Otherwise try to use the one from the AI.
+    let activeThemeKey = previewTheme || site.theme?.themeName || 'midnight_neon';
+    if (!themes[activeThemeKey])
+        activeThemeKey = 'midnight_neon';
+    const activeTheme = themes[activeThemeKey];
+    const bgColor = activeTheme.bgColor;
+    const textColor = activeTheme.textColor;
+    const glassBgBase = activeTheme.glassBgBase;
+    const textMuted = activeTheme.textMuted;
+    const textMutedHover = activeTheme.textMutedHover;
     // Generate product cards with images
     const productsHtml = site.services.map((item, i) => `
  <div class="group relative bg-${glassBgBase}/[0.03] backdrop-blur-sm border border-${glassBgBase}/[0.08] rounded-2xl overflow-hidden hover:border-${glassBgBase}/[0.15] hover:bg-${glassBgBase}/[0.06] transition-all duration-500 hover:-translate-y-1" style="animation: fadeUp 0.6s ease-out ${0.1 * i}s both">
@@ -102,7 +143,7 @@ function renderPremiumWebsite(site) {
  <div class="p-7">
  <div class="flex items-start justify-between mb-3">
  <h3 class="text-lg font-semibold" >${item.name}</h3>
- <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${palette.textGradientClass} shrink-0 ml-3">${item.price}</span>
+ <span class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${activeTheme.gradientClass} shrink-0 ml-3">${item.price}</span>
  </div>
  <p class="text-${textColor}/70 text-sm leading-relaxed mb-5">${item.description}</p>
  <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" 
@@ -126,7 +167,7 @@ function renderPremiumWebsite(site) {
  <script src="https://cdn.tailwindcss.com"></script>
  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
  <style>
- * { font-family: 'Inter', system-ui, sans-serif; }
+ * { font-family: '${activeTheme.fontFamily}', system-ui, sans-serif; }
  
  @keyframes fadeUp {
  from { opacity: 0; transform: translateY(30px); }
@@ -311,7 +352,7 @@ function renderPremiumWebsite(site) {
  <div class="max-w-6xl mx-auto px-6">
  <div class="grid md:grid-cols-2 gap-16 items-center">
  <div class="scroll-reveal">
- <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${palette.textGradientClass} mb-4">Our Story</span>
+ <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${activeTheme.gradientClass} mb-4">Our Story</span>
  <h2 class="text-3xl md:text-5xl font-black text-${textColor} leading-tight tracking-tight">${site.storyTitle}</h2>
  <p class="text-${textColor}/70 text-base md:text-lg leading-relaxed mt-6">${site.storyContent}</p>
  <div class="flex gap-4 mt-8">
@@ -335,7 +376,7 @@ function renderPremiumWebsite(site) {
  <section id="services" class="py-24 md:py-32 relative">
  <div class="max-w-6xl mx-auto px-6">
  <div class="text-center mb-16 scroll-reveal">
- <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${palette.textGradientClass} mb-4">What We Offer</span>
+ <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${activeTheme.gradientClass} mb-4">What We Offer</span>
  <h2 class="text-3xl md:text-5xl font-black text-${textColor} tracking-tight">Our Services & Products</h2>
  <p class="text-zinc-500 text-base mt-4 max-w-lg mx-auto">Handcrafted with passion, delivered with excellence.</p>
  </div>
@@ -350,7 +391,7 @@ function renderPremiumWebsite(site) {
  <div class="max-w-6xl mx-auto px-6">
  <div class="grid md:grid-cols-2 gap-16">
  <div class="scroll-reveal">
- <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${palette.textGradientClass} mb-4">Contact</span>
+ <span class="inline-block text-xs font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r ${activeTheme.gradientClass} mb-4">Contact</span>
  <h2 class="text-3xl md:text-4xl font-black text-${textColor} tracking-tight">Let's Connect</h2>
  <p class="text-${textColor}/70 mt-4 leading-relaxed">We'd love to hear from you. Reach out via WhatsApp for the fastest response.</p>
  
