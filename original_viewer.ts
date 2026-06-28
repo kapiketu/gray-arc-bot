@@ -86,7 +86,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
   const palette = getSmartPalette(cleanCategory, site.theme);
   
   // Get category-specific stock images
-  const images = getCategoryImages(site);
+  const images = getCategoryImages(cleanCategory);
   
   // Generate product cards with images
   const productsHtml = site.services.map((item, i) => `
@@ -209,7 +209,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
   <nav class="fixed top-0 w-full z-50 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="#" class="flex items-center gap-3">
-        <img src="${images.logo}" alt="Logo" class="w-10 h-10 rounded-lg object-cover bg-zinc-900 border border-white/10" loading="lazy">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br ${palette.iconGradient} flex items-center justify-center text-white font-bold text-sm">${site.businessName.charAt(0)}</div>
         <span class="font-bold text-white text-lg tracking-tight">${site.businessName}</span>
       </a>
       <div class="hidden md:flex items-center gap-8 text-sm text-zinc-400">
@@ -519,27 +519,109 @@ function getSmartPalette(category: string, theme: any): Palette {
 
 interface CategoryImages {
   hero: string;
-  logo: string;
   about: string;
   products: string[];
 }
 
-
-function getCategoryImages(site: SiteConfig): CategoryImages {
-  const encName = encodeURIComponent(site.businessName);
-  const cleanCategory = site.category.split('\n')[0].replace(/^category:\s*/i, '').trim().split(' ').slice(0, 3).join(' ');
-  const encCat = encodeURIComponent(cleanCategory);
+function getCategoryImages(category: string): CategoryImages {
+  const cat = category.toLowerCase();
   
+  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1556217477-d325251ece38?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  if (cat.includes('restaurant') || cat.includes('food') || cat.includes('cafe') || cat.includes('coffee') || cat.includes('kitchen')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1551076805-e1869033e561?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  if (cat.includes('tech') || cat.includes('software') || cat.includes('it') || cat.includes('digital') || cat.includes('web')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80&auto=format&fit=crop',
+      about: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80&auto=format&fit=crop',
+      products: [
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80&auto=format&fit=crop',
+      ],
+    };
+  }
+  
+  // Default: Professional business imagery
   return {
-    logo: `https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encName}?width=200&height=200&nologo=true`,
-    hero: `https://image.pollinations.ai/prompt/professional%20high%20quality%20photography%20of%20${encCat}%20business%20hero%20image?width=1600&height=900&nologo=true`,
-    about: `https://image.pollinations.ai/prompt/professional%20photography%20of%20${encCat}%20storefront%20or%20office%20interior?width=800&height=800&nologo=true`,
-    products: site.services.map((s) => 
-      `https://image.pollinations.ai/prompt/professional%20product%20photography%20of%20${encodeURIComponent(s.name)}%20for%20${encCat}?width=600&height=600&nologo=true`
-    )
+    hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80&auto=format&fit=crop',
+    about: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80&auto=format&fit=crop',
+    products: [
+      'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80&auto=format&fit=crop',
+    ],
   };
 }
 
+// ────────────────────────────────────────────────────────
+// HELPER PAGES
+// ────────────────────────────────────────────────────────
 
 function render404Page(): string {
   return `<!DOCTYPE html><html><head><title>Not Found</title>

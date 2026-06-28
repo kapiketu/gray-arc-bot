@@ -132,7 +132,7 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
     - Contact Details / Address (raw input): ${contactRaw}
     
     INSTRUCTIONS:
-    1. Select the absolute perfect theme for this business from this exact list: 'midnight_neon', 'luxury_spa', 'warm_amber', 'ocean_breeze', 'corporate_clean'.
+    1. Select an appropriate, professional, and modern theme palette based on the business type (must contain hexadecimal colors for primary, secondary, background, and text colors, and a clean Google font name like 'Inter', 'Outfit', 'Playfair Display', or 'Oswald').
     2. Write an attractive, punchy Hero Title and Subtitle.
     3. Generate a compelling "Our Story" paragraph expanding on the user's description.
     4. Parse the raw services input into a clean JSON array of products (with a name, price in Rupees e.g. "₹499" or "₹1,200", and a short description).
@@ -141,7 +141,11 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
     Output the result EXACTLY matching this JSON structure:
     {
       "theme": {
-        "themeName": "selected theme string"
+        "primaryColor": "hex string",
+        "secondaryColor": "hex string",
+        "fontFamily": "font string",
+        "bgColor": "hex string",
+        "textColor": "hex string"
       },
       "services": [
         { "name": "service name", "price": "price with currency", "description": "short description" }
