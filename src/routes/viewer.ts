@@ -254,227 +254,230 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
 // ────────────────────────────────────────────────────────
 
 
-function renderPremiumWebsite(site: SiteConfig): string {
-    const images = getCategoryImages(site.category);
-    return `
-<!DOCTYPE html><html><head lang="en">
-    <meta charset="UTF-8">
-
-    <!--Page Title-->
-    <title>${site.businessName} - Premium Website</title>
-
-    <!--Meta Keywords and Description-->
-    <meta name="keywords" content="">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-    <!--Favicon-->
-    <link rel="shortcut icon" href="https://onepagelove.com/favicon.ico" title="Favicon">
-
-    <!-- Main CSS Files -->
-    <link rel="stylesheet" href="/public/css/style.css">
-
-    <!-- Namari Color CSS -->
-    <link rel="stylesheet" href="/public/css/namari-color.css">
-
-    <!--Icon Fonts - Font Awesome Icons-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
-
-    <!-- Animate CSS-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" type="text/css">
-
-    <!--Google Webfonts-->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css">
-</head>
-<body>
-
-<!-- Preloader -->
-<div id="preloader">
-    <div id="status" class="la-ball-triangle-path">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-</div>
-<!--End of Preloader-->
-
-<div class="page-border" data-wow-duration="0.7s" data-wow-delay="0.2s">
-    <div class="top-border wow fadeInDown animated" style="visibility: visible; animation-name: fadeInDown;"></div>
-    <div class="right-border wow fadeInRight animated" style="visibility: visible; animation-name: fadeInRight;"></div>
-    <div class="bottom-border wow fadeInUp animated" style="visibility: visible; animation-name: fadeInUp;"></div>
-    <div class="left-border wow fadeInLeft animated" style="visibility: visible; animation-name: fadeInLeft;"></div>
-</div>
-
-<div id="wrapper">
-
-    <header id="banner" class="scrollto clearfix" data-enllax-ratio=".5" style="background: url('${images.hero}') no-repeat center top; background-size: cover;">
-        <div id="header" class="nav-collapse">
-            <div class="row clearfix">
-                <div class="col-1">
-
-                    <!--Logo-->
-                    <div id="logo">
-
-                        <!--Logo that is shown on the banner-->
-                        <h1 style="color:white; font-size: 24px; font-weight: bold; margin: 0;">${site.businessName}</h1>
-                        <!--End of Banner Logo-->
-
-                        <!--The Logo that is shown on the sticky Navigation Bar-->
-                        <h1 style="color:#333; font-size: 24px; font-weight: bold; margin: 0;">${site.businessName}</h1>
-                        <!--End of Navigation Logo-->
-
-                    </div>
-                    <!--End of Logo-->
-
-                    <aside>
-
-                        <!--Social Icons in Header-->
-                        
-                        <!--End of Social Icons in Header-->
-
-                    </aside>
-
-                    <!--Main Navigation-->
-                    <nav id="nav-main">
-                        <ul>
-                            <li>
-                                <a href="#banner">Home</a>
-                            </li>
-                            <li>
-                                <a href="#about">About</a>
-                            </li>
-                            <li>
-                                <a href="#services">Services</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <!--End of Main Navigation-->
-
-                    <div id="nav-trigger"><span></span></div>
-                    <nav id="nav-mobile"></nav>
-
-                </div>
-            </div>
-        </div><!--End of Header-->
-
-        <!--Banner Content-->
-        <div id="banner-content" class="row clearfix">
-
-            <div class="col-38">
-
-                <div class="section-heading">${site.heroTitle || site.businessName}</div>
-
-                <!--Call to Action-->
-                <a href="https://wa.me/${site.phoneNumber}" class="button">Contact Us on WhatsApp</a>
-                <!--End Call to Action-->
-
-            </div>
-
-        </div><!--End of Row-->
-    </header>
-
-    <!--Main Content Area-->
-    <main id="content">
-
-        <!--Introduction-->
-        <section id="about" class="introduction scrollto">
-
-            <div class="row clearfix">
-
-                <div class="col-3">
-                    <img src="${images.about}" alt="About Image" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%;">
-                </div>
-
-                <div class="col-2-3">
-    <h2 class="section-heading" data-wow-delay="0.1s">${site.storyTitle || "Our Story"}</h2>
-    <p>${site.storyContent || site.aboutText}</p>
-    <a href="https://wa.me/${site.phoneNumber}" class="button" data-wow-delay="0.2s">Get in touch</a>
-</div>
-
-            </div>
-
-
-        </section>
-<section id="services" class="scrollto clearfix">
-    <div class="row clearfix">
-        <div class="col-3">
-            <div class="section-heading">
-                <h3>SERVICES</h3>
-                <h2 class="section-title">What We Offer</h2>
-            </div>
-        </div>
-        <div class="col-2-3">
-            ${site.services.map((item, i) => `
-            <div class="col-2 icon-block icon-top wow fadeInUp" data-wow-delay="${0.1 * i}s">
-                <div class="icon-block-description">
-                    <img src="${images.products[i % images.products.length]}" style="width: 100%; border-radius: 4px; margin-bottom: 15px;">
-                    <h4>${item.name}</h4>
-                    <p style="color: #3b82f6; font-weight: bold; margin-top: 5px;">${item.price}</p>
-                    <p>${item.description}</p>
-                    <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="button" style="margin-top: 15px; padding: 8px 15px;">Order Now</a>
-                </div>
-            </div>
-            `).join('')}
-        </div>
-    </div>
-</section>
-
-        <!--End of Introduction-->
-
-
-        <!--Gallery-->
-        
-        <!--End of Gallery-->
-
-
-
-
-        <!--Testimonials-->
-        
-        <!--End of Testimonials-->
-
-        <!--Clients-->
-        
-        <!--End of Clients-->
-
-        <!--Pricing Tables-->
-        
-        <!--End of Pricing Tables-->
-
-    </main>
-    <!--End Main Content Area-->
-
-
-    <!--Footer-->
-    <footer id="landing-footer" class="clearfix">
-    <div class="row clearfix text-center">
-        <h2 style="color: white; margin-bottom: 20px;">Get In Touch</h2>
-        <p style="color: #ccc; margin-bottom: 30px;">Ready to start? Send us a message directly on WhatsApp.</p>
-        <a href="https://wa.me/${site.phoneNumber}" class="button">Chat with us</a>
-        <p style="margin-top: 50px; font-size: 12px; color: #666;">Powered by The Gray Arc</p>
-    </div>
-</footer>
-    <!--End of Footer-->
-
-</div>
-
-<!-- Include JavaScript resources -->
-<script src="/public/js/jquery.1.8.3.min.js"></script>
-<script src="/public/js/wow.min.js"></script>
-<script src="/public/js/featherlight.min.js"></script>
-<script src="/public/js/featherlight.gallery.min.js"></script>
-<script src="/public/js/jquery.enllax.min.js"></script>
-<script src="/public/js/jquery.scrollUp.min.js"></script>
-<script src="/public/js/jquery.easing.min.js"></script>
-<script src="/public/js/jquery.stickyNavbar.min.js"></script>
-<script src="/public/js/jquery.waypoints.min.js"></script>
-<script src="/public/js/images-loaded.min.js"></script>
-<script src="/public/js/lightbox.min.js"></script>
-<script src="/public/js/site.js"></script>
-</body></html>
-    `;
+interface ThemeConfig {
+  primary: string;
+  primaryHex: string;
+  bgGradient: string;
+  accentText: string;
+  accentBg: string;
+  accentBorder: string;
+  accentGlow: string;
+  fontTitle: string;
+  fontFamilyTitle: string;
+  fontFamilyImport: string;
 }
 
+function getCategoryTheme(category: string): ThemeConfig {
+  const cat = category.toLowerCase();
+  
+  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('food') || cat.includes('restaurant') || cat.includes('cafe') || cat.includes('coffee') || cat.includes('kitchen')) {
+    return {
+      primary: 'amber',
+      primaryHex: '#b45309',
+      bgGradient: 'from-amber-50/30 via-stone-50 to-stone-100/30',
+      accentText: 'text-amber-700',
+      accentBg: 'bg-amber-700 hover:bg-amber-800 text-white',
+      accentBorder: 'border-amber-200',
+      accentGlow: 'shadow-amber-100',
+      fontTitle: 'font-serif italic font-bold',
+      fontFamilyTitle: "'Lora', serif",
+      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,600&display=swap'
+    };
+  }
+  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+    return {
+      primary: 'rose',
+      primaryHex: '#e11d48',
+      bgGradient: 'from-rose-50/40 via-stone-50 to-stone-100/50',
+      accentText: 'text-rose-600',
+      accentBg: 'bg-rose-600 hover:bg-rose-700 text-white',
+      accentBorder: 'border-rose-200',
+      accentGlow: 'shadow-rose-100',
+      fontTitle: 'font-serif',
+      fontFamilyTitle: "'Playfair Display', serif",
+      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap'
+    };
+  }
+  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+    return {
+      primary: 'orange',
+      primaryHex: '#ea580c',
+      bgGradient: 'from-zinc-50 via-orange-50/10 to-zinc-100/30',
+      accentText: 'text-orange-600',
+      accentBg: 'bg-orange-600 hover:bg-orange-700 text-white',
+      accentBorder: 'border-orange-200',
+      accentGlow: 'shadow-orange-100',
+      fontTitle: 'font-sans font-extrabold tracking-tighter uppercase italic',
+      fontFamilyTitle: "'Montserrat', sans-serif",
+      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,800&display=swap'
+    };
+  }
+  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical') || cat.includes('lawyer') || cat.includes('legal') || cat.includes('advocate')) {
+    return {
+      primary: 'blue',
+      primaryHex: '#1d4ed8',
+      bgGradient: 'from-slate-50 via-blue-50/20 to-slate-100/40',
+      accentText: 'text-blue-700',
+      accentBg: 'bg-blue-700 hover:bg-blue-800 text-white',
+      accentBorder: 'border-blue-200',
+      accentGlow: 'shadow-blue-100',
+      fontTitle: 'font-sans font-bold tracking-tight',
+      fontFamilyTitle: "'Outfit', sans-serif",
+      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap'
+    };
+  }
+  
+  return {
+    primary: 'indigo',
+    primaryHex: '#4f46e5',
+    bgGradient: 'from-indigo-50/20 via-slate-50 to-slate-100/30',
+    accentText: 'text-indigo-600',
+    accentBg: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    accentBorder: 'border-indigo-200',
+    accentGlow: 'shadow-indigo-100',
+    fontTitle: 'font-sans font-bold tracking-tight',
+    fontFamilyTitle: "'Inter', sans-serif",
+    fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap'
+  };
+}
+
+function renderPremiumWebsite(site: SiteConfig): string {
+  const images = getCategoryImages(site.category);
+  const theme = getCategoryTheme(site.category);
+  
+  const formatPrice = (price: string) => {
+    if (price.toLowerCase().includes('contact')) return 'Contact Us';
+    return price;
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${site.businessName}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="${theme.fontFamilyImport}" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, .theme-font-title { font-family: ${theme.fontFamilyTitle}; }
+  </style>
+</head>
+<body class="bg-gradient-to-br ${theme.bgGradient} min-h-screen text-slate-800 antialiased selection:bg-${theme.primary}-100 selection:text-${theme.primary}-900">
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="text-2xl font-bold tracking-tight text-slate-900 theme-font-title">${site.businessName}</a>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="#about" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
+        <a href="#services" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
+        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-full shadow-sm ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">Chat Now</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="max-w-6xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-32 grid md:grid-cols-12 gap-12 items-center">
+    <div class="md:col-span-7 flex flex-col justify-center text-left">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-${theme.primary}-50 text-${theme.primary}-700 border border-${theme.primary}-100 mb-6 w-fit">
+        <span class="w-1.5 h-1.5 rounded-full bg-${theme.primary}-500 animate-pulse"></span>
+        Welcome to ${site.businessName}
+      </span>
+      <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6 ${theme.fontTitle}">
+        ${site.heroTitle || site.businessName}
+      </h1>
+      <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
+        ${site.heroSubtitle || "Your premier partner for professional services and solutions, tailored perfectly to fit your needs."}
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-md ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+          Contact on WhatsApp
+        </a>
+        <a href="#services" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition-colors">
+          View Our Offers
+        </a>
+      </div>
+    </div>
+    <div class="md:col-span-5 relative">
+      <div class="absolute inset-0 bg-gradient-to-tr from-${theme.primary}-500 to-indigo-500 rounded-3xl rotate-3 scale-95 blur-2xl opacity-20 animate-pulse"></div>
+      <div class="relative bg-white p-4 rounded-3xl shadow-xl border border-slate-100">
+        <img src="${images.hero}" alt="${site.businessName} Hero Image" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-inner">
+      </div>
+    </div>
+  </header>
+
+  <!-- About Section -->
+  <section id="about" class="py-24 bg-white border-y border-slate-100">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-center">
+      <div class="md:col-span-5">
+        <div class="relative bg-slate-50 p-4 rounded-3xl border border-slate-100">
+          <img src="${images.about}" alt="About ${site.businessName}" class="w-full aspect-square object-cover rounded-2xl shadow-md">
+        </div>
+      </div>
+      <div class="md:col-span-7 text-left">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 theme-font-title">
+          ${site.storyTitle || "Our Story"}
+        </h2>
+        <div class="w-16 h-1 bg-${theme.primary}-500 mb-8 rounded-full"></div>
+        <p class="text-lg text-slate-600 leading-relaxed mb-8">
+          ${site.storyContent || site.aboutText || "We are dedicated to delivering unmatched service and quality. Over the years, we have built a reputation based on trust, excellence, and complete commitment to our clients' success."}
+        </p>
+        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors">
+          Learn More About Us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services / Products Section -->
+  <section id="services" class="py-24 max-w-6xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">What We Offer</h2>
+      <p class="text-slate-600">Select any of our services below to connect directly with us and order via WhatsApp.</p>
+      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
+    </div>
+    
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      ${site.services.map((item, i) => `
+      <div class="group flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1">
+        <div class="overflow-hidden aspect-video bg-slate-50 relative">
+          <img src="${images.products[i % images.products.length]}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="p-6 flex flex-col flex-grow text-left">
+          <div class="flex justify-between items-start mb-3 gap-2">
+            <h3 class="font-bold text-lg text-slate-900 group-hover:${theme.accentText} transition-colors">${item.name}</h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-${theme.primary}-50 text-${theme.primary}-700 shrink-0">
+              ${formatPrice(item.price)}
+            </span>
+          </div>
+          <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${item.description || "Inquire to learn details about this professional service offering."}</p>
+          <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-2xl shadow-sm ${theme.accentBg} transition-all duration-200">
+            Order via WhatsApp
+          </a>
+        </div>
+      </div>
+      `).join('')}
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white py-16 border-t border-slate-800">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 theme-font-title">${site.businessName}</h2>
+      <p class="text-slate-400 max-w-md mx-auto mb-8">Ready to get started? Send us a message on WhatsApp right now and let us know what you need.</p>
+      <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-lg ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-12">
+        Chat With Us Now
+      </a>
+      <div class="w-full h-px bg-slate-800 mb-8"></div>
+      <p class="text-xs text-slate-600">© 2026 ${site.businessName}. Powered by The Gray Arc.</p>
+    </div>
+  </footer>
+
+</body>
+</html>`;
+}
 
 interface CategoryImages {
   hero: string;
