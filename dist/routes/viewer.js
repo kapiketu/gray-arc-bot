@@ -369,7 +369,7 @@ function renderPremiumClassicTemplate(site) {
       </button>
     </div>
 
-    <!-- Mobile Navigation Dropdown Menu (Positioned absolutely to overlay content instead of pushing it down) -->
+    <!-- Mobile Navigation Dropdown Menu -->
     <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 border-b border-slate-100 bg-white/95 backdrop-blur-md shadow-xl transition-all duration-300">
       <div class="px-6 py-4 flex flex-col space-y-4">
         <a href="#about" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
@@ -412,7 +412,7 @@ function renderPremiumClassicTemplate(site) {
     </div>
   </header>
 
-  <!-- Moving Text Ticker Section (Left to Right, Styled as premium charcoal black strip) -->
+  <!-- Moving Text Ticker Section -->
   <div class="w-full bg-[#18181b] text-zinc-100 py-3.5 overflow-hidden shadow-inner border-y border-[#27272a] relative z-10">
     <div class="flex whitespace-nowrap min-w-full">
       <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
@@ -463,7 +463,7 @@ function renderPremiumClassicTemplate(site) {
     </div>
   </section>
 
-  <!-- Why Choose Us / Features Section -->
+  <!-- Why Choose Us -->
   <section id="features" class="py-24 max-w-6xl mx-auto px-6 border-b border-slate-100">
     <div class="text-center max-w-2xl mx-auto mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Why Choose Us</h2>
@@ -485,7 +485,7 @@ function renderPremiumClassicTemplate(site) {
     </div>
   </section>
 
-  <!-- Services / Products Section -->
+  <!-- Services -->
   <section id="services" class="py-24 max-w-6xl mx-auto px-6">
     <div class="text-center max-w-2xl mx-auto mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">What We Offer</h2>
@@ -520,7 +520,7 @@ function renderPremiumClassicTemplate(site) {
     </div>
   </section>
 
-  <!-- Testimonials Section -->
+  <!-- Testimonials -->
   <section id="testimonials" class="py-24 bg-white border-y border-slate-100">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-2xl mx-auto mb-16">
@@ -546,7 +546,7 @@ function renderPremiumClassicTemplate(site) {
     </div>
   </section>
 
-  <!-- FAQ Section -->
+  <!-- FAQ -->
   <section id="faq" class="py-24 max-w-4xl mx-auto px-6">
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Frequently Asked Questions</h2>
@@ -585,21 +585,16 @@ function renderPremiumClassicTemplate(site) {
 
   <!-- Floating Sticky Contact Buttons -->
   <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-    <!-- WhatsApp Sticky Button -->
     <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
        class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
       <i class="fab fa-whatsapp text-xl"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
     </a>
-    <!-- Call Sticky Button -->
     <a href="tel:${site.phoneNumber}" 
        class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
       <i class="fas fa-phone text-base"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
     </a>
   </div>
 
-  <!-- Mobile Menu Toggle JavaScript -->
   <script>
     const menuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -617,16 +612,6 @@ function renderPremiumClassicTemplate(site) {
           menuIcon.classList.remove('fa-xmark');
           menuIcon.classList.add('fa-bars');
         }
-      });
-      
-      // Close menu when clicking links
-      const links = mobileMenu.querySelectorAll('.mobile-nav-link');
-      links.forEach(link => {
-        link.addEventListener('click', () => {
-          mobileMenu.classList.add('hidden');
-          menuIcon.classList.remove('fa-xmark');
-          menuIcon.classList.add('fa-bars');
-        });
       });
     }
   </script>
@@ -756,8 +741,6 @@ function renderAstroAgencyTemplate(site) {
             <li><a href="#about-us" class="hover:text-[var(--color-primary)] transition-colors">About Us</a></li>
             <li><a href="#features" class="hover:text-[var(--color-primary)] transition-colors">Features</a></li>
             <li><a href="#services" class="hover:text-[var(--color-primary)] transition-colors">Services</a></li>
-            <li><a href="#testimonials" class="hover:text-[var(--color-primary)] transition-colors">Reviews</a></li>
-            <li><a href="#faq" class="hover:text-[var(--color-primary)] transition-colors">FAQ</a></li>
           </ul>
         </div>
 
@@ -784,8 +767,6 @@ function renderAstroAgencyTemplate(site) {
           <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
           <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
           <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
-          <a href="#testimonials" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Reviews</a>
-          <a href="#faq" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">FAQ</a>
           <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl bg-[var(--color-primary)] text-white">Get Started</a>
         </div>
       </nav>
@@ -819,7 +800,7 @@ function renderAstroAgencyTemplate(site) {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V19.5z" />
               </svg>
             </span>
-            <input type="text" placeholder="johndoe@gmail.com" readonly class="w-full py-3 outline-none bg-transparent text-sm cursor-pointer text-[rgb(var(--heading-2))] font-medium">
+            <input type="text" placeholder="Interested? Send a message..." readonly class="w-full py-3 outline-none bg-transparent text-sm cursor-pointer text-[rgb(var(--heading-2))] font-medium">
             <button class="min-w-max text-white bg-[var(--color-primary)] hover:opacity-90 px-6 py-3 rounded-full font-semibold transition-all">
               Get Started
             </button>
@@ -881,9 +862,6 @@ function renderAstroAgencyTemplate(site) {
         </div>
         <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
           <img src="/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
         </div>
       </div>
     </div>
@@ -983,7 +961,7 @@ function renderAstroAgencyTemplate(site) {
       <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
         <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">We provide Important Features for Digital Marketing</h2>
         <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
-        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
+        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, font-medium text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
         
         <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-3))] w-full">
           <li class="flex items-center gap-3">
@@ -1007,58 +985,6 @@ function renderAstroAgencyTemplate(site) {
         <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
         <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
         <img src="/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
-      </div>
-    </div>
-  </section>
-
-  <!-- Reviews / Testimonials Section -->
-  <section id="testimonials" class="py-24 bg-slate-50 dark:bg-slate-900/10 border-b border-[rgb(var(--box-border))]">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">Client Stories</h2>
-        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Hear directly from some of our valued clients about their experiences working with us.</p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
-        ${(site.testimonials || [
-        { name: 'Aarav Mehta', role: 'Regular Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined. I highly recommend them to anyone seeking top-tier service!' },
-        { name: 'Priya Sharma', role: 'Local Customer', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. It is rare to find a business that cares this much about its clients.' },
-        { name: 'Rohan Gupta', role: 'Business Owner', content: 'They exceeded my expectations in every possible way. The project was completed on time, within budget, and the attention to details was absolutely spectacular. Their team is knowledgeable, responsive, and incredibly dedicated to customer success. Five stars!' }
-    ]).map(t => `
-          <div class="p-6 sm:p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left flex flex-col justify-between">
-            <p class="text-sm text-[rgb(var(--heading-3))] italic leading-relaxed mb-6">"${t.content}"</p>
-            <div>
-              <h4 class="font-bold text-[rgb(var(--heading-1))] text-base">${t.name}</h4>
-              <p class="text-xs text-[var(--color-primary)] mt-1 font-semibold">${t.role}</p>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section id="faq" class="py-24">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="text-center mb-16 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">Frequently Asked Questions</h2>
-        <p class="text-[rgb(var(--heading-3))] text-base">Got questions? We have got answers. If you do not see your question here, feel free to WhatsApp us.</p>
-      </div>
-
-      <div class="space-y-4">
-        ${(site.faqs || [
-        { question: 'What are your operating hours?', answer: 'We are fully operational Monday through Saturday from 10:00 AM to 8:00 PM. Our team is available to assist you during these hours, and you can always send us a message via WhatsApp to schedule an appointment outside these times if needed.' },
-        { question: 'How do I book a service or order?', answer: 'Booking is incredibly easy and direct. Simply scroll to our services section, select the offering you are interested in, and click the "Order via WhatsApp" button. This will open a chat with us containing the service details so we can finalize your booking instantly.' },
-        { question: 'Where are you located and do you offer delivery?', answer: 'We are based in local area, India, serving clients across the region. If you need precise directions, maps, or want to check if we service your specific area, feel free to send us a message on WhatsApp and we will share our location details.' }
-    ]).map(faq => `
-          <div class="p-6 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
-            <h3 class="font-bold text-lg text-[rgb(var(--heading-2))] mb-2 flex items-start gap-3">
-              <span class="text-[var(--color-primary)] shrink-0">Q.</span>
-              <span>${faq.question}</span>
-            </h3>
-            <p class="text-sm text-[rgb(var(--heading-3))] pl-6 leading-relaxed">${faq.answer}</p>
-          </div>
-        `).join('')}
       </div>
     </div>
   </section>
@@ -1124,7 +1050,7 @@ function renderAstroAgencyTemplate(site) {
         <div class="flex flex-col gap-3">
           <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Company</h4>
           <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
-            <li><a href="#about-us" class="hover:text-[var(--color-primary)]">About</a></li>
+            <li><a href="#about-us" class="hover:text-[var(--color-primary)]">About Us</a></li>
             <li><a href="#" class="hover:text-[var(--color-primary)]">Blog</a></li>
             <li><a href="#" class="hover:text-[var(--color-primary)]">Jobs</a></li>
           </ul>
@@ -1133,7 +1059,7 @@ function renderAstroAgencyTemplate(site) {
         <div class="flex flex-col gap-3">
           <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Resources</h4>
           <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
-            <li><a href="#faq" class="hover:text-[var(--color-primary)]">FAQs Support</a></li>
+            <li><a href="#" class="hover:text-[var(--color-primary)]">FAQs Support</a></li>
             <li><a href="#testimonials" class="hover:text-[var(--color-primary)]">Guides</a></li>
             <li><a href="#" class="hover:text-[var(--color-primary)]">Contact</a></li>
           </ul>
@@ -1158,13 +1084,11 @@ function renderAstroAgencyTemplate(site) {
     <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
        class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
       <i class="fab fa-whatsapp text-xl"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
     </a>
     <!-- Call Sticky Button -->
     <a href="tel:${site.phoneNumber}" 
        class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
       <i class="fas fa-phone text-base"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
     </a>
   </div>
 
@@ -1218,7 +1142,7 @@ function renderAstroAgencyTemplate(site) {
           doc.classList.remove('dark');
           localStorage.setItem('appTheme', 'light');
         } else {
-          doc.documentElement.classList.add('dark');
+          doc.classList.add('dark');
           localStorage.setItem('appTheme', 'dark');
         }
       });
