@@ -372,7 +372,10 @@ function renderPremiumWebsite(site: SiteConfig): string {
       <a href="#" class="text-2xl font-bold tracking-tight text-slate-900 theme-font-title">${site.businessName}</a>
       <div class="hidden md:flex items-center space-x-8">
         <a href="#about" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
+        <a href="#features" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Why Choose Us</a>
         <a href="#services" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
+        <a href="#testimonials" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Reviews</a>
+        <a href="#faq" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">FAQ</a>
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-full shadow-sm ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">Chat Now</a>
       </div>
     </div>
@@ -431,6 +434,28 @@ function renderPremiumWebsite(site: SiteConfig): string {
     </div>
   </section>
 
+  <!-- Why Choose Us / Features Section -->
+  <section id="features" class="py-24 max-w-6xl mx-auto px-6 border-b border-slate-100">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Why Choose Us</h2>
+      <p class="text-slate-600">We are committed to delivering excellence and building long-term relationships based on outstanding results.</p>
+      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+      ${(site.features || [
+        { title: 'Premium Quality', description: 'We source the best materials and use proven techniques to deliver top-notch results.' },
+        { title: 'Experienced Team', description: 'Our professionals bring years of expertise and dedication to every client request.' },
+        { title: 'Client Centric', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision.' }
+      ]).map((feat: any) => `
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-left">
+          <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center font-bold text-xl mb-6">✓</div>
+          <h3 class="font-bold text-xl text-slate-900 mb-3">${feat.title}</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">${feat.description}</p>
+        </div>
+      `).join('')}
+    </div>
+  </section>
+
   <!-- Services / Products Section -->
   <section id="services" class="py-24 max-w-6xl mx-auto px-6">
     <div class="text-center max-w-2xl mx-auto mb-16">
@@ -458,6 +483,56 @@ function renderPremiumWebsite(site: SiteConfig): string {
           </a>
         </div>
       </div>
+      `).join('')}
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="py-24 bg-white border-y border-slate-100">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Client Stories</h2>
+        <p class="text-slate-600">Hear directly from some of our valued clients about their experiences working with us.</p>
+        <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        ${(site.testimonials || [
+          { name: 'Aarav Mehta', role: 'Regular Client', content: 'Absolutely incredible service. They were highly professional and exceeded all my expectations!' },
+          { name: 'Priya Sharma', role: 'Local Customer', content: 'Highly recommended! Reliable, affordable, and top-tier quality every single time.' },
+          { name: 'Rohan Gupta', role: 'Business Owner', content: 'Superb attention to detail and outstanding customer service. I will definitely work with them again.' }
+        ]).map((t: any) => `
+          <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 flex flex-col justify-between text-left">
+            <p class="text-sm text-slate-600 italic leading-relaxed mb-6">"${t.content}"</p>
+            <div>
+              <h4 class="font-bold text-slate-950 text-base">${t.name}</h4>
+              <p class="text-xs text-slate-500">${t.role}</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-24 max-w-4xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Frequently Asked Questions</h2>
+      <p class="text-slate-600">Got questions? We have got answers. If you do not see your question here, feel free to WhatsApp us.</p>
+      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
+    </div>
+    <div class="space-y-6">
+      ${(site.faqs || [
+        { question: 'What are your operating hours?', answer: 'We are open Monday through Saturday from 10:00 AM to 8:00 PM.' },
+        { question: 'How do I book a service?', answer: 'You can click any of the "Order via WhatsApp" buttons to message us directly and schedule your booking.' },
+        { question: 'Where are you located?', answer: 'We are located in local area, India. Feel free to contact us via WhatsApp to request directions or address details.' }
+      ]).map((faq: any) => `
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-left">
+          <h3 class="font-bold text-lg text-slate-950 mb-2 flex items-start gap-3">
+            <span class="text-${theme.primary}-500 shrink-0">Q.</span>
+            <span>${faq.question}</span>
+          </h3>
+          <p class="text-sm text-slate-600 pl-6 leading-relaxed">${faq.answer}</p>
+        </div>
       `).join('')}
     </div>
   </section>

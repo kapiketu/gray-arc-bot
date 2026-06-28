@@ -32,6 +32,22 @@ export interface SiteProduct {
   description: string;
 }
 
+export interface SiteFeature {
+  title: string;
+  description: string;
+}
+
+export interface SiteFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface SiteTestimonial {
+  name: string;
+  role: string;
+  content: string;
+}
+
 export interface SiteConfig {
   id: string; // Subdomain slug, e.g. "sweet-treats"
   phoneNumber: string;
@@ -62,6 +78,10 @@ export interface SiteConfig {
   heroSubtitle: string;
   storyTitle: string;
   storyContent: string;
+  // Dynamic extended sections
+  features?: SiteFeature[];
+  faqs?: SiteFAQ[];
+  testimonials?: SiteTestimonial[];
 }
 
 export const db = {
