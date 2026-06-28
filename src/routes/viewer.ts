@@ -218,7 +218,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
         <a href="#about" class="hover:text-[${textColor}] transition-colors duration-300">About</a>
         <a href="#services" class="hover:text-[${textColor}] transition-colors duration-300">Services</a>
         <a href="#contact" class="hover:text-[${textColor}] transition-colors duration-300">Contact</a>
-        <a href="https://wa.me/${site.phoneNumber}" class="bg-white text-zinc-900 font-semibold px-5 py-2 rounded-full hover:bg-zinc-100 transition-all duration-300 hover:shadow-lg hover:shadow-white/10">
+        <a href="https://wa.me/${site.phoneNumber}" class="bg-[${textColor}] text-[${bgColor}] font-semibold px-5 py-2 rounded-full hover:bg-zinc-100 transition-all duration-300 hover:shadow-lg hover:shadow-white/10">
           Get in Touch
         </a>
       </div>
@@ -226,12 +226,12 @@ function renderPremiumWebsite(site: SiteConfig): string {
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden border-t border-[${textColor}]/[0.06] bg-zinc-950/95 backdrop-blur-xl">
+    <div id="mobile-menu" class="hidden md:hidden border-t border-[${textColor}]/[0.06] bg-[${bgColor}]/95 backdrop-blur-xl">
       <div class="px-6 py-4 space-y-3">
         <a href="#about" class="block text-[${textColor}]/80 hover:text-[${textColor}] py-2">About</a>
         <a href="#services" class="block text-[${textColor}]/80 hover:text-[${textColor}] py-2">Services</a>
         <a href="#contact" class="block text-[${textColor}]/80 hover:text-[${textColor}] py-2">Contact</a>
-        <a href="https://wa.me/${site.phoneNumber}" class="block bg-white text-zinc-900 font-semibold px-5 py-3 rounded-xl text-center mt-2">Get in Touch</a>
+        <a href="https://wa.me/${site.phoneNumber}" class="block bg-[${textColor}] text-[${bgColor}] font-semibold px-5 py-3 rounded-xl text-center mt-2">Get in Touch</a>
       </div>
     </div>
   </nav>
@@ -266,7 +266,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
       </p>
       
       <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10 animate-fade-up" style="animation-delay: 0.6s">
-        <a href="#services" class="group bg-white text-zinc-900 font-semibold py-4 px-8 rounded-full hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-white/10 flex items-center justify-center gap-2">
+        <a href="#services" class="group bg-[${textColor}] text-[${bgColor}] font-semibold py-4 px-8 rounded-full hover:bg-zinc-100 transition-all duration-300 hover:shadow-xl hover:shadow-white/10 flex items-center justify-center gap-2">
           Explore Our Work
           <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
@@ -278,11 +278,11 @@ function renderPremiumWebsite(site: SiteConfig): string {
     </div>
     
     <!-- Bottom fade -->
-    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[${bgColor}] to-transparent"></div>
   </section>
 
   <!-- ══════════ STATS BAR ══════════ -->
-  <section class="border-y border-[${textColor}]/[0.06] bg-zinc-950">
+  <section class="border-y border-[${textColor}]/[0.06] bg-[${textColor}]/[0.02]">
     <div class="max-w-6xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 scroll-reveal">
       <div class="text-center">
         <div class="text-3xl md:text-4xl font-black stat-number">${yearsInBusiness}+</div>
@@ -322,7 +322,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
         <div class="scroll-reveal relative">
           <div class="aspect-[4/3] rounded-3xl overflow-hidden relative">
             <img src="${images.about}" alt="About ${site.businessName}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
-            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/40 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[${bgColor}]/40 to-transparent"></div>
           </div>
           <div class="absolute -bottom-4 -right-4 w-full h-full rounded-3xl border border-[${textColor}]/[0.06] -z-10"></div>
         </div>
@@ -392,7 +392,7 @@ function renderPremiumWebsite(site: SiteConfig): string {
               <input name="name" type="text" placeholder="Your Name" class="w-full p-4 bg-[${textColor}]/[0.04] border border-[${textColor}]/[0.08] rounded-xl text-[${textColor}] placeholder-zinc-600 focus:border-[${textColor}]/[0.2] focus:bg-[${textColor}]/[0.06] outline-none transition text-sm">
               <input name="email" type="email" placeholder="Email Address" class="w-full p-4 bg-[${textColor}]/[0.04] border border-[${textColor}]/[0.08] rounded-xl text-[${textColor}] placeholder-zinc-600 focus:border-[${textColor}]/[0.2] focus:bg-[${textColor}]/[0.06] outline-none transition text-sm">
               <textarea name="message" placeholder="Tell us what you need..." rows="4" class="w-full p-4 bg-[${textColor}]/[0.04] border border-[${textColor}]/[0.08] rounded-xl text-[${textColor}] placeholder-zinc-600 focus:border-[${textColor}]/[0.2] focus:bg-[${textColor}]/[0.06] outline-none transition text-sm resize-none"></textarea>
-              <button class="w-full bg-white text-zinc-900 font-semibold py-4 rounded-xl hover:bg-zinc-100 transition-all duration-300 hover:shadow-lg hover:shadow-white/5">
+              <button class="w-full bg-[${textColor}] text-[${bgColor}] font-semibold py-4 rounded-xl hover:bg-zinc-100 transition-all duration-300 hover:shadow-lg hover:shadow-white/5">
                 Send Message →
               </button>
             </form>
