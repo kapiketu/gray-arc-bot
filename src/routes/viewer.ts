@@ -374,6 +374,14 @@ function renderPremiumWebsite(site: SiteConfig): string {
   <style>
     body { font-family: 'Inter', sans-serif; }
     h1, h2, h3, .theme-font-title { font-family: ${theme.fontFamilyTitle}; }
+    
+    @keyframes marquee-ltr {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(0%); }
+    }
+    .animate-marquee-ltr {
+      animation: marquee-ltr 22s linear infinite;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br ${theme.bgGradient} min-h-screen text-slate-800 antialiased selection:bg-${theme.primary}-100 selection:text-${theme.primary}-900">
@@ -441,6 +449,34 @@ function renderPremiumWebsite(site: SiteConfig): string {
       </div>
     </div>
   </header>
+
+  <!-- Moving Text Ticker Section (Left to Right) -->
+  <div class="w-full bg-${theme.primaryHex} text-white py-3.5 overflow-hidden shadow-inner border-y border-${theme.primary}-700 relative z-10">
+    <div class="flex whitespace-nowrap min-w-full">
+      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
+        <span>⚡ Premium Services</span>
+        <span>•</span>
+        <span>💬 Direct WhatsApp Booking</span>
+        <span>•</span>
+        <span>⭐ Client Satisfaction Guaranteed</span>
+        <span>•</span>
+        <span>🎯 Professional Expert Care</span>
+        <span>•</span>
+        <span>💼 Trusted Local Solutions</span>
+      </div>
+      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
+        <span>⚡ Premium Services</span>
+        <span>•</span>
+        <span>💬 Direct WhatsApp Booking</span>
+        <span>•</span>
+        <span>⭐ Client Satisfaction Guaranteed</span>
+        <span>•</span>
+        <span>🎯 Professional Expert Care</span>
+        <span>•</span>
+        <span>💼 Trusted Local Solutions</span>
+      </div>
+    </div>
+  </div>
 
   <!-- About Section -->
   <section id="about" class="py-24 bg-white border-y border-slate-100">
