@@ -88,8 +88,24 @@ function renderPremiumWebsite(site: SiteConfig): string {
  // Get category-specific dynamic images using Pollinations AI
  const images = getCategoryImages(site);
  
- const textColor = site.theme?.textColor || '#f4f4f5';
  const bgColor = site.theme?.bgColor || '#09090b';
+
+ // Calculate luminance to determine light or dark theme structural elements
+ const isLight = (() => {
+  try {
+   const hex = bgColor.replace('#', '');
+   const r = parseInt(hex.substr(0, 2), 16);
+   const g = parseInt(hex.substr(2, 2), 16);
+   const b = parseInt(hex.substr(4, 2), 16);
+   const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+   return luma > 128;
+  } catch { return false; }
+ })();
+
+ const glassBgBase = isLight ? 'black' : 'white';
+ const textColor = isLight ? 'zinc-900' : 'white';
+ const textMuted = isLight ? 'zinc-600' : 'zinc-400';
+ const textMutedHover = isLight ? 'zinc-900' : 'white';
  // Generate product cards with images
  const productsHtml = site.services.map((item, i) => `
  <div class="group relative bg-${glassBgBase}/[0.03] backdrop-blur-sm border border-${glassBgBase}/[0.08] rounded-2xl overflow-hidden hover:border-${glassBgBase}/[0.15] hover:bg-${glassBgBase}/[0.06] transition-all duration-500 hover:-translate-y-1" style="animation: fadeUp 0.6s ease-out ${0.1 * i}s both">
