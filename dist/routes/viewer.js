@@ -635,7 +635,6 @@ function renderPremiumClassicTemplate(site) {
 </html>`;
 }
 function renderAstroAgencyTemplate(site) {
-    const images = getCategoryImages(site.category);
     const theme = getCategoryTheme(site.category);
     const formatPrice = (price) => {
         if (price.toLowerCase().includes('contact'))
@@ -650,6 +649,23 @@ function renderAstroAgencyTemplate(site) {
     let story = site.storyContent || site.aboutText || '';
     if (story.length < 150) {
         story = `${story} Our journey began with a simple yet powerful mission: to serve our community with honest, high-quality, and reliable solutions. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom service solution, our experienced specialists work tirelessly to ensure your expectations are not just met, but exceeded.`;
+    }
+    // Helper to split hero title and apply gradient theme highlights like original AgenceX
+    const titleWords = (site.heroTitle || 'Social Media Marketing is the Best Ever').split(' ');
+    let heroTitleHtml = '';
+    if (titleWords.length > 3) {
+        const firstPart = titleWords.slice(0, titleWords.length - 3).join(' ');
+        const highlightedPart = titleWords.slice(titleWords.length - 3, titleWords.length - 1).join(' ');
+        const lastPart = titleWords[titleWords.length - 1];
+        heroTitleHtml = `${firstPart} <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${highlightedPart}</span> ${lastPart}`;
+    }
+    else if (titleWords.length > 1) {
+        const firstPart = titleWords.slice(0, titleWords.length - 1).join(' ');
+        const lastWord = titleWords[titleWords.length - 1];
+        heroTitleHtml = `${firstPart} <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${lastWord}</span>`;
+    }
+    else {
+        heroTitleHtml = `<span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${titleWords[0]}</span>`;
     }
     return `<!DOCTYPE html>
 <html lang="en">
@@ -669,7 +685,7 @@ function renderAstroAgencyTemplate(site) {
       --heading-1: 23 37 84;
       --heading-2: 31 41 55;
       --heading-3: 55 65 81;
-      --color-primary: ${theme.primaryHex};
+      --color-primary: #1d4ed8; /* Hardcoded blue primary to match original AgenceX */
     }
 
     .dark {
@@ -690,15 +706,6 @@ function renderAstroAgencyTemplate(site) {
       background-color: rgb(var(--color-bg));
       color: rgb(var(--heading-3));
       font-family: 'Raleway', sans-serif;
-    }
-
-    /* Ticker animation keyframes */
-    @keyframes marquee-ltr {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(0%); }
-    }
-    .animate-marquee-ltr {
-      animation: marquee-ltr 22s linear infinite;
     }
   </style>
 </head>
@@ -743,7 +750,7 @@ function renderAstroAgencyTemplate(site) {
           </button>
           
           <a href="https://wa.me/${site.phoneNumber}" class="hidden sm:inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-full bg-[var(--color-primary)] text-white hover:opacity-95 transition-all">
-            Chat Now
+            Get Started
           </a>
 
           <!-- Mobile Toggle menu button -->
@@ -753,13 +760,13 @@ function renderAstroAgencyTemplate(site) {
         </div>
 
         <!-- Mobile Navigation Panel -->
-        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50">
+        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50 animate-fade-in">
           <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
           <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
           <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
           <a href="#testimonials" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Reviews</a>
           <a href="#faq" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">FAQ</a>
-          <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl bg-[var(--color-primary)] text-white">Chat Now</a>
+          <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl bg-[var(--color-primary)] text-white">Get Started</a>
         </div>
       </nav>
     </div>
@@ -770,7 +777,7 @@ function renderAstroAgencyTemplate(site) {
     <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
       <!-- Glow Shapes -->
       <div class="absolute w-full lg:w-1/2 inset-y-0 lg:right-0 pointer-events-none">
-        <span class="absolute -left-6 md:left-4 top-24 lg:top-28 w-24 h-24 rotate-90 skew-x-12 rounded-3xl bg-green-400 blur-xl opacity-40 lg:opacity-70 lg:block hidden"></span>
+        <span class="absolute -left-6 md:left-4 top-24 lg:top-28 w-24 h-24 rotate-90 skew-x-12 rounded-3xl bg-green-400 blur-xl opacity-40 lg:opacity-75 lg:block hidden"></span>
         <span class="absolute right-4 bottom-12 w-24 h-24 rounded-3xl bg-[var(--color-primary)] blur-xl opacity-60"></span>
       </div>
       <span class="w-4/12 lg:w-2/12 aspect-square bg-gradient-to-tr from-[var(--color-primary)] to-green-400 absolute -top-5 lg:left-0 rounded-full skew-y-12 blur-2xl opacity-20 pointer-events-none"></span>
@@ -778,7 +785,7 @@ function renderAstroAgencyTemplate(site) {
       <!-- Content -->
       <div class="relative flex flex-col items-center text-center lg:text-left lg:items-start lg:max-w-none max-w-3xl mx-auto lg:mx-0 lg:flex-1 lg:w-1/2">
         <h1 class="text-3xl/tight sm:text-4xl/tight md:text-5xl/tight xl:text-6xl/tight font-bold text-[rgb(var(--heading-1))] leading-tight">
-          ${site.heroTitle || 'Social Media Marketing is the Best Ever'}
+          ${heroTitleHtml}
         </h1>
         <p class="mt-8 text-base text-[rgb(var(--heading-3))] leading-relaxed max-w-xl">
           ${subtitle}
@@ -792,17 +799,17 @@ function renderAstroAgencyTemplate(site) {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V19.5z" />
               </svg>
             </span>
-            <input type="text" placeholder="Interested? Send a message..." readonly class="w-full py-3 outline-none bg-transparent text-sm cursor-pointer text-[rgb(var(--heading-2))] font-medium">
+            <input type="text" placeholder="johndoe@gmail.com" readonly class="w-full py-3 outline-none bg-transparent text-sm cursor-pointer text-[rgb(var(--heading-2))] font-medium">
             <button class="min-w-max text-white bg-[var(--color-primary)] hover:opacity-90 px-6 py-3 rounded-full font-semibold transition-all">
-              Connect
+              Get Started
             </button>
           </form>
         </div>
       </div>
 
-      <!-- Image -->
+      <!-- Image (Original AgenceX Hero WebP Image illustration) -->
       <div class="flex flex-1 lg:w-1/2 lg:h-auto relative lg:max-w-none lg:mx-0 mx-auto max-w-3xl w-full">
-        <img src="${images.hero}" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
+        <img src="/images/image1.webp" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
       </div>
     </div>
   </section>
@@ -813,57 +820,29 @@ function renderAstroAgencyTemplate(site) {
       <div class="mx-auto lg:mx-0 p-6 sm:p-8 rounded-3xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] shadow-lg md:divide-x divide-[rgb(var(--box-border))] grid grid-cols-2 md:grid-cols-4 gap-6">
         <div class="text-center">
           <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">12+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium uppercase tracking-wider">Premium Services</p>
+          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Created projects</p>
         </div>
         <div class="text-center">
           <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">200+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium uppercase tracking-wider">Happy Clients</p>
+          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Projects</p>
         </div>
         <div class="text-center">
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">120+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium uppercase tracking-wider">Hours Supported</p>
+          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">120</h2>
+          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Happy Client</p>
         </div>
         <div class="text-center">
           <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">5+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium uppercase tracking-wider">Years Experience</p>
+          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Years</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Moving Text Ticker Section (Left to Right, Styled as premium charcoal black strip) -->
-  <div class="w-full bg-[#18181b] text-zinc-100 py-3.5 overflow-hidden shadow-inner border-y border-[#27272a] relative z-10">
-    <div class="flex whitespace-nowrap min-w-full">
-      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>Premium Services</span>
-        <span>•</span>
-        <span>Direct WhatsApp Booking</span>
-        <span>•</span>
-        <span>Client Satisfaction Guaranteed</span>
-        <span>•</span>
-        <span>Professional Expert Care</span>
-        <span>•</span>
-        <span>Trusted Local Solutions</span>
-      </div>
-      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>Premium Services</span>
-        <span>•</span>
-        <span>Direct WhatsApp Booking</span>
-        <span>•</span>
-        <span>Client Satisfaction Guaranteed</span>
-        <span>•</span>
-        <span>Professional Expert Care</span>
-        <span>•</span>
-        <span>Trusted Local Solutions</span>
-      </div>
-    </div>
-  </div>
-
   <!-- Services / Products Section -->
   <section id="services" class="py-24 relative">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">What We Offer</h2>
+        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">What we offer</h2>
         <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Select any of our services below to connect directly with us and order instantly via WhatsApp.</p>
       </div>
 
@@ -901,15 +880,15 @@ function renderAstroAgencyTemplate(site) {
   </section>
 
   <!-- About Us Section -->
-  <section id="about-us" class="py-24 bg-slate-50 dark:bg-slate-900/10 border-y border-[rgb(var(--box-border))]">
+  <section id="about-us" class="py-24 border-y border-[rgb(var(--box-border))]">
     <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
-      <!-- Left image -->
+      <!-- Left image (Original AgenceX dev-with-c-1 WebP Image illustration) -->
       <div class="flex-1 flex w-full lg:w-1/2">
         <div class="w-full relative">
           <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
           <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
           <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-          <img src="${images.about}" alt="About story banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
+          <img src="/images/dev-with-c-1.webp" alt="About story banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
         </div>
       </div>
 
@@ -930,8 +909,8 @@ function renderAstroAgencyTemplate(site) {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
               </svg>
             </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Our Mission</h4>
-            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">To deliver exceptional client-centric solutions that exceed quality standards and deliver tangible business value.</p>
+            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Mission</h4>
+            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
           </div>
 
           <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
@@ -941,8 +920,8 @@ function renderAstroAgencyTemplate(site) {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Our Vision</h4>
-            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">To scale as an industry benchmark through transparent customer partnerships, high integrity, and constant design innovation.</p>
+            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mb-2">Vision</h4>
+            <p class="text-xs text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
           </div>
         </div>
       </div>
@@ -954,32 +933,31 @@ function renderAstroAgencyTemplate(site) {
     <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-12 items-center">
       <!-- Left content -->
       <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">Why Partner With Us</h2>
-        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">We source the best materials, enforce rigorous standards, and customize our outputs to match your exact business priorities.</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">We provide Important Features for Digital Marketing</h2>
+        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio dignissimos consequatur?</p>
         
-        <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-2))] w-full">
-          ${(site.features || [
-        { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
-        { title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience and problem-solving focus to all we do.' },
-        { title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision. We take the time to understand your exact requirements, provide transparent updates, and offer flexible solutions to guarantee satisfaction.' }
-    ]).map(feat => `
-          <li class="flex items-start gap-3">
-            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-7 h-7 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm text-sm">✓</span>
-            <div>
-              <span class="font-bold text-[rgb(var(--heading-2))] block text-base">${feat.title}</span>
-              <span class="text-xs text-[rgb(var(--heading-3))] leading-relaxed mt-1 block">${feat.description}</span>
-            </div>
+        <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-3))] w-full">
+          <li class="flex items-center gap-3">
+            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
+            <span>Web site Analysis</span>
           </li>
-          `).join('')}
+          <li class="flex items-center gap-3">
+            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
+            <span>Free optimization</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
+            <span>Content Optimization</span>
+          </li>
         </ul>
       </div>
 
-      <!-- Right image -->
+      <!-- Right image (Original AgenceX dev-with-c WebP Image illustration) -->
       <div class="flex-1 flex w-full lg:w-1/2 relative">
         <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
         <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
         <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-        <img src="${images.products[0] || images.hero}" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
+        <img src="/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
       </div>
     </div>
   </section>
@@ -1039,7 +1017,7 @@ function renderAstroAgencyTemplate(site) {
   <!-- CTA Section -->
   <section id="cta" class="pb-24">
     <div class="max-w-6xl mx-auto px-6">
-      <div class="w-full relative py-12 md:py-16 px-6 md:px-12 rounded-3xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent border border-[rgb(var(--box-border))] shadow-inner overflow-hidden">
+      <div class="w-full relative py-12 md:py-16 px-6 md:px-12 rounded-3xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent border border-[rgb(var(--box-border))] shadow-inner overflow-hidden animate-fade-in">
         <!-- Glows -->
         <div class="absolute right-0 top-0 h-full w-full flex justify-end pointer-events-none">
           <div class="w-28 h-28 overflow-hidden flex rounded-xl relative blur-2xl">
@@ -1058,14 +1036,14 @@ function renderAstroAgencyTemplate(site) {
 
         <div class="mx-auto text-center max-w-xl md:max-w-2xl relative z-10 flex flex-col items-center">
           <h2 class="text-3xl/tight sm:text-4xl/tight md:text-5xl/tight font-bold text-[rgb(var(--heading-1))] leading-tight">
-            Quick Start your Project with ${site.businessName} Today
+            Quick Start your <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">Strategic Digital</span> Marketing Campaign
           </h2>
           <p class="pt-6 text-sm text-[rgb(var(--heading-3))] leading-relaxed max-w-lg">
             Ready to scale up? Message us on WhatsApp right now to let us know your requirements. Our specialists are online to guide you.
           </p>
           <div class="pt-8">
             <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full bg-[var(--color-primary)] text-white hover:opacity-90 transition-all shadow-md">
-              Get In Touch via WhatsApp
+              Get In Touch
             </a>
           </div>
         </div>
@@ -1086,29 +1064,29 @@ function renderAstroAgencyTemplate(site) {
               <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
             </div>
             <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              ${site.businessName}
+              AgenceX
             </div>
           </a>
           <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mt-4">
-            We are proud to serve our community with professional services built on years of expertise and client success focus.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae, maiores nam doloribus id magni.
           </p>
         </div>
 
         <div class="flex flex-col gap-3">
-          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Company Links</h4>
+          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Company</h4>
           <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
-            <li><a href="#about-us" class="hover:text-[var(--color-primary)]">About Story</a></li>
-            <li><a href="#features" class="hover:text-[var(--color-primary)]">Key Features</a></li>
-            <li><a href="#services" class="hover:text-[var(--color-primary)]">Offers & Services</a></li>
+            <li><a href="#about-us" class="hover:text-[var(--color-primary)]">About</a></li>
+            <li><a href="#" class="hover:text-[var(--color-primary)]">Blog</a></li>
+            <li><a href="#" class="hover:text-[var(--color-primary)]">Jobs</a></li>
           </ul>
         </div>
 
         <div class="flex flex-col gap-3">
-          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Support Details</h4>
+          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Resources</h4>
           <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
             <li><a href="#faq" class="hover:text-[var(--color-primary)]">FAQs Support</a></li>
-            <li><a href="#testimonials" class="hover:text-[var(--color-primary)]">Reviews</a></li>
-            <li><a href="https://wa.me/${site.phoneNumber}" class="hover:text-[var(--color-primary)]">Direct Chat</a></li>
+            <li><a href="#testimonials" class="hover:text-[var(--color-primary)]">Guides</a></li>
+            <li><a href="#" class="hover:text-[var(--color-primary)]">Contact</a></li>
           </ul>
         </div>
       </div>
@@ -1116,30 +1094,14 @@ function renderAstroAgencyTemplate(site) {
       <div class="w-full h-px bg-[rgb(var(--box-border))] my-8"></div>
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">
         <div>
-          &copy; 2026 ${site.businessName}. All rights reserved.
+          &copy; <span id="year">2026</span> AgenceX. All rights reserved.
         </div>
         <div>
-          Powered by The Gray Arc.
+          Proudly made by John Kat.
         </div>
       </div>
     </div>
   </footer>
-
-  <!-- Floating Sticky Contact Buttons -->
-  <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-    <!-- WhatsApp Sticky Button -->
-    <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
-       class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fab fa-whatsapp text-xl"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Chat on WhatsApp</span>
-    </a>
-    <!-- Call Sticky Button -->
-    <a href="tel:${site.phoneNumber}" 
-       class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fas fa-phone text-base"></i>
-      <span class="absolute right-12 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">Call Us Now</span>
-    </a>
-  </div>
 
   <!-- Mobile Toggle Script & Light/Dark Theme Switcher Script -->
   <script>
@@ -1191,7 +1153,7 @@ function renderAstroAgencyTemplate(site) {
           doc.classList.remove('dark');
           localStorage.setItem('appTheme', 'light');
         } else {
-          doc.classList.add('dark');
+          doc.documentElement.classList.add('dark');
           localStorage.setItem('appTheme', 'dark');
         }
       });
