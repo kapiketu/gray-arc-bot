@@ -313,6 +313,15 @@ function renderPremiumWebsite(site) {
             return 'Contact Us';
         return price;
     };
+    // On-the-fly copy text expansion to fix short content on existing registered sites
+    let subtitle = site.heroSubtitle || '';
+    if (subtitle.length < 120) {
+        subtitle = `${subtitle} Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time.`;
+    }
+    let story = site.storyContent || site.aboutText || '';
+    if (story.length < 150) {
+        story = `${story} Our journey began with a simple yet powerful mission: to serve our community with honest, high-quality, and reliable solutions. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom service solution, our experienced specialists work tirelessly to ensure your expectations are not just met, but exceeded.`;
+    }
     return `<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -356,7 +365,7 @@ function renderPremiumWebsite(site) {
         ${site.heroTitle || site.businessName}
       </h1>
       <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
-        ${site.heroSubtitle || "Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time."}
+        ${subtitle}
       </p>
       <div class="flex flex-col sm:flex-row gap-4">
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-md ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
@@ -389,7 +398,7 @@ function renderPremiumWebsite(site) {
         </h2>
         <div class="w-16 h-1 bg-${theme.primary}-500 mb-8 rounded-full"></div>
         <p class="text-lg text-slate-600 leading-relaxed mb-8">
-          ${site.storyContent || site.aboutText || "Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded. Thank you for trusting us to be your partner; we look forward to serving you with integrity and excellence for years to come."}
+          ${story}
         </p>
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors">
           Learn More About Us
@@ -408,8 +417,8 @@ function renderPremiumWebsite(site) {
     <div class="grid md:grid-cols-3 gap-8">
       ${(site.features || [
         { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
-        { title: 'Experienced Specialists', description: 'Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience, specialized skills, and a committed, problem-solving focus to every single project we undertake.' },
-        { title: 'Client Centric Partnership', description: 'Your goals are our priorities. We take the time to understand your exact requirements, provide transparent progress updates, and offer tailored, flexible solutions designed to guarantee your complete satisfaction.' }
+        { title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience and problem-solving focus to all we do.' },
+        { title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision. We take the time to understand your exact requirements, provide transparent updates, and offer flexible solutions to guarantee satisfaction.' }
     ]).map((feat) => `
         <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-left">
           <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center font-bold text-xl mb-6">✓</div>
@@ -429,25 +438,29 @@ function renderPremiumWebsite(site) {
     </div>
     
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      ${site.services.map((item, i) => `
-      <div class="group flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1">
-        <div class="overflow-hidden aspect-video bg-slate-50 relative">
-          <img src="${images.products[i % images.products.length]}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-        </div>
-        <div class="p-6 flex flex-col flex-grow text-left">
-          <div class="flex justify-between items-start mb-3 gap-2">
-            <h3 class="font-bold text-lg text-slate-900 group-hover:${theme.accentText} transition-colors">${item.name}</h3>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-${theme.primary}-50 text-${theme.primary}-700 shrink-0">
-              ${formatPrice(item.price)}
-            </span>
+      ${site.services.map((item, i) => {
+        let desc = item.description || '';
+        if (desc.length < 80) {
+            desc = `${desc} We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals.`;
+        }
+        return `<div class="group flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1">
+          <div class="overflow-hidden aspect-video bg-slate-50 relative">
+            <img src="${images.products[i % images.products.length]}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
-          <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${item.description || "We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals."}</p>
-          <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-2xl shadow-sm ${theme.accentBg} transition-all duration-200">
-            Order via WhatsApp
-          </a>
-        </div>
-      </div>
-      `).join('')}
+          <div class="p-6 flex flex-col flex-grow text-left">
+            <div class="flex justify-between items-start mb-3 gap-2">
+              <h3 class="font-bold text-lg text-slate-900 group-hover:${theme.accentText} transition-colors">${item.name}</h3>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-${theme.primary}-50 text-${theme.primary}-700 shrink-0">
+                ${formatPrice(item.price)}
+              </span>
+            </div>
+            <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${desc}</p>
+            <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-2xl shadow-sm ${theme.accentBg} transition-all duration-200">
+              Order via WhatsApp
+            </a>
+          </div>
+        </div>`;
+    }).join('')}
     </div>
   </section>
 
