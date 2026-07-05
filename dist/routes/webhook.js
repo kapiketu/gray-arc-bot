@@ -516,7 +516,12 @@ async function handleChatFlow(input) {
             }
             break;
         case 'AWAITING_DOMAIN_NAME':
-            session.answers.customDomainRequested = text.toLowerCase();
+            // Clean domain input (strip protocol, www., and trailing paths)
+            const cleanedDomain = text.toLowerCase().trim()
+                .replace(/^https?:\/\//i, '')
+                .replace(/^www\./i, '')
+                .split('/')[0];
+            session.answers.customDomainRequested = cleanedDomain;
             await buildAndPublishSite(from, session, true);
             break;
         // ─── EDIT STEPS (for existing sites) ───

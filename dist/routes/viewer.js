@@ -174,6 +174,50 @@ async function viewerRoutes(fastify) {
 </html>`;
         return reply.type('text/html').send(html);
     });
+    fastify.get('/', async (request, reply) => {
+        const hostname = request.hostname || request.headers.host || '';
+        console.log(`[viewer] Request on root '/' from hostname: ${hostname}`);
+        // Try to lookup site by custom domain
+        const site = await db_1.db.getSiteByDomain(hostname);
+        if (site) {
+            const now = new Date();
+            const trialExpired = site.billingStatus === 'trial' && now > new Date(site.trialEndsAt);
+            const subscriptionInactive = site.billingStatus !== 'trial' && site.billingStatus !== 'active';
+            if (trialExpired || subscriptionInactive) {
+                return reply.type('text/html').send(renderSubscriptionPendingPage(site));
+            }
+            return reply.type('text/html').send(renderPremiumWebsite(site, site.template));
+        }
+        // Default main landing page when accessing root of main builder app
+        return reply.type('text/html').send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>The Gray Arc Website Builder</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+      <style>body { font-family: 'Outfit', sans-serif; }</style>
+    </head>
+    <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center relative overflow-hidden">
+      <div class="absolute w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl -top-40 -left-40"></div>
+      <div class="absolute w-[500px] h-[500px] bg-green-500/10 rounded-full blur-3xl -bottom-40 -right-40"></div>
+      
+      <div class="max-w-xl p-8 bg-zinc-950/40 backdrop-blur-md rounded-3xl shadow-2xl border border-white/5 text-center relative z-10 mx-6">
+        <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-green-500 mx-auto mb-8 rounded-full"></div>
+        <h1 class="text-4xl font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-green-400 text-transparent bg-clip-text">The Gray Arc</h1>
+        <p class="text-zinc-400 text-base mb-8 max-w-md mx-auto leading-relaxed">
+          Create premium, high-converting business websites instantly directly through WhatsApp! Powered by AI.
+        </p>
+        <a href="https://wa.me/919693186322" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full bg-gradient-to-r from-indigo-600 to-green-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg text-white">
+          Build Your Website Now
+        </a>
+      </div>
+    </body>
+    </html>
+  `);
+    });
     fastify.get('/site/:siteId', async (request, reply) => {
         const { siteId } = request.params;
         const site = await db_1.db.getSite(siteId);

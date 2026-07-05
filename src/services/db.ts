@@ -150,23 +150,23 @@ export const db = {
   },
 
   async getSiteByDomain(domain: string): Promise<SiteConfig | null> {
+    const cleanDomain = domain.replace(/^www\./i, '').split(':')[0].toLowerCase();
+    
     const { data, error } = await supabase
       .from('sites')
       .select('data')
-      .eq('custom_domain', domain)
+      .eq('custom_domain', cleanDomain)
       .single();
       
     if (data) return data.data as SiteConfig;
     
     // Fallback: check if it matches a subdomain (e.g. site-id.localhost)
-    // We have to scan all sites for this fallback since it's not indexed nicely,
-    // or just assume standard formatting. For production, we'd query better.
     const { data: allSites, error: errAll } = await supabase.from('sites').select('id, data');
     if (!errAll && allSites) {
        for (const site of allSites) {
-         if (`${site.id}.localhost:3000` === domain || `${site.id}.localhost` === domain) {
-           return site.data as SiteConfig;
-         }
+          if (`${site.id}.localhost` === cleanDomain || site.id === cleanDomain) {
+            return site.data as SiteConfig;
+          }
        }
     }
     
