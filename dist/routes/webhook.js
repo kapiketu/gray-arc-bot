@@ -15,7 +15,7 @@ dotenv_1.default.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
-const WHATSAPP_FLOW_ID = process.env.WHATSAPP_FLOW_ID || '1234567890';
+const WHATSAPP_FLOW_ID = process.env.WHATSAPP_FLOW_ID || '1732929764793467';
 // ────────────────────────────────────────────────────────
 // OFF-TOPIC DETECTION
 // ────────────────────────────────────────────────────────
