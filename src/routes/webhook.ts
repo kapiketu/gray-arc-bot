@@ -690,9 +690,10 @@ async function handleChatFlow(input: UserInput) {
         break;
       }
       
+      const price = checkResult.price || 500;
       session.answers.customDomainRequested = cleanedDomain;
-      session.answers.domainPrice = checkResult.price || 500;
-      await sendTextMessage(from, `✅ *${cleanedDomain}* is available!`);
+      session.answers.domainPrice = price;
+      await sendTextMessage(from, `✅ *${cleanedDomain}* is available for *₹${price}*!`);
       await buildAndPublishSite(from, session, true);
       break;
 

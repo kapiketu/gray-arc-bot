@@ -533,9 +533,10 @@ async function handleChatFlow(input) {
                 await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*${altMsg}\n\nPlease type another domain name to search:`);
                 break;
             }
+            const price = checkResult.price || 500;
             session.answers.customDomainRequested = cleanedDomain;
-            session.answers.domainPrice = checkResult.price || 500;
-            await (0, whatsapp_1.sendTextMessage)(from, `✅ *${cleanedDomain}* is available!`);
+            session.answers.domainPrice = price;
+            await (0, whatsapp_1.sendTextMessage)(from, `✅ *${cleanedDomain}* is available for *₹${price}*!`);
             await buildAndPublishSite(from, session, true);
             break;
         // ─── EDIT STEPS (for existing sites) ───
