@@ -233,7 +233,7 @@ async function viewerRoutes(fastify) {
             return reply.type('text/html').send(renderSubscriptionPendingPage(site));
         }
         const { template } = request.query;
-        return reply.type('text/html').send(renderPremiumWebsite(site, template));
+        return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
     });
     // 2. Mock Razorpay Domain Payment Page
     fastify.get('/pay/domain', async (request, reply) => {

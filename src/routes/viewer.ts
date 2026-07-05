@@ -248,7 +248,7 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
     }
 
     const { template } = request.query as { template?: string };
-    return reply.type('text/html').send(renderPremiumWebsite(site, template));
+    return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
   });
 
   // 2. Mock Razorpay Domain Payment Page
