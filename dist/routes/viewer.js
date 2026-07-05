@@ -2846,7 +2846,7 @@ body{font-family:Outfit,sans-serif;background:#0f172a;color:#fff}
 <a href="#faq" class="hover:text-[var(--primary)] transition-colors">FAQ</a>
 <a href="#contact" class="hover:text-[var(--primary)] transition-colors">Contact</a>
 </div>
-<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-5 py-2 rounded-full text-black font-semibold hover:opacity-90 transition-opacity" style="background:var(--primary)">Get Quote</a>
+<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-5 py-2 rounded-full bg-black text-white border border-white/10 font-semibold hover:bg-slate-900 transition-colors">Get Quote</a>
 </div></nav>
 
 <section class="hero min-h-screen flex items-center relative py-20">
@@ -2856,7 +2856,7 @@ body{font-family:Outfit,sans-serif;background:#0f172a;color:#fff}
 <h1 class="text-5xl md:text-6xl font-extrabold mt-4 leading-tight">${site.heroTitle || site.businessName}</h1>
 <p class="mt-6 text-slate-300 text-lg leading-relaxed">${site.heroSubtitle || (isTaxi ? 'Airport transfers, outstation trips and corporate travel with professional drivers.' : 'Professional and reliable services customized to fit your specific business requirements.')}</p>
 <div class="mt-8 flex flex-wrap gap-4">
-<a href="#contact" class="px-8 py-4 rounded-full text-black font-bold hover:opacity-90 transition-opacity" style="background:var(--primary)">Get Free Quote</a>
+<a href="#contact" class="px-8 py-4 rounded-full bg-black text-white border border-white/10 font-bold hover:bg-slate-900 transition-colors">Get Free Quote</a>
 <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors">WhatsApp Us</a>
 </div>
 </div>
@@ -2951,7 +2951,7 @@ ${site.contactDetails?.address ? `<p class="mt-1 text-sm">${site.contactDetails.
 <!-- Floating Action Buttons -->
 <div class="fixed right-5 bottom-24 z-50 flex flex-col gap-3">
 <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="stickyBtn bg-green-500 text-white">💬</a>
-<a href="tel:${site.phoneNumber}" class="stickyBtn text-black" style="background:var(--primary)">📞</a>
+<a href="tel:${site.phoneNumber}" class="stickyBtn bg-black text-white border border-white/10">📞</a>
 </div>
 
 <script>
