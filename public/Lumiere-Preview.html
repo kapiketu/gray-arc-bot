@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{business_name}} | {{category}}</title>
-    <meta name="description" content="{{hero_subtitle}}">
+    <title>L'Ambroisie Fine Dining | Premium Fine Dining</title>
+    <meta name="description" content="Experience the pinnacle of culinary excellence, where every dish is a meticulously crafted work of art designed to awaken the senses.">
     
     <!-- Google Fonts: Playfair Display (Serif) & Inter (Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,8 +88,8 @@
     <nav class="fixed w-full z-50 transition-all duration-300 backdrop-blur-md bg-charcoal/80 border-b border-white/5" id="navbar">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3 font-serif text-2xl tracking-widest text-white">
-    {{logo}}
-    <span>{{business_name}}</span>
+    <div class="w-8 h-8 rounded-full border border-gold-400 flex items-center justify-center text-gold-400 text-sm font-serif">L</div>
+    <span>L'Ambroisie Fine Dining</span>
 </div>
             <div class="hidden md:flex gap-8 text-sm tracking-widest uppercase text-zinc-400">
                 <a href="#about" class="hover:text-gold-400 transition-colors">Story</a>
@@ -105,13 +105,13 @@
     <!-- 1. Hero Section -->
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="{{hero_image}}" alt="Fine Dining" class="w-full h-full object-cover opacity-40">
+            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2000&auto=format&fit=crop" alt="Fine Dining" class="w-full h-full object-cover opacity-40">
             <div class="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-charcoal/60 to-charcoal"></div>
         </div>
         <div class="relative z-10 text-center max-w-4xl px-6 reveal">
-            <h4 class="text-gold-400 tracking-[0.3em] uppercase text-sm mb-6">{{category}}</h4>
-            <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight">{{hero_title}}</h1>
-            <p class="text-zinc-400 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto">{{hero_subtitle}}</p>
+            <h4 class="text-gold-400 tracking-[0.3em] uppercase text-sm mb-6">Premium Fine Dining</h4>
+            <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight">Masterful Gastronomy</h1>
+            <p class="text-zinc-400 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto">Experience the pinnacle of culinary excellence, where every dish is a meticulously crafted work of art designed to awaken the senses.</p>
         </div>
     </section>
 
@@ -142,14 +142,15 @@
         <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <div class="reveal">
                 <h4 class="text-gold-400 tracking-[0.2em] uppercase text-xs mb-4">Our Heritage</h4>
-                <h2 class="font-serif text-4xl md:text-5xl text-white mb-6">{{about_title}}</h2>
+                <h2 class="font-serif text-4xl md:text-5xl text-white mb-6">A legacy of taste and tradition.</h2>
                 <div class="text-zinc-400 font-light leading-relaxed mb-8 space-y-4">
-    {{about_content}}
+    <p>Founded on the principles of passion and precision, L'Ambroisie brings together local, sustainable ingredients and avant-garde techniques.</p>
+                              <p>We believe dining is not just a meal, but a cinematic journey. From the ambient lighting to the bespoke tableware, every detail is orchestrated for perfection.</p>
 </div>
                 <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=600&auto=format&fit=crop" alt="Chef Signature" class="w-48 opacity-70 grayscale">
             </div>
             <div class="relative h-[600px] img-container reveal overflow-hidden rounded-sm">
-                <img src="{{about_image}}" alt="Restaurant Interior" class="w-full h-full object-cover img-zoom">
+                <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop" alt="Restaurant Interior" class="w-full h-full object-cover img-zoom">
             </div>
         </div>
     </section>
@@ -162,7 +163,38 @@
                 <h2 class="font-serif text-4xl md:text-5xl text-white">The Lumière Experience</h2>
             </div>
             
-            {{services_grid}}
+            
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:auto-rows-[300px]">
+          <!-- Large Tasting Menu -->
+          <div class="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-sm bento-card reveal img-container">
+              <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200&auto=format&fit=crop" alt="Tasting Menu" class="absolute inset-0 w-full h-full object-cover img-zoom opacity-60 group-hover:opacity-40 transition-opacity">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0F0F11] via-transparent to-transparent"></div>
+              <div class="absolute bottom-0 left-0 p-8">
+                  <h3 class="font-serif text-3xl text-white mb-2">Grand Chef's Tasting Menu</h3>
+                  <p class="text-zinc-300 font-light max-w-md">An exclusive 12-course sensory journey through contemporary French cuisine, hand-crafted daily by Chef de Cuisine.</p>
+                  <span class="inline-block mt-4 text-gold-400 font-bold text-lg">₹8,500 per guest</span>
+              </div>
+          </div>
+          <!-- Sommelier Pairing -->
+          <div class="relative group overflow-hidden rounded-sm bento-card reveal img-container bg-zinc-900/60 border border-white/5">
+              <div class="absolute inset-0 p-8 flex flex-col justify-end z-10">
+                  <i data-lucide="wine" class="text-gold-400 mb-4 w-8 h-8"></i>
+                  <h3 class="font-serif text-xl text-white mb-2">Elite Sommelier Pairing</h3>
+                  <p class="text-zinc-400 text-sm font-light">Rare vintages and legendary Bordeaux pairings curated by our master cellars.</p>
+                  <span class="text-gold-400 font-bold text-sm mt-3">₹4,900 pairing</span>
+              </div>
+          </div>
+          <!-- Private Dining -->
+          <div class="relative group overflow-hidden rounded-sm bento-card reveal img-container">
+              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" alt="Private Dining" class="absolute inset-0 w-full h-full object-cover img-zoom opacity-50">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0F0F11] via-transparent to-transparent"></div>
+              <div class="absolute bottom-0 left-0 p-8 z-10">
+                  <h3 class="font-serif text-xl text-white mb-2">The Orchid Room</h3>
+                  <p class="text-zinc-300 text-sm font-light">Bespoke private vaults and customized banquets for your milestone occasions.</p>
+              </div>
+          </div>
+      </div>
+    
         </div>
     </section>
 
@@ -212,24 +244,24 @@
                 <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal">
                     <div class="flex items-center justify-center w-10 h-10 rounded-full border border-gold-400 bg-charcoal text-gold-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(212,175,55,0.2)] z-10 font-serif">1</div>
                     <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-6 bg-zinc-900/40 rounded-sm border border-white/5">
-                        <h3 class="font-serif text-xl text-white mb-2">{{feature_1_title}}</h3>
-                        <p class="text-zinc-400 text-sm font-light">{{feature_1_desc}}</p>
+                        <h3 class="font-serif text-xl text-white mb-2">Sourcing Excellence</h3>
+                        <p class="text-zinc-400 text-sm font-light">Hand-selecting the finest seasonal organic ingredients at dawn.</p>
                     </div>
                 </div>
                 <!-- Step 2 -->
                 <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal">
                     <div class="flex items-center justify-center w-10 h-10 rounded-full border border-gold-400 bg-charcoal text-gold-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(212,175,55,0.2)] z-10 font-serif">2</div>
                     <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-6 bg-zinc-900/40 rounded-sm border border-white/5">
-                        <h3 class="font-serif text-xl text-white mb-2">{{feature_2_title}}</h3>
-                        <p class="text-zinc-400 text-sm font-light">{{feature_2_desc}}</p>
+                        <h3 class="font-serif text-xl text-white mb-2">Preparation Precision</h3>
+                        <p class="text-zinc-400 text-sm font-light">Meticulous culinary techniques applied to enhance natural flavor notes.</p>
                     </div>
                 </div>
                 <!-- Step 3 -->
                 <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group reveal">
                     <div class="flex items-center justify-center w-10 h-10 rounded-full border border-gold-400 bg-charcoal text-gold-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(212,175,55,0.2)] z-10 font-serif">3</div>
                     <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-6 bg-zinc-900/40 rounded-sm border border-white/5">
-                        <h3 class="font-serif text-xl text-white mb-2">{{feature_3_title}}</h3>
-                        <p class="text-zinc-400 text-sm font-light">{{feature_3_desc}}</p>
+                        <h3 class="font-serif text-xl text-white mb-2">Plating Artistry</h3>
+                        <p class="text-zinc-400 text-sm font-light">Designing every dish as an artistic masterpiece on a custom-blown plate.</p>
                     </div>
                 </div>
             </div>
@@ -240,7 +272,32 @@
     <section class="py-32 bg-zinc-900/20 border-y border-white/5">
         <div class="max-w-7xl mx-auto px-6">
             <h2 class="font-serif text-4xl text-center text-white mb-16 reveal">Voices of Delight</h2>
-            {{testimonials_slider}}
+            
+      <div class="grid md:grid-cols-2 gap-8">
+          <div class="p-10 bg-[#0F0F11] border border-white/5 reveal rounded-sm relative">
+              <i data-lucide="quote" class="absolute top-8 right-8 text-white/5 w-16 h-16"></i>
+              <p class="text-zinc-300 font-light italic leading-relaxed mb-6">"An absolute triumph. L'Ambroisie doesn't just serve food; they craft memories. The attention to detail in both the tasting menu and the service is unmatched in the city."</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold font-serif">EV</div>
+                  <div>
+                      <div class="text-white text-sm">Eleanor Vance</div>
+                      <div class="text-gold-400 text-xs tracking-wider uppercase">Culinary Critic</div>
+                  </div>
+              </div>
+          </div>
+          <div class="p-10 bg-[#0F0F11] border border-white/5 reveal rounded-sm relative" style="transition-delay: 100ms;">
+              <i data-lucide="quote" class="absolute top-8 right-8 text-white/5 w-16 h-16"></i>
+              <p class="text-zinc-300 font-light italic leading-relaxed mb-6">"From the moment we walked through the doors, we were transported. The wine pairing was exquisite, and the ambience was perfectly curated."</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold font-serif">JS</div>
+                  <div>
+                      <div class="text-white text-sm">James Sterling</div>
+                      <div class="text-gold-400 text-xs tracking-wider uppercase">Private Guest</div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    
         </div>
     </section>
 
@@ -251,7 +308,7 @@
             <h2 class="font-serif text-4xl md:text-5xl text-white mb-6">Reserve Your Experience</h2>
             <p class="text-zinc-400 font-light mb-12">Due to high demand, we recommend submitting your request early. Our concierge will contact you to confirm availability.</p>
             
-            <form action="mailto:{{email}}" method="POST" enctype="text/plain" class="max-w-md mx-auto space-y-8 text-left">
+            <form action="mailto:concierge@lambroisie.com" method="POST" enctype="text/plain" class="max-w-md mx-auto space-y-8 text-left">
                 <div class="relative">
                     <input type="text" id="name" name="Name" required class="form-input w-full peer placeholder-transparent" placeholder="Name">
                     <label for="name" class="absolute left-0 -top-3.5 text-zinc-500 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-gold-400 peer-focus:text-sm">Full Name</label>
@@ -273,22 +330,22 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16 text-center md:text-left">
                 <div>
                     <div class="flex items-center gap-3 font-serif text-2xl tracking-widest text-white mb-6">
-    {{logo}}
-    <span>{{business_name}}</span>
+    <div class="w-8 h-8 rounded-full border border-gold-400 flex items-center justify-center text-gold-400 text-sm font-serif">L</div>
+    <span>L'Ambroisie Fine Dining</span>
 </div>
-                    <p class="text-zinc-500 font-light text-sm max-w-xs mx-auto md:mx-0">Redefining premium {{category}} services through elegance, innovation, and uncompromising quality.</p>
+                    <p class="text-zinc-500 font-light text-sm max-w-xs mx-auto md:mx-0">Redefining premium Premium Fine Dining services through elegance, innovation, and uncompromising quality.</p>
                 </div>
                 <div class="flex flex-col space-y-4">
                     <h5 class="text-white tracking-widest uppercase text-xs mb-2">Location</h5>
-                    <p class="text-zinc-500 font-light text-sm">{{address}}</p>
+                    <p class="text-zinc-500 font-light text-sm">124 Elite Avenue, Metropolis District, 10001</p>
                 </div>
                 <div class="flex flex-col space-y-4">
                     <h5 class="text-white tracking-widest uppercase text-xs mb-2">Contact</h5>
-                    <p class="text-zinc-500 font-light text-sm">{{email}}<br>{{phone}}</p>
+                    <p class="text-zinc-500 font-light text-sm">concierge@lambroisie.com<br>+91 98765 43210</p>
                 </div>
             </div>
             <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-zinc-600 text-xs font-light">
-                <p>&copy; 2026 {{business_name}}. All Rights Reserved.</p>
+                <p>&copy; 2026 L'Ambroisie Fine Dining. All Rights Reserved.</p>
                 <div class="flex gap-4 mt-4 md:mt-0">
                     <a href="#" class="hover:text-gold-400 transition-colors">Instagram</a>
                     <a href="#" class="hover:text-gold-400 transition-colors">Facebook</a>

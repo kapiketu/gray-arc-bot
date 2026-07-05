@@ -1,0 +1,5 @@
+body{font-family:Manrope,sans-serif;background:#0b1220;color:#fff;margin:0}
+.navbar{position:sticky;top:0;padding:20px;background:rgba(0,0,0,.6)}
+.container{max-width:1200px;margin:auto;padding:20px}
+.hero{padding:120px 20px}
+.contact-card{display:flex;flex-direction:column;gap:10px;max-width:400px}

@@ -12,6 +12,8 @@ const billing_1 = require("../services/billing");
 const domains_1 = require("../services/domains");
 const crypto_1 = __importDefault(require("crypto"));
 const axios_1 = __importDefault(require("axios"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
@@ -753,10 +755,36 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
         catch (e) {
             console.warn(`[Logo Generator] Warning: logo generation timed out or failed, but continuing:`, e.message);
         }
-        // Apply selected template
-        if (session.answers.template) {
-            siteConfig.template = session.answers.template;
+        // Apply selected template or auto-match it using metadata.json suitability mapping
+        let selectedTemplate = session.answers.template;
+        if (!selectedTemplate) {
+            try {
+                const templatesDir = path_1.default.join(__dirname, '../../templates');
+                if (fs_1.default.existsSync(templatesDir)) {
+                    const folders = fs_1.default.readdirSync(templatesDir).filter(f => fs_1.default.statSync(path_1.default.join(templatesDir, f)).isDirectory());
+                    const categoryLower = (session.answers.category || '').toLowerCase();
+                    for (const folder of folders) {
+                        const metaPath = path_1.default.join(templatesDir, folder, 'metadata.json');
+                        if (fs_1.default.existsSync(metaPath)) {
+                            const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
+                            const industries = meta.industries || meta.suitable_business_categories;
+                            if (Array.isArray(industries)) {
+                                const match = industries.some((ind) => categoryLower.includes(ind.toLowerCase()));
+                                if (match) {
+                                    selectedTemplate = folder;
+                                    console.log(`[Auto-Match] Category "${session.answers.category}" matched template "${folder}" via metadata.`);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (err) {
+                console.error(`[Auto-Match] Failed to match template via metadata:`, err.message);
+            }
         }
+        siteConfig.template = selectedTemplate || 'GA001';
         await db_1.db.saveSite(siteConfig);
         await db_1.db.deleteSession(from);
         const subdomainUrl = `${BASE_URL}/site/${siteConfig.id}`;

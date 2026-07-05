@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{business_name}}</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar">
+<div class="container">
+<div class="logo">{{logo}}</div>
+<ul>
+<li>Home</li><li>Services</li><li>About</li><li>Gallery</li><li>Contact</li>
+</ul>
+<a class="quote-btn">Get Quote</a>
+</div>
+</nav>
+
+<section class="hero">
+<div class="container">
+<h1>{{hero_title}}</h1>
+<p>{{hero_subtitle}}</p>
+<form class="contact-card">
+<input placeholder="Your Name">
+<input placeholder="Phone Number">
+<button>Submit</button>
+</form>
+</div>
+</section>
+
+<section class="services">
+<h2>Our Services</h2>
+<div>{{service_1}}</div>
+<div>{{service_2}}</div>
+<div>{{service_3}}</div>
+<div>{{service_4}}</div>
+<div>{{service_5}}</div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
