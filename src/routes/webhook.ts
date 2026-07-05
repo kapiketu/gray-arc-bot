@@ -374,15 +374,26 @@ async function handleChatFlow(input: UserInput) {
       };
       await db.saveSession(newSession);
       
-      await sendFlowMessage(
-        from,
-        `Let's build your website! Tap the button below to fill out your business details in one go:`,
-        'Fill Details 📝',
-        WHATSAPP_FLOW_ID,
-        `flow_token_${Date.now()}`,
-        'BUSINESS_DETAILS',
-        'Website Builder'
-      );
+      try {
+        await sendFlowMessage(
+          from,
+          `Let's build your website! Tap the button below to fill out your business details in one go:`,
+          'Fill Details 📝',
+          WHATSAPP_FLOW_ID,
+          `flow_token_${Date.now()}`,
+          'BUSINESS_DETAILS',
+          'Website Builder'
+        );
+      } catch (flowError) {
+        console.error('[Flow Error] Failed to send Flow message, falling back to step-by-step chat flow:', flowError);
+        
+        // Update session back to category list step
+        newSession.step = 'AWAITING_CATEGORY';
+        await db.saveSession(newSession);
+        
+        await sendTextMessage(from, `⚠️ WhatsApp Form is not active yet (missing/invalid WHATSAPP_FLOW_ID). \n\nNo worries! Let's set up your website step-by-step instead:`);
+        await sendCategoryList(from);
+      }
       return;
     }
 
