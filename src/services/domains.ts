@@ -125,9 +125,9 @@ export async function purchaseDomain(domain: string, phoneNumber: string, regist
 
   try {
     const consent = {
-      agreements: ['DNRA'],
-      agreementKeys: ['DNRA'],
-      ipAddress: '127.0.0.1'
+      agreedBy: `${registrant.nameFirst} ${registrant.nameLast}`,
+      agreedAt: new Date().toISOString(),
+      agreementKeys: ['DNRA']
     };
 
     // Retrieve terms of agreement first
@@ -210,6 +210,18 @@ export async function setupDomainDNS(domain: string): Promise<boolean> {
 
 // Contact configuration helper for GoDaddy API schema
 function getContactInfo(phone: string, registrant: RegistrantInfo) {
+  // Format phone to GoDaddy schema standard format: e.g. +91.9999988888
+  let cleanDigits = phone.replace(/\D/g, '');
+  let formattedPhone = '';
+  
+  if (cleanDigits.startsWith('91') && cleanDigits.length > 10) {
+    formattedPhone = `+91.${cleanDigits.slice(2)}`;
+  } else if (cleanDigits.length === 10) {
+    formattedPhone = `+91.${cleanDigits}`;
+  } else {
+    formattedPhone = `+1.${cleanDigits || '9999999999'}`;
+  }
+
   return {
     addressMailing: {
       address1: registrant.address1,
@@ -221,7 +233,7 @@ function getContactInfo(phone: string, registrant: RegistrantInfo) {
     email: registrant.email,
     nameFirst: registrant.nameFirst,
     nameLast: registrant.nameLast,
-    phone: phone.startsWith('+') ? phone : `+91${phone}`,
+    phone: formattedPhone,
     jobTitle: 'Registrant',
     organization: `${registrant.nameFirst} ${registrant.nameLast}`
   };
