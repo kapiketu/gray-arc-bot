@@ -158,9 +158,8 @@ async function sendTemplateSelector(to: string) {
 async function sendSiteReadyMenu(to: string, siteUrl: string) {
   await sendButtonMessage(
     to,
-    `🎉 *Your website is live!*\n\n🔗 ${siteUrl}\n\nWhat would you like to do next?`,
+    `🎉 *Congratulations! Your website is live!*\n\n🔗 ${siteUrl}\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`,
     [
-      { id: 'btn_view_site', title: 'View Live Site' },
       { id: 'btn_edit_details', title: 'Edit Details' },
       { id: 'btn_change_template', title: 'Change Template' }
     ]
@@ -764,11 +763,6 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       );
     } else {
       const subscription = await createSubscriptionLink(siteConfig.id);
-
-      await sendTextMessage(
-        from,
-        `🎉 *Congratulations! Your website is live!*\n\n🔗 URL: ${subdomainUrl}\n\n🎁 Your *30-Day Free Trial* is now active!`
-      );
 
       await sendSiteReadyMenu(from, subdomainUrl);
     }
