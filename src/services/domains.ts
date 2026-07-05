@@ -102,7 +102,20 @@ export async function checkDomainAvailability(domain: string): Promise<DomainChe
  * Purchases a domain automatically from GoDaddy.
  * In a real production environment, you should fill in the buyer contact details.
  */
-export async function purchaseDomain(domain: string, phoneNumber: string): Promise<boolean> {
+export interface RegistrantInfo {
+  nameFirst: string;
+  nameLast: string;
+  email: string;
+  address1: string;
+  city: string;
+  state: string;
+  postalCode: string;
+}
+
+/**
+ * Purchases a domain automatically from GoDaddy using customer credentials.
+ */
+export async function purchaseDomain(domain: string, phoneNumber: string, registrant: RegistrantInfo): Promise<boolean> {
   console.log(`[Domain Service] Automating domain purchase for: ${domain}`);
 
   if (!GODADDY_API_KEY || !GODADDY_API_SECRET) {
@@ -130,16 +143,17 @@ export async function purchaseDomain(domain: string, phoneNumber: string): Promi
       console.warn('[Domain Service] Could not fetch agreements. Using default agreement keys.');
     }
 
+    const contact = getContactInfo(phoneNumber, registrant);
+
     const payload = {
       consent,
       domain,
       period: 1, // 1 year
       renewAuto: true,
-      // Provide developer or default contact info
-      contactAdmin: getContactInfo(phoneNumber),
-      contactBilling: getContactInfo(phoneNumber),
-      contactRegistrant: getContactInfo(phoneNumber),
-      contactTech: getContactInfo(phoneNumber)
+      contactAdmin: contact,
+      contactBilling: contact,
+      contactRegistrant: contact,
+      contactTech: contact
     };
 
     const response = await axios.post(`${BASE_URL}/v1/domains/purchase`, payload, {
@@ -157,22 +171,59 @@ export async function purchaseDomain(domain: string, phoneNumber: string): Promi
   }
 }
 
+/**
+ * Automatically sets up CNAME records for the domain pointing to our server.
+ */
+export async function setupDomainDNS(domain: string): Promise<boolean> {
+  console.log(`[Domain Service] Automatically setting up CNAME records for: ${domain}`);
+
+  if (!GODADDY_API_KEY || !GODADDY_API_SECRET) {
+    console.log('[Domain Service] No credentials. Mocking DNS record updates.');
+    return true;
+  }
+
+  try {
+    // Standard DNS pointing www as CNAME to our app domain
+    const records = [
+      {
+        type: 'CNAME',
+        name: 'www',
+        data: 'gray-arc-bot-production.up.railway.app',
+        ttl: 3600
+      }
+    ];
+
+    const response = await axios.put(`${BASE_URL}/v1/domains/${domain}/records/CNAME/www`, records, {
+      headers: {
+        Authorization: `sso-key ${GODADDY_API_KEY}:${GODADDY_API_SECRET}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('[Domain Service] GoDaddy DNS record updates status:', response.status);
+    return response.status === 200 || response.status === 204;
+  } catch (error: any) {
+    console.error('[Domain Service] GoDaddy DNS Config Error:', error.response?.data || error.message);
+    return false;
+  }
+}
+
 // Contact configuration helper for GoDaddy API schema
-function getContactInfo(phone: string) {
+function getContactInfo(phone: string, registrant: RegistrantInfo) {
   return {
     addressMailing: {
-      address1: '123 Tech Square',
-      city: 'Mumbai',
+      address1: registrant.address1,
+      city: registrant.city,
       country: 'IN',
-      postalCode: '400001',
-      state: 'Maharashtra'
+      postalCode: registrant.postalCode,
+      state: registrant.state
     },
-    email: 'domains@thegrayarc.com',
-    nameFirst: 'Gray',
-    nameLast: 'Arc',
+    email: registrant.email,
+    nameFirst: registrant.nameFirst,
+    nameLast: registrant.nameLast,
     phone: phone.startsWith('+') ? phone : `+91${phone}`,
-    jobTitle: 'Business Owner',
-    organization: 'The Gray Arc'
+    jobTitle: 'Registrant',
+    organization: `${registrant.nameFirst} ${registrant.nameLast}`
   };
 }
 

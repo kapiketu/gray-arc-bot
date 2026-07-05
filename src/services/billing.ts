@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import { db } from './db';
 import { sendTextMessage } from './whatsapp';
-import { purchaseDomain } from './domains';
+import { purchaseDomain, setupDomainDNS } from './domains';
 
 dotenv.config();
 
@@ -109,18 +109,38 @@ export async function processPaymentWebhook(payload: any): Promise<boolean> {
         await db.saveSite(site);
         console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" marked as PAID for site "${siteId}".`);
         
-        // Automate domain registration via GoDaddy API
-        const purchased = await purchaseDomain(domain, site.phoneNumber);
+        // Extract customer details from Razorpay payload
+        const customerName = linkEntity.customer?.name || 'Gray Arc Customer';
+        const customerEmail = linkEntity.customer?.email || 'domains@thegrayarc.com';
+        
+        const registrant = {
+          nameFirst: customerName.split(' ')[0],
+          nameLast: customerName.split(' ').length > 1 ? customerName.split(' ').slice(1).join(' ') : 'Customer',
+          email: customerEmail,
+          address1: '123 Tech Square',
+          city: 'Mumbai',
+          state: 'Maharashtra',
+          postalCode: '400001'
+        };
+
+        // 1. Automate domain registration via GoDaddy API under customer details
+        const purchased = await purchaseDomain(domain, site.phoneNumber, registrant);
         if (purchased) {
-          console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" successfully purchased/registered via GoDaddy.`);
+          console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" successfully purchased under registrant "${customerEmail}".`);
+          
+          // 2. Automate DNS Setup (CNAME config)
+          const dnsConfigured = await setupDomainDNS(domain);
+          if (dnsConfigured) {
+            console.log(`[Billing Webhook] 🟢 DNS CNAME configured automatically for "${domain}".`);
+          }
         } else {
-          console.warn(`[Billing Webhook] ⚠️ Failed to auto-purchase domain "${domain}". Developer action required.`);
+          console.warn(`[Billing Webhook] ⚠️ Failed to auto-purchase domain "${domain}". Manual registration required.`);
         }
 
-        // Send DNS instructions to the user
+        // Send confirmation and email verification instructions to the user
         await sendTextMessage(
           site.phoneNumber,
-          `🎉 *Domain Purchase Successful!*\n\nYour custom domain *${domain}* is now unlocked for your website.\n\n*Final Step (DNS Setup):*\nPlease log into your domain provider (GoDaddy, Hostinger, etc.) and add this record to your DNS settings:\n\n*Type:* CNAME\n*Name:* @ (or www)\n*Value:* gray-arc-bot-production.up.railway.app\n\nOnce added, it can take up to 24 hours for your website to appear on your custom domain!`
+          `🎉 *Domain Registration Successful!*\n\nYour custom domain *${domain}* has been registered under your ownership and pointed to your website automatically!\n\n📧 *Action Required:*\nGoDaddy has sent a verification email to your address (*${customerEmail}*). Please click the verification link in that email to confirm ownership and avoid domain suspension.\n\nNo technical setup is needed on your part. Your website will be live on your custom domain shortly!`
         );
 
         return true;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = viewerRoutes;
 const db_1 = require("../services/db");
+const domains_1 = require("../services/domains");
 async function viewerRoutes(fastify) {
     // 1. Render the generated business websites
     // ────────────────────────────────────────────────────────
@@ -250,6 +251,20 @@ async function viewerRoutes(fastify) {
         if (body.type === 'domain') {
             const site = await db_1.db.getSite(body.siteId);
             if (site) {
+                // Construct registrant contact details from form inputs
+                const registrant = {
+                    nameFirst: body.name ? body.name.split(' ')[0] : 'Gray',
+                    nameLast: body.name && body.name.split(' ').length > 1 ? body.name.split(' ').slice(1).join(' ') : 'Arc',
+                    email: body.email || 'domains@thegrayarc.com',
+                    address1: body.address1 || '123 Tech Square',
+                    city: body.city || 'Mumbai',
+                    state: body.state || 'Maharashtra',
+                    postalCode: body.postalCode || '400001'
+                };
+                // 1. Purchase domain via GoDaddy API
+                await (0, domains_1.purchaseDomain)(body.domain, site.phoneNumber, registrant);
+                // 2. Automate DNS Setup (point CNAME records to Railway)
+                await (0, domains_1.setupDomainDNS)(body.domain);
                 site.customDomain = body.domain;
                 site.domainStatus = 'paid';
                 await db_1.db.saveSite(site);
@@ -1468,12 +1483,43 @@ function renderPaymentPage(type, siteId, domain, paymentId, price) {
           <div class="text-4xl font-black text-white mt-1">${isDomain ? `₹${price || 500}` : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
           ${isDomain ? `<p class="text-zinc-500 text-sm mt-3">Domain: <strong class="text-white">${domain}</strong></p>` : '<p class="text-zinc-500 text-xs mt-2">Recurring UPI AutoPay mandate</p>'}
         </div>
-        <form action="/pay/confirm" method="POST">
+        <form action="/pay/confirm" method="POST" class="space-y-4">
           <input type="hidden" name="type" value="${type}">
           <input type="hidden" name="siteId" value="${siteId}">
-          ${isDomain ? `<input type="hidden" name="domain" value="${domain}">` : `<input type="hidden" name="subscriptionId" value="${paymentId}">`}
+          ${isDomain ? `
+            <input type="hidden" name="domain" value="${domain}">
+            <div class="space-y-3 mb-6">
+              <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Domain Registrant Details</h4>
+              <div>
+                <label class="block text-[11px] text-zinc-500 mb-1">Full Name</label>
+                <input type="text" name="name" required placeholder="John Doe" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-[11px] text-zinc-500 mb-1">Email Address</label>
+                <input type="email" name="email" required placeholder="john@example.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-[11px] text-zinc-500 mb-1">Street Address</label>
+                <input type="text" name="address1" required placeholder="123 Main St" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] text-zinc-500 mb-1">City</label>
+                  <input type="text" name="city" required placeholder="Mumbai" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-zinc-500 mb-1">State</label>
+                  <input type="text" name="state" required placeholder="Maharashtra" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] text-zinc-500 mb-1">Pin Code</label>
+                <input type="text" name="postalCode" required placeholder="400001" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+              </div>
+            </div>
+          ` : `<input type="hidden" name="subscriptionId" value="${paymentId}">`}
           <button type="submit" class="w-full ${isDomain ? 'bg-blue-500 hover:bg-blue-400' : 'bg-emerald-500 hover:bg-emerald-400'} text-white font-bold py-4 rounded-xl transition shadow-lg">
-            ${isDomain ? 'Pay via UPI' : 'Authorize UPI AutoPay'}
+            ${isDomain ? 'Pay & Register Domain' : 'Authorize UPI AutoPay'}
           </button>
         </form>
         <p class="text-center text-xs text-zinc-600 mt-6">🔒 Secured by Razorpay</p>
