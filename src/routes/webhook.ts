@@ -965,8 +965,9 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
             const metaPath = path.join(templatesDir, folder, 'metadata.json');
             if (fs.existsSync(metaPath)) {
               const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-              if (Array.isArray(meta.industries)) {
-                const match = meta.industries.some((ind: string) => categoryLower.includes(ind.toLowerCase()));
+              const industries = meta.industries || meta.suitable_business_categories;
+              if (Array.isArray(industries)) {
+                const match = industries.some((ind: string) => categoryLower.includes(ind.toLowerCase()));
                 if (match) {
                   selectedTemplate = folder;
                   console.log(`[Auto-Match] Category "${session.answers.category}" matched template "${folder}" via metadata.`);

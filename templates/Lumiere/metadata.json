@@ -1,0 +1,12 @@
+{
+  "template_id": "gray-arc-premium-restaurant-001",
+  "template_name": "Lumi\u00e8re Fine Dining",
+  "version": "1.0.0",
+  "suitable_business_categories": [
+    "Restaurant",
+    "Fine Dining",
+    "Lounge",
+    "Premium Cafe"
+  ],
+  "short_description": "A cinematic, warm, and elegant single-page template featuring dark luxury aesthetics, bento-grid layouts, and smooth scroll reveals, tailored for high-end culinary establishments."
+}
