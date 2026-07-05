@@ -149,7 +149,7 @@ async function sendTemplateSelector(to: string) {
     `Almost done! Choose a design style for your website:`,
     [
       { id: 'tpl_portfolio', title: 'Nature Portfolio' },
-      { id: 'tpl_astroship', title: 'Astroship' },
+      { id: 'tpl_grayarc', title: 'Gray Arc v1' },
       { id: 'tpl_taxi', title: 'Taxi Board' }
     ],
     'Step 5 of 5',
@@ -371,7 +371,7 @@ async function handleChatFlow(input: UserInput) {
     }
 
     // Template selection
-    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship' || buttonId === 'tpl_nimbus' || buttonId === 'tpl_taxi') {
+    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship' || buttonId === 'tpl_nimbus' || buttonId === 'tpl_taxi' || buttonId === 'tpl_grayarc') {
       if (!session || session.step !== 'AWAITING_TEMPLATE') {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
@@ -387,6 +387,9 @@ async function handleChatFlow(input: UserInput) {
       } else if (buttonId === 'tpl_taxi') {
         selectedTemplateName = 'Taxi Board';
         templateKey = 'taxi';
+      } else if (buttonId === 'tpl_grayarc') {
+        selectedTemplateName = 'Gray Arc v1';
+        templateKey = 'grayarc';
       }
       session.answers.template = templateKey;
       session.step = 'AWAITING_DOMAIN_CHOICE';
@@ -656,6 +659,9 @@ async function handleChatFlow(input: UserInput) {
       } else if (choice.includes('taxi') || choice.includes('cab')) {
         templateKey = 'taxi';
         selectedTemplateName = 'Taxi Board';
+      } else if (choice.includes('gray') || choice.includes('arc') || choice.includes('v1')) {
+        templateKey = 'grayarc';
+        selectedTemplateName = 'Gray Arc v1';
       }
       session.answers.template = templateKey;
       session.step = 'AWAITING_DOMAIN_CHOICE';

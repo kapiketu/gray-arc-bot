@@ -1504,6 +1504,9 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
 }
 
 function renderPremiumWebsite(site: SiteConfig, templateName?: string): string {
+  if (templateName === 'grayarc') {
+    return renderGrayArcTemplate(site);
+  }
   if (templateName === 'taxi') {
     return renderTaxiTemplate(site);
   }
@@ -2854,6 +2857,218 @@ function renderTaxiTemplate(site: SiteConfig): string {
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
   AOS.init({duration:800,once:true});
+</script>
+</body>
+</html>`;
+}
+
+
+function renderGrayArcTemplate(site: SiteConfig): string {
+  const category = (site.category || '').toLowerCase();
+  const isTaxi = category.includes('taxi') || category.includes('cab') || category.includes('transport');
+  const isFood = category.includes('bakery') || category.includes('cake') || category.includes('food') || category.includes('restaurant');
+  const isBeauty = category.includes('salon') || category.includes('spa') || category.includes('hair') || category.includes('beauty');
+
+  // Define colors based on category
+  let primaryColor = '#6366f1'; // Indigo
+  let secondaryColor = '#4f46e5';
+  if (isTaxi) {
+    primaryColor = '#facc15'; // Yellow
+    secondaryColor = '#eab308';
+  } else if (isFood) {
+    primaryColor = '#f59e0b'; // Amber
+    secondaryColor = '#d97706';
+  } else if (isBeauty) {
+    primaryColor = '#ec4899'; // Pink
+    secondaryColor = '#db2777';
+  }
+
+  const currentYear = new Date().getFullYear();
+  const services = site.services || [];
+  const images = getCategoryImages(site.category || '');
+
+  // Define dynamic features
+  let features = [
+    { title: '⭐ Premium Quality', desc: 'Excellence and top-tier quality in every detail.' },
+    { title: '🤝 Trusted Team', desc: 'Professional staff dedicated to your satisfaction.' },
+    { title: '📞 Instant Booking', desc: 'Quick support and order coordination via WhatsApp.' },
+    { title: '💡 Reliable Solutions', desc: 'Consistent, top-rated support for all clients.' }
+  ];
+  if (isTaxi) {
+    features = [
+      { title: '🚖 24/7 Availability', desc: 'Always online and ready to pick you up.' },
+      { title: '💳 Fixed Pricing', desc: 'Clear upfront rates with no hidden surcharges.' },
+      { title: '🛡️ Safe Drivers', desc: 'Experienced and background-checked drivers.' },
+      { title: '⚡ Express Booking', desc: 'Instant dispatch and short wait times.' }
+    ];
+  } else if (isFood) {
+    features = [
+      { title: '🍰 Baked Fresh', desc: 'Prepared daily with premium quality ingredients.' },
+      { title: '🎨 Custom Designs', desc: 'Cakes and treats tailored for your special events.' },
+      { title: '⚡ Quick Delivery', desc: 'Fast local delivery straight to your doorstep.' },
+      { title: '❤️ Secret Recipes', desc: 'Traditional recipes loved by all our customers.' }
+    ];
+  }
+
+  // Define dynamic FAQs
+  let faqs = [
+    { q: 'How can I get started?', a: `Just click the "Order Now" or WhatsApp button to chat directly with our team at ${site.businessName}.` },
+    { q: 'What are your operational hours?', a: 'We respond quickly during our business hours. Feel free to leave a message on WhatsApp anytime!' },
+    { q: 'What forms of payment do you accept?', a: 'We accept all major UPI apps, card payments, net banking, and cash.' }
+  ];
+  if (isTaxi) {
+    faqs = [
+      { q: 'How can I book a ride?', a: 'Simply send your pickup and destination locations via our WhatsApp quick booking form above.' },
+      { q: 'Are your rates fixed?', a: 'Yes, we offer transparent fixed pricing based on distance with zero surge charges.' },
+      { q: 'Do you offer outstation trips?', a: 'Yes, we offer airport transfers, outstation packages, and hourly local rentals.' }
+    ];
+  } else if (isFood) {
+    faqs = [
+      { q: 'Do you take custom cake orders?', a: 'Yes! We specialize in custom cakes for birthdays, weddings, and anniversaries. Contact us on WhatsApp to discuss your design.' },
+      { q: 'How far in advance should I order?', a: 'For standard cakes, 24 hours is enough. For custom cakes, we recommend ordering 3-5 days in advance.' },
+      { q: 'Do you offer home delivery?', a: 'Yes, we deliver across town. Delivery charges vary based on distance.' }
+    ];
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${site.businessName} | ${site.category || 'Premium Service'}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+body{font-family:Outfit,sans-serif;background:#0f172a;color:#fff}
+:root{--primary:${primaryColor};--secondary:${secondaryColor};}
+.glass{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08)}
+.card{transition:.3s}.card:hover{transform:translateY(-8px);border-color:var(--primary)}
+.hero{background:linear-gradient(rgba(2,6,23,.75),rgba(2,6,23,.85)),url('${images.hero || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1600&q=80'}') center/cover}
+.stickyBtn{width:60px;height:60px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;box-shadow:0 10px 20px rgba(0,0,0,0.3)}
+</style>
+</head>
+<body class="scroll-smooth">
+<nav class="fixed w-full bg-black/40 backdrop-blur z-50 border-b border-white/5">
+<div class="max-w-7xl mx-auto flex justify-between p-5 items-center">
+<div class="font-bold text-2xl text-white">${site.businessName}</div>
+<div class="hidden md:flex gap-8">
+<a href="#services" class="hover:text-[var(--primary)] transition-colors">Services</a>
+<a href="#gallery" class="hover:text-[var(--primary)] transition-colors">Gallery</a>
+<a href="#faq" class="hover:text-[var(--primary)] transition-colors">FAQ</a>
+<a href="#contact" class="hover:text-[var(--primary)] transition-colors">Contact</a>
+</div>
+<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-5 py-2 rounded-full text-black font-semibold hover:opacity-90 transition-opacity" style="background:var(--primary)">Get Quote</a>
+</div></nav>
+
+<section class="hero min-h-screen flex items-center relative py-20">
+<div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+<div data-aos="fade-right">
+<p class="uppercase tracking-widest text-sm font-semibold" style="color:var(--primary)">${site.category || 'Premium Service'}</p>
+<h1 class="text-5xl md:text-6xl font-extrabold mt-4 leading-tight">${site.heroTitle || site.businessName}</h1>
+<p class="mt-6 text-slate-300 text-lg leading-relaxed">${site.heroSubtitle || (isTaxi ? 'Airport transfers, outstation trips and corporate travel with professional drivers.' : 'Professional and reliable services customized to fit your specific business requirements.')}</p>
+<div class="mt-8 flex flex-wrap gap-4">
+<a href="#contact" class="px-8 py-4 rounded-full text-black font-bold hover:opacity-90 transition-opacity" style="background:var(--primary)">Get Free Quote</a>
+<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors">WhatsApp Us</a>
+</div>
+</div>
+<div class="glass rounded-3xl p-8 shadow-2xl" data-aos="zoom-in">
+<h3 class="text-2xl font-bold mb-6">Quick Contact</h3>
+<div class="space-y-4 text-slate-200">
+  <p class="flex items-center gap-3">📞 <span class="font-mono">${site.phoneNumber}</span></p>
+  ${site.contactDetails?.address ? `<p class="flex items-center gap-3">📍 <span>${site.contactDetails.address}</span></p>` : ''}
+  ${site.contactDetails?.hours ? `<p class="flex items-center gap-3">🕐 <span>${site.contactDetails.hours}</span></p>` : ''}
+</div>
+</div>
+</div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="py-24 max-w-7xl mx-auto px-6">
+<h2 class="text-4xl font-bold text-center">Why Choose Us</h2>
+<div class="grid md:grid-cols-4 gap-6 mt-16">
+  ${features.map(f => `
+    <div class="glass card p-8 rounded-2xl border border-white/5">
+      <h3 class="font-bold text-xl mb-3 text-white">${f.title}</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">${f.desc}</p>
+    </div>
+  `).join('')}
+</div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="py-24 bg-slate-900/60 border-y border-white/5">
+<div class="max-w-7xl mx-auto px-6">
+<h2 class="text-4xl font-bold text-center">Our Services & Catalog</h2>
+<div id="servicesGrid" class="grid md:grid-cols-3 gap-6 mt-16">
+  ${services.map((service, index) => `
+    <div class="glass p-6 rounded-2xl card border border-white/5 cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
+      <h3 class="font-bold text-xl text-white group-hover:text-[var(--primary)]">${service.name}</h3>
+      <p class="mt-3 text-slate-400 text-sm leading-relaxed">${service.description || 'Premium custom service designed to meet your requirements.'}</p>
+      <span class="mt-6 text-sm font-semibold block" style="color:var(--primary)">Enquire Now →</span>
+    </div>
+  `).join('')}
+</div>
+</div></section>
+
+<!-- HOW IT WORKS -->
+<section class="py-24 max-w-7xl mx-auto px-6">
+<h2 class="text-4xl font-bold text-center">How It Works</h2>
+<div class="grid md:grid-cols-4 gap-6 mt-16 text-center">
+<div class="glass p-8 rounded-2xl border border-white/5">1. Contact</div>
+<div class="glass p-8 rounded-2xl border border-white/5">2. Quote</div>
+<div class="glass p-8 rounded-2xl border border-white/5">3. Schedule</div>
+<div class="glass p-8 rounded-2xl border border-white/5">4. Done</div>
+</div></section>
+
+<!-- GALLERY -->
+<section id="gallery" class="py-24 bg-slate-900/60 border-y border-white/5">
+<div class="max-w-7xl mx-auto px-6">
+<h2 class="text-4xl font-bold text-center">Gallery</h2>
+<div class="grid md:grid-cols-3 gap-6 mt-16">
+<img src="${images.about || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
+<img src="${images.hero || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
+<img src="${images.products[0] || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
+</div></div></section>
+
+<!-- PROMO CALL OUT -->
+<section class="py-24 max-w-5xl mx-auto px-6 text-center">
+<div class="glass p-12 rounded-3xl border border-white/10">
+<h2 class="text-4xl font-bold text-white">Ready to grow your business?</h2>
+<p class="mt-6 text-slate-300 text-lg leading-relaxed">Get in touch with ${site.businessName} today on WhatsApp and let us take care of the rest!</p>
+</div></section>
+
+<!-- FAQ -->
+<section id="faq" class="py-24 max-w-4xl mx-auto px-6">
+<h2 class="text-4xl font-bold text-center mb-16">FAQ</h2>
+<div id="faqList">
+  ${faqs.map(f => `
+    <details class="glass p-6 mb-4 rounded-2xl border border-white/5 group">
+      <summary class="font-bold text-lg cursor-pointer list-none flex justify-between items-center text-white">
+        <span>${f.q}</span>
+        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+      </summary>
+      <p class="mt-4 text-slate-400 leading-relaxed text-sm">${f.a}</p>
+    </details>
+  `).join('')}
+</div>
+</section>
+
+<footer id="contact" class="bg-black py-12 text-center border-t border-white/5 text-slate-500">
+<p class="font-bold text-white text-lg">${site.businessName}</p>
+<p class="mt-2 text-sm">${site.phoneNumber}</p>
+${site.contactDetails?.address ? `<p class="mt-1 text-sm">${site.contactDetails.address}</p>` : ''}
+</footer>
+
+<!-- Floating Action Buttons -->
+<div class="fixed right-5 bottom-24 z-50 flex flex-col gap-3">
+<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="stickyBtn bg-green-500 text-white">💬</a>
+<a href="tel:${site.phoneNumber}" class="stickyBtn text-black" style="background:var(--primary)">📞</a>
+</div>
+
+<script>
+AOS.init({ duration: 800, once: true });
 </script>
 </body>
 </html>`;
