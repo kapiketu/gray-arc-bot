@@ -399,6 +399,7 @@ function renderPremiumClassicTemplate(site: SiteConfig): string {
         <a href="#services" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
         <a href="#testimonials" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Reviews</a>
         <a href="#faq" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">FAQ</a>
+        <a href="#contact" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Contact</a>
         <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-full shadow-sm ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">Chat Now</a>
       </div>
 
@@ -416,6 +417,7 @@ function renderPremiumClassicTemplate(site: SiteConfig): string {
         <a href="#services" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
         <a href="#testimonials" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Reviews</a>
         <a href="#faq" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">FAQ</a>
+        <a href="#contact" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Contact</a>
         <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl shadow-sm ${theme.accentBg} transition-all duration-200">Chat Now</a>
       </div>
     </div>
@@ -609,6 +611,59 @@ function renderPremiumClassicTemplate(site: SiteConfig): string {
     </div>
   </section>
 
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Contact Us</h2>
+        <p class="text-slate-600">Get in touch with us directly via phone, WhatsApp, or visit us at our location.</p>
+        <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Phone & WhatsApp Card -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3">Call or Chat</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">Have any questions? Give us a call or send a message on WhatsApp.</p>
+          </div>
+          <div class="space-y-2">
+            <a href="tel:${site.phoneNumber}" class="block text-base font-bold text-${theme.primary}-600 hover:underline">${site.contactDetails?.phone || site.phoneNumber}</a>
+            <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-600 hover:underline">
+              <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Address Card -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3">Our Location</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">Visit us at our physical location. We'd love to welcome you.</p>
+          </div>
+          <p class="text-base font-bold text-slate-800">${site.contactDetails?.address || 'Local Business, India'}</p>
+        </div>
+
+        <!-- Business Hours Card -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3">Business Hours</h3>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">We are open during the following hours to assist you.</p>
+          </div>
+          <p class="text-base font-bold text-slate-800">${site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM'}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="bg-slate-900 text-white py-16 border-t border-slate-800">
     <div class="max-w-6xl mx-auto px-6 text-center">
@@ -651,6 +706,16 @@ function renderPremiumClassicTemplate(site: SiteConfig): string {
           menuIcon.classList.remove('fa-xmark');
           menuIcon.classList.add('fa-bars');
         }
+      });
+
+      // Close menu when links are clicked
+      const links = mobileMenu.querySelectorAll('.mobile-nav-link');
+      links.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          menuIcon.classList.remove('fa-xmark');
+          menuIcon.classList.add('fa-bars');
+        });
       });
     }
   </script>
@@ -709,7 +774,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       theme: {
         extend: {
           colors: {
-            primary: '#1d4ed8',
+            primary: '${theme.primaryHex}',
             'box-bg': 'rgb(var(--color-box))',
             'box-border': 'rgb(var(--box-border))',
             'heading-1': 'rgb(var(--heading-1))',
@@ -732,7 +797,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       --heading-1: 23 37 84;
       --heading-2: 31 41 55;
       --heading-3: 55 65 81;
-      --color-primary: #1d4ed8;
+      --color-primary: ${theme.primaryHex};
     }
 
     .dark {
@@ -783,6 +848,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
             <li><a href="#about-us" class="hover:text-[var(--color-primary)] transition-colors">About Us</a></li>
             <li><a href="#features" class="hover:text-[var(--color-primary)] transition-colors">Features</a></li>
             <li><a href="#services" class="hover:text-[var(--color-primary)] transition-colors">Services</a></li>
+            <li><a href="#contact" class="hover:text-[var(--color-primary)] transition-colors">Contact</a></li>
           </ul>
         </div>
 
@@ -809,6 +875,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
           <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
           <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
           <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
+          <a href="#contact" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Contact</a>
           <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl bg-[var(--color-primary)] text-white">Get Started</a>
         </div>
       </nav>
@@ -978,7 +1045,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
               </svg>
             </div>
             <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Mission</h4>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">To deliver top-tier ${site.category.toLowerCase()} services that enhance our customers' lives and businesses with reliability, excellence, and care.</p>
           </div>
 
           <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
@@ -989,7 +1056,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
               </svg>
             </div>
             <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Vision</h4>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum dolor sit amet consectetur.</p>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">To be the leading provider of ${site.category.toLowerCase()} solutions, recognized for our commitment to excellence, innovation, and client satisfaction.</p>
           </div>
         </div>
       </div>
@@ -1001,23 +1068,23 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
     <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-12 items-center">
       <!-- Left content -->
       <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">We provide Important Features for Digital Marketing</h2>
-        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
-        <p class="mt-2 text-base text-[rgb(var(--heading-3))] leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe aliquid autem alias vero distinctio  consequatur?</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">Why Choose Us</h2>
+        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">We are committed to delivering excellence and building long-term relationships based on outstanding results.</p>
         
-        <ul class="mt-8 space-y-4 font-medium text-[rgb(var(--heading-3))] w-full">
-          <li class="flex items-center gap-3">
-            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
-            <span>Web site Analysis</span>
-          </li>
-          <li class="flex items-center gap-3">
-            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
-            <span>Free optimization</span>
-          </li>
-          <li class="flex items-center gap-3">
-            <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
-            <span>Content Optimization</span>
-          </li>
+        <ul class="mt-8 space-y-6 font-medium text-[rgb(var(--heading-3))] w-full">
+          ${(site.features || [
+            { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards.' },
+            { title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Our crew consists of highly trained, certified, and passionate professionals.' },
+            { title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision, taking the time to understand your exact requirements.' }
+          ]).map((feat: any) => `
+            <li class="flex items-start gap-4">
+              <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
+              <div>
+                <h4 class="font-semibold text-base text-[rgb(var(--heading-2))]">${feat.title}</h4>
+                <p class="text-sm text-[rgb(var(--heading-3))] mt-1">${feat.description}</p>
+              </div>
+            </li>
+          `).join('')}
         </ul>
       </div>
 
@@ -1027,6 +1094,59 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
         <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
         <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
         <img src="/public/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 border-b border-[rgb(var(--box-border))]">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">Contact Us</h2>
+        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Get in touch with us directly via phone, WhatsApp, or visit our location.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <!-- Phone & WhatsApp Card -->
+        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
+          <div>
+            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
+              <i class="fas fa-phone-alt text-lg"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Phone & Chat</h3>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">Have any questions? Give us a call or send a message on WhatsApp.</p>
+          </div>
+          <div class="space-y-3">
+            <a href="tel:${site.phoneNumber}" class="block text-base font-bold text-[var(--color-primary)] hover:underline">${site.contactDetails?.phone || site.phoneNumber}</a>
+            <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-500 hover:underline">
+              <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Address Card -->
+        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
+          <div>
+            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
+              <i class="fas fa-map-marker-alt text-lg"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Our Location</h3>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">Visit us at our physical location. We'd love to welcome you.</p>
+          </div>
+          <p class="text-base font-bold text-[rgb(var(--heading-2))]">${site.contactDetails?.address || 'Local Business, India'}</p>
+        </div>
+
+        <!-- Business Hours Card -->
+        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
+          <div>
+            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
+              <i class="fas fa-clock text-lg"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Business Hours</h3>
+            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">We are open during the following hours to assist you.</p>
+          </div>
+          <p class="text-base font-bold text-[rgb(var(--heading-2))]">${site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM'}</p>
+        </div>
       </div>
     </div>
   </section>
@@ -1053,7 +1173,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
 
         <div class="mx-auto text-center max-w-xl md:max-w-2xl relative z-10 flex flex-col items-center">
           <h2 class="text-3xl/tight sm:text-4xl/tight md:text-5xl/tight font-bold text-[rgb(var(--heading-1))] leading-tight">
-            Quick Start your <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">Strategic Digital</span> Marketing Campaign
+            Connect with <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${site.businessName}</span> Today
           </h2>
           <p class="pt-6 text-sm text-[rgb(var(--heading-3))] leading-relaxed max-w-lg">
             Ready to scale up? Message us on WhatsApp right now to let us know your requirements. Our specialists are online to guide you.
@@ -1081,11 +1201,11 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
               <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
             </div>
             <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              AgenceX
+              ${site.businessName}
             </div>
           </a>
           <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mt-4">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae, maiores nam doloribus id magni.
+            Your trusted partner for premium ${site.category.toLowerCase()} services.
           </p>
         </div>
 
@@ -1103,7 +1223,7 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
           <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
             <li><a href="#" class="hover:text-[var(--color-primary)]">FAQs Support</a></li>
             <li><a href="#testimonials" class="hover:text-[var(--color-primary)]">Guides</a></li>
-            <li><a href="#" class="hover:text-[var(--color-primary)]">Contact</a></li>
+            <li><a href="#contact" class="hover:text-[var(--color-primary)] font-semibold text-[var(--color-primary)]">Contact Us</a></li>
           </ul>
         </div>
       </div>
@@ -1111,10 +1231,10 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
       <div class="w-full h-px bg-[rgb(var(--box-border))] my-8"></div>
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">
         <div>
-          &copy; 2026 AgenceX. All rights reserved.
+          &copy; 2026 ${site.businessName}. All rights reserved.
         </div>
         <div>
-          Proudly made by John Kat.
+          Powered by The Gray Arc.
         </div>
       </div>
     </div>
