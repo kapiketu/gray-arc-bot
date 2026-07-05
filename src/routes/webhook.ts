@@ -4,6 +4,7 @@ import { db, Session } from '../services/db';
 import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage } from '../services/whatsapp';
 import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
 import { createDomainPaymentLink, createSubscriptionLink, processPaymentWebhook } from '../services/billing';
+import { checkDomainAvailability } from '../services/domains';
 import crypto from 'crypto';
 
 dotenv.config();
@@ -672,6 +673,16 @@ async function handleChatFlow(input: UserInput) {
         .replace(/^https?:\/\//i, '')
         .replace(/^www\./i, '')
         .split('/')[0];
+      
+      await sendTextMessage(from, `🔍 Checking availability for *${cleanedDomain}*...`);
+      const checkResult = await checkDomainAvailability(cleanedDomain);
+      if (!checkResult.available) {
+        await sendTextMessage(
+          from,
+          `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*\n\nPlease type another domain name (e.g., sweet-treats.in):`
+        );
+        break;
+      }
       
       session.answers.customDomainRequested = cleanedDomain;
       await buildAndPublishSite(from, session, true);

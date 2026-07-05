@@ -10,6 +10,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const razorpay_1 = __importDefault(require("razorpay"));
 const db_1 = require("./db");
 const whatsapp_1 = require("./whatsapp");
+const domains_1 = require("./domains");
 dotenv_1.default.config();
 const PORT = process.env.PORT || 3000;
 // In production, this would be your public URL
@@ -97,6 +98,14 @@ async function processPaymentWebhook(payload) {
                 site.domainStatus = 'paid';
                 await db_1.db.saveSite(site);
                 console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" marked as PAID for site "${siteId}".`);
+                // Automate domain registration via GoDaddy API
+                const purchased = await (0, domains_1.purchaseDomain)(domain, site.phoneNumber);
+                if (purchased) {
+                    console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" successfully purchased/registered via GoDaddy.`);
+                }
+                else {
+                    console.warn(`[Billing Webhook] ⚠️ Failed to auto-purchase domain "${domain}". Developer action required.`);
+                }
                 // Send DNS instructions to the user
                 await (0, whatsapp_1.sendTextMessage)(site.phoneNumber, `🎉 *Domain Purchase Successful!*\n\nYour custom domain *${domain}* is now unlocked for your website.\n\n*Final Step (DNS Setup):*\nPlease log into your domain provider (GoDaddy, Hostinger, etc.) and add this record to your DNS settings:\n\n*Type:* CNAME\n*Name:* @ (or www)\n*Value:* gray-arc-bot-production.up.railway.app\n\nOnce added, it can take up to 24 hours for your website to appear on your custom domain!`);
                 return true;

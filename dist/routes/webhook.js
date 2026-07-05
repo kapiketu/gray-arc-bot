@@ -9,6 +9,7 @@ const db_1 = require("../services/db");
 const whatsapp_1 = require("../services/whatsapp");
 const ai_1 = require("../services/ai");
 const billing_1 = require("../services/billing");
+const domains_1 = require("../services/domains");
 const crypto_1 = __importDefault(require("crypto"));
 dotenv_1.default.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
@@ -521,6 +522,12 @@ async function handleChatFlow(input) {
                 .replace(/^https?:\/\//i, '')
                 .replace(/^www\./i, '')
                 .split('/')[0];
+            await (0, whatsapp_1.sendTextMessage)(from, `🔍 Checking availability for *${cleanedDomain}*...`);
+            const checkResult = await (0, domains_1.checkDomainAvailability)(cleanedDomain);
+            if (!checkResult.available) {
+                await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*\n\nPlease type another domain name (e.g., sweet-treats.in):`);
+                break;
+            }
             session.answers.customDomainRequested = cleanedDomain;
             await buildAndPublishSite(from, session, true);
             break;

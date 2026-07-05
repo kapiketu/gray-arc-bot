@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import { db } from './db';
 import { sendTextMessage } from './whatsapp';
+import { purchaseDomain } from './domains';
 
 dotenv.config();
 
@@ -108,6 +109,14 @@ export async function processPaymentWebhook(payload: any): Promise<boolean> {
         await db.saveSite(site);
         console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" marked as PAID for site "${siteId}".`);
         
+        // Automate domain registration via GoDaddy API
+        const purchased = await purchaseDomain(domain, site.phoneNumber);
+        if (purchased) {
+          console.log(`[Billing Webhook] 🟢 Custom domain "${domain}" successfully purchased/registered via GoDaddy.`);
+        } else {
+          console.warn(`[Billing Webhook] ⚠️ Failed to auto-purchase domain "${domain}". Developer action required.`);
+        }
+
         // Send DNS instructions to the user
         await sendTextMessage(
           site.phoneNumber,
