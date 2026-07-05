@@ -113,9 +113,10 @@ async function sendCategoryList(to) {
         }], 'Step 1 of 5');
 }
 async function sendTemplateSelector(to) {
-    await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Confirm to use the premium *Nature Portfolio* design for your website:`, [
-        { id: 'tpl_portfolio', title: 'Confirm Design' }
-    ], 'Step 5 of 5', 'Perfect for your business category');
+    await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Choose a design style for your website:`, [
+        { id: 'tpl_portfolio', title: 'Nature Portfolio' },
+        { id: 'tpl_story', title: 'Story Board' }
+    ], 'Step 5 of 5', 'Both designs are mobile-responsive');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
     await (0, whatsapp_1.sendCTAUrlMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`, 'View Live Site', siteUrl);
@@ -290,16 +291,17 @@ async function handleChatFlow(input) {
             return;
         }
         // Template selection
-        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio') {
+        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story') {
             if (!session || session.step !== 'AWAITING_TEMPLATE') {
                 await (0, whatsapp_1.sendTextMessage)(from, `Something went wrong. Type *'reset'* to start over.`);
                 return;
             }
-            session.answers.template = 'portfolio';
+            const selectedTemplateName = buttonId === 'tpl_story' ? 'Story Board' : 'Nature Portfolio';
+            session.answers.template = buttonId === 'tpl_story' ? 'story' : 'portfolio';
             session.step = 'AWAITING_DOMAIN_CHOICE';
             session.lastActive = new Date().toISOString();
             await db_1.db.saveSession(session);
-            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`, [
+            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`, [
                 { id: 'host_buy_custom', title: 'Buy New Domain' },
                 { id: 'host_point_custom', title: 'Connect My Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
@@ -496,10 +498,12 @@ async function handleChatFlow(input) {
             await sendTemplateSelector(from);
             break;
         case 'AWAITING_TEMPLATE':
-            session.answers.template = 'portfolio';
+            const choice = text.toLowerCase();
+            const isStory = choice.includes('story') || choice.includes('board');
+            session.answers.template = isStory ? 'story' : 'portfolio';
             session.step = 'AWAITING_DOMAIN_CHOICE';
             await db_1.db.saveSession(session);
-            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`, [
+            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${isStory ? 'Story Board' : 'Nature Portfolio'}* ✅\n\nHow would you like to host your website?`, [
                 { id: 'host_custom', title: 'Custom Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
             ], 'Hosting Option', 'Custom domain: ₹500 one-time');

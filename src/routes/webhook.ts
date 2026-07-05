@@ -146,12 +146,13 @@ async function sendCategoryList(to: string) {
 async function sendTemplateSelector(to: string) {
   await sendButtonMessage(
     to,
-    `Almost done! Confirm to use the premium *Nature Portfolio* design for your website:`,
+    `Almost done! Choose a design style for your website:`,
     [
-      { id: 'tpl_portfolio', title: 'Confirm Design' }
+      { id: 'tpl_portfolio', title: 'Nature Portfolio' },
+      { id: 'tpl_story', title: 'Story Board' }
     ],
     'Step 5 of 5',
-    'Perfect for your business category'
+    'Both designs are mobile-responsive'
   );
 }
 
@@ -369,19 +370,20 @@ async function handleChatFlow(input: UserInput) {
     }
 
     // Template selection
-    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio') {
+    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story') {
       if (!session || session.step !== 'AWAITING_TEMPLATE') {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
       }
-      session.answers.template = 'portfolio';
+      const selectedTemplateName = buttonId === 'tpl_story' ? 'Story Board' : 'Nature Portfolio';
+      session.answers.template = buttonId === 'tpl_story' ? 'story' : 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       session.lastActive = new Date().toISOString();
       await db.saveSession(session);
 
       await sendButtonMessage(
         from,
-        `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`,
+        `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`,
         [
           { id: 'host_buy_custom', title: 'Buy New Domain' },
           { id: 'host_point_custom', title: 'Connect My Domain' },
@@ -630,12 +632,14 @@ async function handleChatFlow(input: UserInput) {
       break;
 
     case 'AWAITING_TEMPLATE':
-      session.answers.template = 'portfolio';
+      const choice = text.toLowerCase();
+      const isStory = choice.includes('story') || choice.includes('board');
+      session.answers.template = isStory ? 'story' : 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       await db.saveSession(session);
       await sendButtonMessage(
         from,
-        `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`,
+        `Design selected: *${isStory ? 'Story Board' : 'Nature Portfolio'}* ✅\n\nHow would you like to host your website?`,
         [
           { id: 'host_custom', title: 'Custom Domain' },
           { id: 'host_free', title: 'Free Subdomain' }
