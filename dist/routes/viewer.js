@@ -233,6 +233,7 @@ async function viewerRoutes(fastify) {
             return reply.type('text/html').send(renderSubscriptionPendingPage(site));
         }
         const { template } = request.query;
+        reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
         return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
     });
     // 2. Mock Razorpay Domain Payment Page

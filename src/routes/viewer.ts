@@ -248,6 +248,8 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
     }
 
     const { template } = request.query as { template?: string };
+    
+    reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
   });
 
