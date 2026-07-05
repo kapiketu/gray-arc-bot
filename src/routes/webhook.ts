@@ -168,14 +168,36 @@ async function sendCategoryList(to: string) {
 }
 
 async function sendTemplateSelector(to: string) {
+  const buttons: Array<{ id: string; title: string }> = [];
+  try {
+    const templatesDir = path.join(__dirname, '../../templates');
+    if (fs.existsSync(templatesDir)) {
+      const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+      for (const folder of folders) {
+        if (buttons.length >= 3) break;
+        
+        let title = folder;
+        const metaPath = path.join(templatesDir, folder, 'metadata.json');
+        if (fs.existsSync(metaPath)) {
+          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+          title = meta.template_name || meta.name || folder;
+        }
+        if (title.length > 20) title = title.substring(0, 17) + '...';
+        buttons.push({ id: `tpl_${folder}`, title });
+      }
+    }
+  } catch (err: any) {
+    console.error(`[Webhook] Failed reading templates for selector:`, err.message);
+  }
+
+  if (buttons.length === 0) {
+    buttons.push({ id: 'tpl_GA001', title: 'Service Pro' });
+  }
+
   await sendButtonMessage(
     to,
     `Almost done! Choose a design style for your website:`,
-    [
-      { id: 'tpl_portfolio', title: 'Nature Portfolio' },
-      { id: 'tpl_grayarc', title: 'Gray Arc v1' },
-      { id: 'tpl_taxi', title: 'Taxi Board' }
-    ],
+    buttons,
     'Step 5 of 5',
     'All designs are mobile-responsive'
   );
@@ -450,25 +472,21 @@ async function handleChatFlow(input: UserInput) {
     }
 
     // Template selection
-    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship' || buttonId === 'tpl_nimbus' || buttonId === 'tpl_taxi' || buttonId === 'tpl_grayarc') {
+    if (buttonId && buttonId.startsWith('tpl_')) {
       if (!session || session.step !== 'AWAITING_TEMPLATE') {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
       }
-      let selectedTemplateName = 'Nature Portfolio';
-      let templateKey = 'portfolio';
-      if (buttonId === 'tpl_astroship') {
-        selectedTemplateName = 'Astroship';
-        templateKey = 'astroship';
-      } else if (buttonId === 'tpl_nimbus') {
-        selectedTemplateName = 'Nimbus (Dark)';
-        templateKey = 'nimbus';
-      } else if (buttonId === 'tpl_taxi') {
-        selectedTemplateName = 'Taxi Board';
-        templateKey = 'taxi';
-      } else if (buttonId === 'tpl_grayarc') {
-        selectedTemplateName = 'Gray Arc v1';
-        templateKey = 'grayarc';
+      const templateKey = buttonId.replace('tpl_', '');
+      let selectedTemplateName = templateKey;
+      try {
+        const metaPath = path.join(__dirname, '../../templates', templateKey, 'metadata.json');
+        if (fs.existsSync(metaPath)) {
+          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+          selectedTemplateName = meta.template_name || meta.name || templateKey;
+        }
+      } catch (e) {
+        console.warn(`[Webhook] Failed to read template metadata:`, e);
       }
       session.answers.template = templateKey;
       session.step = 'AWAITING_DOMAIN_CHOICE';
@@ -739,20 +757,28 @@ async function handleChatFlow(input: UserInput) {
 
     case 'AWAITING_TEMPLATE':
       const choice = text.toLowerCase();
-      let templateKey = 'portfolio';
-      let selectedTemplateName = 'Nature Portfolio';
-      if (choice.includes('astro') || choice.includes('ship')) {
-        templateKey = 'astroship';
-        selectedTemplateName = 'Astroship';
-      } else if (choice.includes('nimbus') || choice.includes('dark')) {
-        templateKey = 'nimbus';
-        selectedTemplateName = 'Nimbus (Dark)';
-      } else if (choice.includes('taxi') || choice.includes('cab')) {
-        templateKey = 'taxi';
-        selectedTemplateName = 'Taxi Board';
-      } else if (choice.includes('gray') || choice.includes('arc') || choice.includes('v1')) {
-        templateKey = 'grayarc';
-        selectedTemplateName = 'Gray Arc v1';
+      let templateKey = 'GA001';
+      let selectedTemplateName = 'Service Pro';
+      try {
+        const templatesDir = path.join(__dirname, '../../templates');
+        if (fs.existsSync(templatesDir)) {
+          const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+          for (const folder of folders) {
+            let name = folder.toLowerCase();
+            const metaPath = path.join(templatesDir, folder, 'metadata.json');
+            if (fs.existsSync(metaPath)) {
+              const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+              name = (meta.template_name || meta.name || folder).toLowerCase();
+            }
+            if (choice.includes(name) || name.includes(choice)) {
+              templateKey = folder;
+              selectedTemplateName = name;
+              break;
+            }
+          }
+        }
+      } catch (err: any) {
+        console.error(`[Webhook] Failed matching text template choice:`, err.message);
       }
       session.answers.template = templateKey;
       session.step = 'AWAITING_DOMAIN_CHOICE';
@@ -761,11 +787,12 @@ async function handleChatFlow(input: UserInput) {
         from,
         `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`,
         [
-          { id: 'host_custom', title: 'Custom Domain' },
+          { id: 'host_buy_custom', title: 'Buy New Domain' },
+          { id: 'host_point_custom', title: 'Connect My Domain' },
           { id: 'host_free', title: 'Free Subdomain' }
         ],
         'Hosting Option',
-        'Custom domain: ₹500 one-time'
+        'Custom domain setup'
       );
       break;
 
