@@ -259,8 +259,9 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
 
   // 3. Mock Razorpay Subscription Page
   fastify.get('/pay/subscribe', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { siteId, subscriptionId } = request.query as { siteId: string; subscriptionId: string };
-    return reply.type('text/html').send(renderPaymentPage('subscription', siteId, undefined, subscriptionId));
+    const { siteId, subscriptionId, domain, addon } = request.query as { siteId: string; subscriptionId: string; domain?: string; addon?: string };
+    const priceNum = addon ? parseInt(addon) : undefined;
+    return reply.type('text/html').send(renderPaymentPage('subscription', siteId, domain, subscriptionId, priceNum));
   });
 
   // 4. Handle Mock Confirmation
