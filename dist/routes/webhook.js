@@ -11,6 +11,7 @@ const ai_1 = require("../services/ai");
 const billing_1 = require("../services/billing");
 const domains_1 = require("../services/domains");
 const crypto_1 = __importDefault(require("crypto"));
+const axios_1 = __importDefault(require("axios"));
 dotenv_1.default.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
@@ -742,6 +743,16 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
     await (0, whatsapp_1.sendTextMessage)(from, `🛠️ *AI is now designing your website...*\nThis takes about 10-15 seconds. Please wait.`);
     try {
         const siteConfig = await (0, ai_1.generateWebsiteConfig)(session.answers.phone || from, session.answers.businessName || 'My Business', session.answers.category || 'Local Shop', session.answers.about || 'A premium local business.', session.answers.services || '', session.answers.contact || '');
+        // Pre-generate and cache the logo image using Pollinations AI so it loads instantly for the user
+        const logoUrl = `https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(session.answers.businessName || 'Business')}?width=200&height=200&nologo=true`;
+        console.log(`[Logo Generator] Generating logo at: ${logoUrl}`);
+        try {
+            await axios_1.default.get(logoUrl, { timeout: 15000 });
+            console.log(`[Logo Generator] Logo successfully generated and cached!`);
+        }
+        catch (e) {
+            console.warn(`[Logo Generator] Warning: logo generation timed out or failed, but continuing:`, e.message);
+        }
         // Apply selected template
         if (session.answers.template) {
             siteConfig.template = session.answers.template;

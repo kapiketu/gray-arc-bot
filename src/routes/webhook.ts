@@ -6,6 +6,7 @@ import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
 import { createDomainPaymentLink, createSubscriptionLink, createCustomDomainSubscriptionLink, processPaymentWebhook } from '../services/billing';
 import { checkDomainAvailability, suggestAlternativeDomains } from '../services/domains';
 import crypto from 'crypto';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -938,6 +939,16 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       session.answers.services || '',
       session.answers.contact || ''
     );
+    
+    // Pre-generate and cache the logo image using Pollinations AI so it loads instantly for the user
+    const logoUrl = `https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(session.answers.businessName || 'Business')}?width=200&height=200&nologo=true`;
+    console.log(`[Logo Generator] Generating logo at: ${logoUrl}`);
+    try {
+      await axios.get(logoUrl, { timeout: 15000 });
+      console.log(`[Logo Generator] Logo successfully generated and cached!`);
+    } catch (e: any) {
+      console.warn(`[Logo Generator] Warning: logo generation timed out or failed, but continuing:`, e.message);
+    }
 
     // Apply selected template
     if (session.answers.template) {

@@ -2840,7 +2840,10 @@ body{font-family:Outfit,sans-serif;background:#0f172a;color:#fff}
 <body class="scroll-smooth">
 <nav class="fixed w-full bg-black/40 backdrop-blur z-50 border-b border-white/5">
 <div class="max-w-7xl mx-auto flex justify-between p-5 items-center">
-<div class="font-bold text-2xl text-white">${site.businessName}</div>
+<div class="flex items-center gap-3 font-bold text-2xl text-white">
+  <img src="https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(site.businessName)}?width=200&height=200&nologo=true" class="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10" alt="Logo">
+  <span>${site.businessName}</span>
+</div>
 <div class="hidden md:flex gap-8">
 <a href="#services" class="hover:text-[var(--primary)] transition-colors">Services</a>
 <a href="#gallery" class="hover:text-[var(--primary)] transition-colors">Gallery</a>
