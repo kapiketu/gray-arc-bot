@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { db, SiteConfig } from '../services/db';
 import { processPaymentWebhook } from '../services/billing';
 import { purchaseDomain, setupDomainDNS } from '../services/domains';
+import { sendCTAUrlMessage } from '../services/whatsapp';
 
 export default async function viewerRoutes(fastify: FastifyInstance) {
   
@@ -321,6 +322,29 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
 
         await db.saveSite(site);
       }
+    }
+
+    // Send a congratulations WhatsApp notification to the user
+    try {
+      const site = await db.getSite(body.siteId);
+      if (site) {
+        const hasCustomDomain = !!site.customDomain;
+        const liveLink = hasCustomDomain ? `http://${site.customDomain}` : `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
+        
+        const notificationText = hasCustomDomain 
+          ? `🎉 *Congratulations!*\n\nYour payment was successful. We have successfully registered your custom domain *${site.customDomain}*!\n\nIt is now active and live. Tap below to visit your website:`
+          : `🎉 *Congratulations!*\n\nYour payment was successful and your website is now active! Tap below to visit your website:`;
+
+        await sendCTAUrlMessage(
+          site.phoneNumber,
+          notificationText,
+          'Open Website',
+          liveLink
+        );
+        console.log('[Pay Confirm] WhatsApp notification sent to:', site.phoneNumber);
+      }
+    } catch (msgErr) {
+      console.error('[Pay Confirm] Failed to send payment confirmation WhatsApp message:', msgErr);
     }
 
     const isCustomDomain = !!body.domain;

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = viewerRoutes;
 const db_1 = require("../services/db");
 const domains_1 = require("../services/domains");
+const whatsapp_1 = require("../services/whatsapp");
 async function viewerRoutes(fastify) {
     // 1. Render the generated business websites
     // ────────────────────────────────────────────────────────
@@ -295,6 +296,22 @@ async function viewerRoutes(fastify) {
                 }
                 await db_1.db.saveSite(site);
             }
+        }
+        // Send a congratulations WhatsApp notification to the user
+        try {
+            const site = await db_1.db.getSite(body.siteId);
+            if (site) {
+                const hasCustomDomain = !!site.customDomain;
+                const liveLink = hasCustomDomain ? `http://${site.customDomain}` : `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
+                const notificationText = hasCustomDomain
+                    ? `🎉 *Congratulations!*\n\nYour payment was successful. We have successfully registered your custom domain *${site.customDomain}*!\n\nIt is now active and live. Tap below to visit your website:`
+                    : `🎉 *Congratulations!*\n\nYour payment was successful and your website is now active! Tap below to visit your website:`;
+                await (0, whatsapp_1.sendCTAUrlMessage)(site.phoneNumber, notificationText, 'Open Website', liveLink);
+                console.log('[Pay Confirm] WhatsApp notification sent to:', site.phoneNumber);
+            }
+        }
+        catch (msgErr) {
+            console.error('[Pay Confirm] Failed to send payment confirmation WhatsApp message:', msgErr);
         }
         const isCustomDomain = !!body.domain;
         const customDomainUrl = isCustomDomain ? `http://${body.domain.replace(/^https?:\/\//i, '').trim()}` : '';
