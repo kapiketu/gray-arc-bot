@@ -295,6 +295,29 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
       const site = await db.getSite(body.siteId);
       if (site) {
         site.billingStatus = 'active';
+        
+        // If it's a combined subscription + domain registration
+        if (body.domain) {
+          const registrant = {
+            nameFirst: body.name ? body.name.split(' ')[0] : 'Gray',
+            nameLast: body.name && body.name.split(' ').length > 1 ? body.name.split(' ').slice(1).join(' ') : 'Arc',
+            email: body.email || 'domains@thegrayarc.com',
+            address1: body.address1 || '123 Tech Square',
+            city: body.city || 'Mumbai',
+            state: body.state || 'Maharashtra',
+            postalCode: body.postalCode || '400001'
+          };
+
+          // 1. Purchase domain under registrant
+          await purchaseDomain(body.domain, site.phoneNumber, registrant);
+
+          // 2. Automate CNAME DNS Setup
+          await setupDomainDNS(body.domain);
+
+          site.customDomain = body.domain;
+          site.domainStatus = 'paid';
+        }
+
         await db.saveSite(site);
       }
     }
@@ -1530,29 +1553,64 @@ function renderSubscriptionPendingPage(site: SiteConfig): string {
 
 function renderPaymentPage(type: string, siteId: string, domain?: string, paymentId?: string, price?: number): string {
   const isDomain = type === 'domain';
+  const hasAddon = !isDomain && !!domain && !!price;
+
+  let pageTitle = 'Subscription';
+  let pricingText = 'Monthly Subscription';
+  let priceDisplay = '₹399';
+  let detailText = '<p class="text-zinc-500 text-xs mt-2">Recurring UPI AutoPay mandate</p>';
+
+  if (isDomain) {
+    pageTitle = 'Domain Payment';
+    pricingText = 'Domain Registration';
+    priceDisplay = `₹${price || 500}`;
+    detailText = `<p class="text-zinc-500 text-sm mt-3">Domain: <strong class="text-white">${domain}</strong></p>`;
+  } else if (hasAddon) {
+    pageTitle = 'Activate Domain & Site';
+    pricingText = 'Custom Domain Setup';
+    priceDisplay = `₹${399 + (price || 0)}`;
+    detailText = `
+      <div class="text-zinc-500 text-xs mt-3 space-y-1">
+        <p>• Today's Payment: <strong class="text-white">₹${399 + (price || 0)}</strong> (₹${price} Domain + ₹399 Subscription)</p>
+        <p>• Future Months: <strong class="text-white">₹399/month</strong> auto-debit</p>
+        <p>• Domain: <strong class="text-white">${domain}</strong></p>
+      </div>`;
+  }
+
+  // Determine if we need WHOIS Form
+  const showWhoisForm = isDomain || hasAddon;
+
   return `<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
-    <title>${isDomain ? 'Domain Payment' : 'Subscription'}</title>
+    <title>${pageTitle}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>body{font-family:'Inter',sans-serif}</style></head>
-    <body class="bg-zinc-950 flex items-center justify-center min-h-screen">
-      <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md">
+    <body class="bg-zinc-950 flex items-center justify-center min-h-screen py-10">
+      <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md animate-fade-in">
         <div class="flex justify-between items-center mb-8">
           <span class="text-blue-400 font-bold text-lg">Razorpay</span>
           <span class="bg-blue-500/10 text-blue-400 text-xs px-3 py-1 rounded-full font-semibold border border-blue-500/20">Test Mode</span>
         </div>
         <div class="mb-8">
-          <div class="text-zinc-500 text-sm">${isDomain ? 'Domain Registration' : 'Monthly Subscription'}</div>
-          <div class="text-4xl font-black text-white mt-1">${isDomain ? `₹${price || 500}` : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
-          ${isDomain ? `<p class="text-zinc-500 text-sm mt-3">Domain: <strong class="text-white">${domain}</strong></p>` : '<p class="text-zinc-500 text-xs mt-2">Recurring UPI AutoPay mandate</p>'}
+          <div class="text-zinc-500 text-sm">${pricingText}</div>
+          <div class="text-4xl font-black text-white mt-1">${priceDisplay}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
+          ${detailText}
         </div>
         <form action="/pay/confirm" method="POST" class="space-y-4">
           <input type="hidden" name="type" value="${type}">
           <input type="hidden" name="siteId" value="${siteId}">
-          ${isDomain ? `
+          
+          ${hasAddon ? `
             <input type="hidden" name="domain" value="${domain}">
-            <div class="space-y-3 mb-6">
+            <input type="hidden" name="addon" value="${price}">
+          ` : ''}
+
+          ${isDomain ? `<input type="hidden" name="domain" value="${domain}">` : ''}
+          ${!isDomain && !hasAddon ? `<input type="hidden" name="subscriptionId" value="${paymentId}">` : ''}
+
+          ${showWhoisForm ? `
+            <div class="space-y-3 mb-6 border-t border-zinc-800 pt-6">
               <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Domain Registrant Details</h4>
               <div>
                 <label class="block text-[11px] text-zinc-500 mb-1">Full Name</label>
@@ -1581,9 +1639,9 @@ function renderPaymentPage(type: string, siteId: string, domain?: string, paymen
                 <input type="text" name="postalCode" required placeholder="400001" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
               </div>
             </div>
-          ` : `<input type="hidden" name="subscriptionId" value="${paymentId}">`}
-          <button type="submit" class="w-full ${isDomain ? 'bg-blue-500 hover:bg-blue-400' : 'bg-emerald-500 hover:bg-emerald-400'} text-white font-bold py-4 rounded-xl transition shadow-lg">
-            ${isDomain ? 'Pay & Register Domain' : 'Authorize UPI AutoPay'}
+          ` : ''}
+          <button type="submit" class="w-full ${showWhoisForm ? 'bg-blue-500 hover:bg-blue-400' : 'bg-emerald-500 hover:bg-emerald-400'} text-white font-bold py-4 rounded-xl transition shadow-lg">
+            ${showWhoisForm ? 'Authorize AutoPay & Register' : 'Authorize UPI AutoPay'}
           </button>
         </form>
         <p class="text-center text-xs text-zinc-600 mt-6">🔒 Secured by Razorpay</p>

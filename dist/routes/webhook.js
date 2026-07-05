@@ -629,14 +629,14 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
         if (isCustomDomain && session.answers.customDomainRequested) {
             const targetDomain = session.answers.customDomainRequested;
             const domainPrice = session.answers.domainPrice || 500;
-            const payment = await (0, billing_1.createDomainPaymentLink)(siteConfig.id, targetDomain, domainPrice);
+            const payment = await (0, billing_1.createCustomDomainSubscriptionLink)(siteConfig.id, targetDomain, domainPrice);
             siteConfig.customDomain = targetDomain;
             siteConfig.domainStatus = 'pending_payment';
             await db_1.db.saveSite(siteConfig);
             // Send Preview Link CTA
             await (0, whatsapp_1.sendCTAUrlMessage)(from, `🎉 *Congratulations! Your website preview is ready!*\n\n🎁 Your *30-Day Free Trial* is now active on the preview link.\n\nTap below to view it:`, 'View Preview Site', subdomainUrl);
-            // Send Domain Purchase Payment CTA
-            await (0, whatsapp_1.sendCTAUrlMessage)(from, `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Pricing Breakdown:*\n• Custom Domain: *₹${domainPrice}* (one-time)\n• Website Subscription: *₹399/month*\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`, 'Pay & Link Domain', payment.paymentUrl);
+            // Send Domain Purchase & AutoPay Subscription CTA
+            await (0, whatsapp_1.sendCTAUrlMessage)(from, `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹${399 + domainPrice}* (₹${domainPrice} domain + ₹399 subscription)\n• Future Months: *₹399/month* auto-debit.`, 'Activate Domain & Site', payment.paymentUrl);
         }
         else {
             const subscription = await (0, billing_1.createSubscriptionLink)(siteConfig.id);

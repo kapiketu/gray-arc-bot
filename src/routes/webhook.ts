@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { db, Session } from '../services/db';
 import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage } from '../services/whatsapp';
 import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
-import { createDomainPaymentLink, createSubscriptionLink, processPaymentWebhook } from '../services/billing';
+import { createDomainPaymentLink, createSubscriptionLink, createCustomDomainSubscriptionLink, processPaymentWebhook } from '../services/billing';
 import { checkDomainAvailability, suggestAlternativeDomains } from '../services/domains';
 import crypto from 'crypto';
 
@@ -805,7 +805,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
     if (isCustomDomain && session.answers.customDomainRequested) {
       const targetDomain = session.answers.customDomainRequested;
       const domainPrice = session.answers.domainPrice || 500;
-      const payment = await createDomainPaymentLink(siteConfig.id, targetDomain, domainPrice);
+      const payment = await createCustomDomainSubscriptionLink(siteConfig.id, targetDomain, domainPrice);
       
       siteConfig.customDomain = targetDomain;
       siteConfig.domainStatus = 'pending_payment';
@@ -819,11 +819,11 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
         subdomainUrl
       );
 
-      // Send Domain Purchase Payment CTA
+      // Send Domain Purchase & AutoPay Subscription CTA
       await sendCTAUrlMessage(
         from,
-        `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Pricing Breakdown:*\n• Custom Domain: *₹${domainPrice}* (one-time)\n• Website Subscription: *₹399/month*\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`,
-        'Pay & Link Domain',
+        `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹${399 + domainPrice}* (₹${domainPrice} domain + ₹399 subscription)\n• Future Months: *₹399/month* auto-debit.`,
+        'Activate Domain & Site',
         payment.paymentUrl
       );
     } else {

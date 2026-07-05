@@ -87,6 +87,21 @@ export async function createSubscriptionLink(siteId: string): Promise<PaymentLin
 }
 
 /**
+ * Generates a subscription link with an upfront Add-on fee for Custom Domain purchase
+ */
+export async function createCustomDomainSubscriptionLink(siteId: string, domain: string, domainPrice: number): Promise<PaymentLinkResponse> {
+  console.log(`[Billing Service] Creating unified subscription + domain link for ${siteId} -> ${domain}`);
+  
+  const mockSubscriptionId = `sub_${Math.random().toString(36).substring(2, 9)}`;
+  const mockPaymentUrl = `${BASE_URL}/pay/subscribe?siteId=${siteId}&subscriptionId=${mockSubscriptionId}&domain=${domain}&addon=${domainPrice}`;
+  
+  return {
+    paymentUrl: mockPaymentUrl,
+    paymentId: mockSubscriptionId
+  };
+}
+
+/**
  * Handles incoming Razorpay webhook updates to activate subscriptions / domain status
  */
 export async function processPaymentWebhook(payload: any): Promise<boolean> {

@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDomainPaymentLink = createDomainPaymentLink;
 exports.createSubscriptionLink = createSubscriptionLink;
+exports.createCustomDomainSubscriptionLink = createCustomDomainSubscriptionLink;
 exports.processPaymentWebhook = processPaymentWebhook;
 const dotenv_1 = __importDefault(require("dotenv"));
 const razorpay_1 = __importDefault(require("razorpay"));
@@ -74,6 +75,18 @@ async function createSubscriptionLink(siteId) {
     // For simplicity, we are returning a mock link until a Plan ID is provided.
     const mockSubscriptionId = `sub_${Math.random().toString(36).substring(2, 9)}`;
     const mockPaymentUrl = `${BASE_URL}/pay/subscribe?siteId=${siteId}&subscriptionId=${mockSubscriptionId}`;
+    return {
+        paymentUrl: mockPaymentUrl,
+        paymentId: mockSubscriptionId
+    };
+}
+/**
+ * Generates a subscription link with an upfront Add-on fee for Custom Domain purchase
+ */
+async function createCustomDomainSubscriptionLink(siteId, domain, domainPrice) {
+    console.log(`[Billing Service] Creating unified subscription + domain link for ${siteId} -> ${domain}`);
+    const mockSubscriptionId = `sub_${Math.random().toString(36).substring(2, 9)}`;
+    const mockPaymentUrl = `${BASE_URL}/pay/subscribe?siteId=${siteId}&subscriptionId=${mockSubscriptionId}&domain=${domain}&addon=${domainPrice}`;
     return {
         paymentUrl: mockPaymentUrl,
         paymentId: mockSubscriptionId
