@@ -292,7 +292,7 @@ async function handleChatFlow(input) {
             };
             await db_1.db.saveSession(newSession);
             try {
-                await (0, whatsapp_1.sendFlowMessage)(from, `Let's build your website! Tap the button below to fill out your business details in one go:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'BUSINESS_DETAILS', 'Website Builder');
+                await (0, whatsapp_1.sendFlowMessage)(from, `Let's build your website! Tap the button below to fill out your business details in one go:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
             }
             catch (flowError) {
                 console.error('[Flow Error] Failed to send Flow message, falling back to step-by-step chat flow:', flowError);
@@ -541,7 +541,7 @@ async function handleChatFlow(input) {
     // ─── ONBOARDING STEPS (Text input responses) ───
     switch (session.step) {
         case 'AWAITING_FLOW_DATA':
-            await (0, whatsapp_1.sendFlowMessage)(from, `Please use the form to enter your details at once. Tap the button below to open the form:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'BUSINESS_DETAILS', 'Website Builder');
+            await (0, whatsapp_1.sendFlowMessage)(from, `Please use the form to enter your details at once. Tap the button below to open the form:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
             break;
         case 'AWAITING_CATEGORY':
             // User typed category as text instead of using the list menu

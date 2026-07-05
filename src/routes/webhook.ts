@@ -381,7 +381,7 @@ async function handleChatFlow(input: UserInput) {
           'Fill Details 📝',
           WHATSAPP_FLOW_ID,
           `flow_token_${Date.now()}`,
-          'BUSINESS_DETAILS',
+          'WELCOME_SCREEN',
           'Website Builder'
         );
       } catch (flowError: any) {
@@ -683,7 +683,7 @@ async function handleChatFlow(input: UserInput) {
         'Fill Details 📝',
         WHATSAPP_FLOW_ID,
         `flow_token_${Date.now()}`,
-        'BUSINESS_DETAILS',
+        'WELCOME_SCREEN',
         'Website Builder'
       );
       break;
