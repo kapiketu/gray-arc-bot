@@ -158,8 +158,9 @@ async function sendTemplateSelector(to: string) {
 async function sendSiteReadyMenu(to: string, siteUrl: string) {
   await sendButtonMessage(
     to,
-    `🎉 *Congratulations! Your website is live!*\n\n🔗 ${siteUrl}\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`,
+    `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`,
     [
+      { id: 'btn_view_site', title: 'View Live Site' },
       { id: 'btn_edit_details', title: 'Edit Details' },
       { id: 'btn_change_template', title: 'Change Template' }
     ]

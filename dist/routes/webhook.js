@@ -118,7 +118,8 @@ async function sendTemplateSelector(to) {
     ], 'Step 5 of 5', 'You can change this anytime later');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
-    await (0, whatsapp_1.sendButtonMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🔗 ${siteUrl}\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`, [
+    await (0, whatsapp_1.sendButtonMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`, [
+        { id: 'btn_view_site', title: 'View Live Site' },
         { id: 'btn_edit_details', title: 'Edit Details' },
         { id: 'btn_change_template', title: 'Change Template' }
     ]);
