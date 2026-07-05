@@ -1,19 +1,18 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { db, SiteConfig } from '../services/db';
+import { db, SiteConfig, SiteTestimonial } from '../services/db';
 import { processPaymentWebhook } from '../services/billing';
 import { purchaseDomain, setupDomainDNS } from '../services/domains';
 import { sendCTAUrlMessage, sendTextMessage } from '../services/whatsapp';
+import fs from 'fs';
+import path from 'path';
 
 export default async function viewerRoutes(fastify: FastifyInstance) {
   
   // 1. Render the generated business websites
   
-// ────────────────────────────────────────────────────────
-// SECRET PREVIEW TEMPLATES
-// ────────────────────────────────────────────────────────
-
-fastify.get('/preview/dark', async (request, reply) => {
-  const html = `<!DOCTYPE html>
+  // Secret Preview Templates for mock testing
+  fastify.get('/preview/dark', async (request, reply) => {
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Iron Edge Gym</title>
@@ -68,11 +67,11 @@ fastify.get('/preview/dark', async (request, reply) => {
   </section>
 </body>
 </html>`;
-  return reply.type('text/html').send(html);
-});
+    return reply.type('text/html').send(html);
+  });
 
-fastify.get('/preview/elegant', async (request, reply) => {
-  const html = `<!DOCTYPE html>
+  fastify.get('/preview/elegant', async (request, reply) => {
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Aura Beauty Spa</title>
@@ -127,11 +126,11 @@ fastify.get('/preview/elegant', async (request, reply) => {
   </section>
 </body>
 </html>`;
-  return reply.type('text/html').send(html);
-});
+    return reply.type('text/html').send(html);
+  });
 
-fastify.get('/preview/corporate', async (request, reply) => {
-  const html = `<!DOCTYPE html>
+  fastify.get('/preview/corporate', async (request, reply) => {
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sterling & Co. Legal</title>
@@ -179,59 +178,59 @@ fastify.get('/preview/corporate', async (request, reply) => {
   </section>
 </body>
 </html>`;
-  return reply.type('text/html').send(html);
-});
+    return reply.type('text/html').send(html);
+  });
 
-fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-  const hostname = request.hostname || request.headers.host || '';
-  console.log(`[viewer] Request on root '/' from hostname: ${hostname}`);
-  
-  // Try to lookup site by custom domain
-  const site = await db.getSiteByDomain(hostname);
-  if (site) {
-    const now = new Date();
-    const trialExpired = site.billingStatus === 'trial' && now > new Date(site.trialEndsAt);
-    const subscriptionInactive = site.billingStatus !== 'trial' && site.billingStatus !== 'active';
+  fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+    const hostname = request.hostname || request.headers.host || '';
+    console.log(`[viewer] Request on root '/' from hostname: ${hostname}`);
+    
+    // Try to lookup site by custom domain
+    const site = await db.getSiteByDomain(hostname);
+    if (site) {
+      const now = new Date();
+      const trialExpired = site.billingStatus === 'trial' && now > new Date(site.trialEndsAt);
+      const subscriptionInactive = site.billingStatus !== 'trial' && site.billingStatus !== 'active';
 
-    if (trialExpired || subscriptionInactive) {
-      return reply.type('text/html').send(renderSubscriptionPendingPage(site));
+      if (trialExpired || subscriptionInactive) {
+        return reply.type('text/html').send(renderSubscriptionPendingPage(site));
+      }
+
+      return reply.type('text/html').send(renderPremiumWebsite(site, site.template));
     }
 
-    return reply.type('text/html').send(renderPremiumWebsite(site, site.template));
-  }
+    // Default main landing page when accessing root of main builder app
+    return reply.type('text/html').send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The Gray Arc Website Builder</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+        <style>body { font-family: 'Outfit', sans-serif; }</style>
+      </head>
+      <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="absolute w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl -top-40 -left-40"></div>
+        <div class="absolute w-[500px] h-[500px] bg-green-500/10 rounded-full blur-3xl -bottom-40 -right-40"></div>
+        
+        <div class="max-w-xl p-8 bg-zinc-950/40 backdrop-blur-md rounded-3xl shadow-2xl border border-white/5 text-center relative z-10 mx-6">
+          <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-green-500 mx-auto mb-8 rounded-full"></div>
+          <h1 class="text-4xl font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-green-400 text-transparent bg-clip-text">The Gray Arc</h1>
+          <p class="text-zinc-400 text-base mb-8 max-w-md mx-auto leading-relaxed">
+            Create premium, high-converting business websites instantly directly through WhatsApp! Powered by AI.
+          </p>
+          <a href="https://wa.me/919693186322" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full bg-gradient-to-r from-indigo-600 to-green-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg text-white">
+            Build Your Website Now
+          </a>
+        </div>
+      </body>
+      </html>
+    `);
+  });
 
-  // Default main landing page when accessing root of main builder app
-  return reply.type('text/html').send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>The Gray Arc Website Builder</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-      <style>body { font-family: 'Outfit', sans-serif; }</style>
-    </head>
-    <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center relative overflow-hidden">
-      <div class="absolute w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl -top-40 -left-40"></div>
-      <div class="absolute w-[500px] h-[500px] bg-green-500/10 rounded-full blur-3xl -bottom-40 -right-40"></div>
-      
-      <div class="max-w-xl p-8 bg-zinc-950/40 backdrop-blur-md rounded-3xl shadow-2xl border border-white/5 text-center relative z-10 mx-6">
-        <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-green-500 mx-auto mb-8 rounded-full"></div>
-        <h1 class="text-4xl font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-green-400 text-transparent bg-clip-text">The Gray Arc</h1>
-        <p class="text-zinc-400 text-base mb-8 max-w-md mx-auto leading-relaxed">
-          Create premium, high-converting business websites instantly directly through WhatsApp! Powered by AI.
-        </p>
-        <a href="https://wa.me/919693186322" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full bg-gradient-to-r from-indigo-600 to-green-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg text-white">
-          Build Your Website Now
-        </a>
-      </div>
-    </body>
-    </html>
-  `);
-});
-
-fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply) => {
     const { siteId } = request.params as { siteId: string };
     const site = await db.getSite(siteId);
     
@@ -441,2644 +440,196 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
 }
 
 // ────────────────────────────────────────────────────────
-// PREMIUM WEBSITE TEMPLATE
+// PREMIUM WEBSITE TEMPLATE ENGINE (DYNAMIC LOADER)
 // ────────────────────────────────────────────────────────
 
-
-interface ThemeConfig {
-  primary: string;
-  primaryHex: string;
-  bgGradient: string;
-  accentText: string;
-  accentBg: string;
-  accentBorder: string;
-  accentGlow: string;
-  fontTitle: string;
-  fontFamilyTitle: string;
-  fontFamilyImport: string;
-}
-
-function getCategoryTheme(category: string): ThemeConfig {
-  const cat = category.toLowerCase();
-  
-  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('food') || cat.includes('restaurant') || cat.includes('cafe') || cat.includes('coffee') || cat.includes('kitchen')) {
-    return {
-      primary: 'amber',
-      primaryHex: '#b45309',
-      bgGradient: 'from-amber-50/30 via-stone-50 to-stone-100/30',
-      accentText: 'text-amber-700',
-      accentBg: 'bg-amber-700 hover:bg-amber-800 text-white',
-      accentBorder: 'border-amber-200',
-      accentGlow: 'shadow-amber-100',
-      fontTitle: 'font-serif italic font-bold',
-      fontFamilyTitle: "'Lora', serif",
-      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,600&display=swap'
-    };
-  }
-  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
-    return {
-      primary: 'rose',
-      primaryHex: '#e11d48',
-      bgGradient: 'from-rose-50/40 via-stone-50 to-stone-100/50',
-      accentText: 'text-rose-600',
-      accentBg: 'bg-rose-600 hover:bg-rose-700 text-white',
-      accentBorder: 'border-rose-200',
-      accentGlow: 'shadow-rose-100',
-      fontTitle: 'font-serif',
-      fontFamilyTitle: "'Playfair Display', serif",
-      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap'
-    };
-  }
-  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
-    return {
-      primary: 'orange',
-      primaryHex: '#ea580c',
-      bgGradient: 'from-zinc-50 via-orange-50/10 to-zinc-100/30',
-      accentText: 'text-orange-600',
-      accentBg: 'bg-orange-600 hover:bg-orange-700 text-white',
-      accentBorder: 'border-orange-200',
-      accentGlow: 'shadow-orange-100',
-      fontTitle: 'font-sans font-extrabold tracking-tighter uppercase italic',
-      fontFamilyTitle: "'Montserrat', sans-serif",
-      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,800&display=swap'
-    };
-  }
-  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical') || cat.includes('lawyer') || cat.includes('legal') || cat.includes('advocate')) {
-    return {
-      primary: 'blue',
-      primaryHex: '#1d4ed8',
-      bgGradient: 'from-slate-50 via-blue-50/20 to-slate-100/40',
-      accentText: 'text-blue-700',
-      accentBg: 'bg-blue-700 hover:bg-blue-800 text-white',
-      accentBorder: 'border-blue-200',
-      accentGlow: 'shadow-blue-100',
-      fontTitle: 'font-sans font-bold tracking-tight',
-      fontFamilyTitle: "'Outfit', sans-serif",
-      fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap'
-    };
-  }
-  
-  return {
-    primary: 'indigo',
-    primaryHex: '#4f46e5',
-    bgGradient: 'from-indigo-50/20 via-slate-50 to-slate-100/30',
-    accentText: 'text-indigo-600',
-    accentBg: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    accentBorder: 'border-indigo-200',
-    accentGlow: 'shadow-indigo-100',
-    fontTitle: 'font-sans font-bold tracking-tight',
-    fontFamilyTitle: "'Inter', sans-serif",
-    fontFamilyImport: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap'
-  };
-}
-
-function renderPremiumClassicTemplate(site: SiteConfig): string {
-  const images = getCategoryImages(site.category);
-  const theme = getCategoryTheme(site.category);
-  
-  const formatPrice = (price: string) => {
-    if (price.toLowerCase().includes('contact')) return 'Contact Us';
-    return price;
-  };
-
-  // On-the-fly copy text expansion to fix short content on existing registered sites
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 120) {
-    subtitle = `${subtitle} Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 150) {
-    story = `${story} Our journey began with a simple yet powerful mission: to serve our community with honest, high-quality, and reliable solutions. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom service solution, our experienced specialists work tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-
-  return `<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${site.businessName}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="${theme.fontFamilyImport}" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    h1, h2, h3, .theme-font-title { font-family: ${theme.fontFamilyTitle}; }
-    
-    @keyframes marquee-ltr {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(0%); }
-    }
-    .animate-marquee-ltr {
-      animation: marquee-ltr 22s linear infinite;
-    }
-  </style>
-</head>
-<body class="bg-gradient-to-br ${theme.bgGradient} min-h-screen text-slate-800 antialiased selection:bg-${theme.primary}-100 selection:text-${theme.primary}-900">
-
-  <!-- Navigation -->
-  <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-slate-100/80 transition-all duration-300">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="#" class="text-2xl font-bold tracking-tight text-slate-900 theme-font-title">${site.businessName}</a>
-      
-      <!-- Desktop Navigation Menu -->
-      <div class="hidden md:flex items-center space-x-8">
-        <a href="#about" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
-        <a href="#features" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Why Choose Us</a>
-        <a href="#services" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
-        <a href="#testimonials" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Reviews</a>
-        <a href="#faq" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">FAQ</a>
-        <a href="#contact" class="text-sm font-medium text-slate-600 hover:text-${theme.primary}-600 transition-colors">Contact</a>
-        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-full shadow-sm ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">Chat Now</a>
-      </div>
-
-      <!-- Mobile Menu Button -->
-      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors focus:outline-none" aria-label="Toggle Menu">
-        <i class="fas fa-bars text-xl" id="menu-icon"></i>
-      </button>
-    </div>
-
-    <!-- Mobile Navigation Dropdown Menu -->
-    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 border-b border-slate-100 bg-white/95 backdrop-blur-md shadow-xl transition-all duration-300">
-      <div class="px-6 py-4 flex flex-col space-y-4">
-        <a href="#about" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">About</a>
-        <a href="#features" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Why Choose Us</a>
-        <a href="#services" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Services</a>
-        <a href="#testimonials" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Reviews</a>
-        <a href="#faq" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">FAQ</a>
-        <a href="#contact" class="mobile-nav-link text-sm font-semibold text-slate-600 hover:text-${theme.primary}-600 transition-colors">Contact</a>
-        <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl shadow-sm ${theme.accentBg} transition-all duration-200">Chat Now</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <header class="max-w-6xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-32 grid md:grid-cols-12 gap-12 items-center">
-    <div class="md:col-span-7 flex flex-col justify-center text-left">
-      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-${theme.primary}-50 text-${theme.primary}-700 border border-${theme.primary}-100 mb-6 w-fit">
-        <span class="w-1.5 h-1.5 rounded-full bg-${theme.primary}-500 animate-pulse"></span>
-        Welcome to ${site.businessName}
-      </span>
-      <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6 ${theme.fontTitle}">
-        ${site.heroTitle || site.businessName}
-      </h1>
-      <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
-        ${subtitle}
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-md ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
-          Contact on WhatsApp
-        </a>
-        <a href="#services" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition-colors">
-          View Our Offers
-        </a>
-      </div>
-    </div>
-    <div class="md:col-span-5 relative">
-      <div class="absolute inset-0 bg-gradient-to-tr from-${theme.primary}-500 to-indigo-500 rounded-3xl rotate-3 scale-95 blur-2xl opacity-20 animate-pulse"></div>
-      <div class="relative bg-white p-4 rounded-3xl shadow-xl border border-slate-100">
-        <img src="${images.hero}" alt="${site.businessName} Hero Image" class="w-full h-full aspect-[4/5] object-cover rounded-2xl shadow-inner">
-      </div>
-    </div>
-  </header>
-
-  <!-- Moving Text Ticker Section -->
-  <div class="w-full bg-[#18181b] text-zinc-100 py-3.5 overflow-hidden shadow-inner border-y border-[#27272a] relative z-10">
-    <div class="flex whitespace-nowrap min-w-full">
-      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>Premium Services</span>
-        <span>•</span>
-        <span>Direct WhatsApp Booking</span>
-        <span>•</span>
-        <span>Client Satisfaction Guaranteed</span>
-        <span>•</span>
-        <span>Professional Expert Care</span>
-        <span>•</span>
-        <span>Trusted Local Solutions</span>
-      </div>
-      <div class="flex shrink-0 gap-8 px-4 justify-around min-w-full animate-marquee-ltr text-xs md:text-sm font-bold tracking-wider uppercase">
-        <span>Premium Services</span>
-        <span>•</span>
-        <span>Direct WhatsApp Booking</span>
-        <span>•</span>
-        <span>Client Satisfaction Guaranteed</span>
-        <span>•</span>
-        <span>Professional Expert Care</span>
-        <span>•</span>
-        <span>Trusted Local Solutions</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- About Section -->
-  <section id="about" class="py-24 bg-white border-y border-slate-100">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-center">
-      <div class="md:col-span-5">
-        <div class="relative bg-slate-50 p-4 rounded-3xl border border-slate-100">
-          <img src="${images.about}" alt="About ${site.businessName}" class="w-full aspect-square object-cover rounded-2xl shadow-md">
-        </div>
-      </div>
-      <div class="md:col-span-7 text-left">
-        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 theme-font-title">
-          ${site.storyTitle || "Our Story"}
-        </h2>
-        <div class="w-16 h-1 bg-${theme.primary}-500 mb-8 rounded-full"></div>
-        <p class="text-lg text-slate-600 leading-relaxed mb-8">
-          ${story}
-        </p>
-        <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors">
-          Learn More About Us
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why Choose Us -->
-  <section id="features" class="py-24 max-w-6xl mx-auto px-6 border-b border-slate-100">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Why Choose Us</h2>
-      <p class="text-slate-600">We are committed to delivering excellence and building long-term relationships based on outstanding results.</p>
-      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
-    </div>
-    <div class="grid md:grid-cols-3 gap-8">
-      ${(site.features || [
-        { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
-        { title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience and problem-solving focus to all we do.' },
-        { title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision. We take the time to understand your exact requirements, provide transparent updates, and offer flexible solutions to guarantee satisfaction.' }
-      ]).map((feat: any) => `
-        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-left">
-          <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center font-bold text-xl mb-6">✓</div>
-          <h3 class="font-bold text-xl text-slate-900 mb-3">${feat.title}</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">${feat.description}</p>
-        </div>
-      `).join('')}
-    </div>
-  </section>
-
-  <!-- Services -->
-  <section id="services" class="py-24 max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">What We Offer</h2>
-      <p class="text-slate-600">Select any of our services below to connect directly with us and order via WhatsApp.</p>
-      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
-    </div>
-    
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      ${site.services.map((item, i) => {
-        let desc = item.description || '';
-        if (desc.length < 80) {
-          desc = `${desc} We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals.`;
-        }
-        return `<div class="group flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1">
-          <div class="overflow-hidden aspect-video bg-slate-50 relative">
-            <img src="${images.products[i % images.products.length]}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <div class="p-6 flex flex-col flex-grow text-left">
-            <div class="flex justify-between items-start mb-3 gap-2">
-              <h3 class="font-bold text-lg text-slate-900 group-hover:${theme.accentText} transition-colors">${item.name}</h3>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-${theme.primary}-50 text-${theme.primary}-700 shrink-0">
-                ${formatPrice(item.price)}
-              </span>
-            </div>
-            <p class="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">${desc}</p>
-            <a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-2xl shadow-sm ${theme.accentBg} transition-all duration-200">
-              Order via WhatsApp
-            </a>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section id="testimonials" class="py-24 bg-white border-y border-slate-100">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Client Stories</h2>
-        <p class="text-slate-600">Hear directly from some of our valued clients about their experiences working with us.</p>
-        <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
-      </div>
-      <div class="grid md:grid-cols-3 gap-8">
-        ${(site.testimonials || [
-          { name: 'Aarav Mehta', role: 'Regular Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined. I highly recommend them to anyone seeking top-tier service!' },
-          { name: 'Priya Sharma', role: 'Local Customer', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. It is rare to find a business that cares this much about its clients.' },
-          { name: 'Rohan Gupta', role: 'Business Owner', content: 'They exceeded my expectations in every possible way. The project was completed on time, within budget, and the attention to details was absolutely spectacular. Their team is knowledgeable, responsive, and incredibly dedicated to customer success. Five stars!' }
-        ]).map((t: any) => `
-          <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 flex flex-col justify-between text-left">
-            <p class="text-sm text-slate-600 italic leading-relaxed mb-6">"${t.content}"</p>
-            <div>
-              <h4 class="font-bold text-slate-950 text-base">${t.name}</h4>
-              <p class="text-xs text-slate-500">${t.role}</p>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq" class="py-24 max-w-4xl mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Frequently Asked Questions</h2>
-      <p class="text-slate-600">Got questions? We have got answers. If you do not see your question here, feel free to WhatsApp us.</p>
-      <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
-    </div>
-    <div class="space-y-6">
-      ${(site.faqs || [
-        { question: 'What are your operating hours?', answer: 'We are fully operational Monday through Saturday from 10:00 AM to 8:00 PM. Our team is available to assist you during these hours, and you can always send us a message via WhatsApp to schedule an appointment outside these times if needed.' },
-        { question: 'How do I book a service or order?', answer: 'Booking is incredibly easy and direct. Simply scroll to our services section, select the offering you are interested in, and click the "Order via WhatsApp" button. This will open a chat with us containing the service details so we can finalize your booking instantly.' },
-        { question: 'Where are you located and do you offer delivery?', answer: 'Where are you located and do you offer delivery? We are based in local area, India, serving clients across the region. If you need precise directions, maps, or want to check if we service your specific area, feel free to send us a message on WhatsApp and we will share our location details.' }
-      ]).map((faq: any) => `
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-left">
-          <h3 class="font-bold text-lg text-slate-950 mb-2 flex items-start gap-3">
-            <span class="text-${theme.primary}-500 shrink-0">Q.</span>
-            <span>${faq.question}</span>
-          </h3>
-          <p class="text-sm text-slate-600 pl-6 leading-relaxed">${faq.answer}</p>
-        </div>
-      `).join('')}
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="py-24 bg-slate-50 border-t border-slate-100">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 theme-font-title">Contact Us</h2>
-        <p class="text-slate-600">Get in touch with us directly via phone, WhatsApp, or visit us at our location.</p>
-        <div class="w-16 h-1 bg-${theme.primary}-500 mx-auto mt-6 rounded-full"></div>
-      </div>
-      <div class="grid md:grid-cols-3 gap-8">
-        <!-- Phone & WhatsApp Card -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
-              <i class="fas fa-phone-alt"></i>
-            </div>
-            <h3 class="font-bold text-xl text-slate-900 mb-3">Call or Chat</h3>
-            <p class="text-sm text-slate-600 leading-relaxed mb-4">Have any questions? Give us a call or send a message on WhatsApp.</p>
-          </div>
-          <div class="space-y-2">
-            <a href="tel:${site.phoneNumber}" class="block text-base font-bold text-${theme.primary}-600 hover:underline">${site.contactDetails?.phone || site.phoneNumber}</a>
-            <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-600 hover:underline">
-              <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-            </a>
-          </div>
-        </div>
-
-        <!-- Address Card -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
-              <i class="fas fa-map-marker-alt"></i>
-            </div>
-            <h3 class="font-bold text-xl text-slate-900 mb-3">Our Location</h3>
-            <p class="text-sm text-slate-600 leading-relaxed mb-4">Visit us at our physical location. We'd love to welcome you.</p>
-          </div>
-          <p class="text-base font-bold text-slate-800">${site.contactDetails?.address || 'Local Business, India'}</p>
-        </div>
-
-        <!-- Business Hours Card -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-left flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-${theme.primary}-50 text-${theme.primary}-600 flex items-center justify-center text-xl mb-6">
-              <i class="fas fa-clock"></i>
-            </div>
-            <h3 class="font-bold text-xl text-slate-900 mb-3">Business Hours</h3>
-            <p class="text-sm text-slate-600 leading-relaxed mb-4">We are open during the following hours to assist you.</p>
-          </div>
-          <p class="text-base font-bold text-slate-800">${site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM'}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-slate-900 text-white py-16 border-t border-slate-800">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      <h2 class="text-2xl md:text-3xl font-bold mb-4 theme-font-title">${site.businessName}</h2>
-      <p class="text-slate-400 max-w-md mx-auto mb-8">Ready to get started? Send us a message on WhatsApp right now and let us know what you need.</p>
-      <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full shadow-lg ${theme.accentBg} transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-12">
-        Chat With Us Now
-      </a>
-      <div class="w-full h-px bg-slate-800 mb-8"></div>
-      <p class="text-xs text-slate-600">© 2026 ${site.businessName}. Powered by The Gray Arc.</p>
-    </div>
-  </footer>
-
-  <!-- Floating Sticky Contact Buttons -->
-  <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-    <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
-       class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fab fa-whatsapp text-xl"></i>
-    </a>
-    <a href="tel:${site.phoneNumber}" 
-       class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fas fa-phone text-base"></i>
-    </a>
-  </div>
-
-  <script>
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const menuIcon = document.getElementById('menu-icon');
-    
-    if (menuBtn && mobileMenu && menuIcon) {
-      menuBtn.addEventListener('click', () => {
-        const isHidden = mobileMenu.classList.contains('hidden');
-        if (isHidden) {
-          mobileMenu.classList.remove('hidden');
-          menuIcon.classList.remove('fa-bars');
-          menuIcon.classList.add('fa-xmark');
-        } else {
-          mobileMenu.classList.add('hidden');
-          menuIcon.classList.remove('fa-xmark');
-          menuIcon.classList.add('fa-bars');
-        }
-      });
-
-      // Close menu when links are clicked
-      const links = mobileMenu.querySelectorAll('.mobile-nav-link');
-      links.forEach(link => {
-        link.addEventListener('click', () => {
-          mobileMenu.classList.add('hidden');
-          menuIcon.classList.remove('fa-xmark');
-          menuIcon.classList.add('fa-bars');
-        });
-      });
-    }
-  </script>
-
-</body>
-</html>`;
-}
-
-function renderAstroAgencyTemplate(site: SiteConfig): string {
-  const theme = getCategoryTheme(site.category);
-  
-  const formatPrice = (price: string) => {
-    if (price.toLowerCase().includes('contact')) return 'Contact Us';
-    return price;
-  };
-
-  // On-the-fly copy text expansion to fix short content
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 120) {
-    subtitle = `${subtitle} Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 150) {
-    story = `${story} Our journey began with a simple yet powerful mission: to serve our community with honest, high-quality, and reliable solutions. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom service solution, our experienced specialists work tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-
-  // Helper to split hero title and apply gradient theme highlights like original AgenceX
-  const titleWords = (site.heroTitle || 'Social Media Marketing is the Best Ever').split(' ');
-  let heroTitleHtml = '';
-  if (titleWords.length > 3) {
-    const firstPart = titleWords.slice(0, titleWords.length - 3).join(' ');
-    const highlightedPart = titleWords.slice(titleWords.length - 3, titleWords.length - 1).join(' ');
-    const lastPart = titleWords[titleWords.length - 1];
-    heroTitleHtml = `${firstPart} <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${highlightedPart}</span> ${lastPart}`;
-  } else if (titleWords.length > 1) {
-    const firstPart = titleWords.slice(0, titleWords.length - 1).join(' ');
-    const lastWord = titleWords[titleWords.length - 1];
-    heroTitleHtml = `${firstPart} <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${lastWord}</span>`;
-  } else {
-    heroTitleHtml = `<span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${titleWords[0]}</span>`;
-  }
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${site.businessName}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '${theme.primaryHex}',
-            'box-bg': 'rgb(var(--color-box))',
-            'box-border': 'rgb(var(--box-border))',
-            'heading-1': 'rgb(var(--heading-1))',
-            'heading-2': 'rgb(var(--heading-2))',
-            'heading-3': 'rgb(var(--heading-3))',
-          },
-          screens: {
-            midmd: '880px',
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    :root {
-      --color-bg: 255 255 255;
-      --color-box: 255 255 255;
-      --box-border: 229 231 235;
-      --box-sd: 226 232 240 / 0.5;
-      --heading-1: 23 37 84;
-      --heading-2: 31 41 55;
-      --heading-3: 55 65 81;
-      --color-primary: ${theme.primaryHex};
-    }
-
-    .dark {
-      --color-bg: 3 7 18;
-      --color-box: 17 24 39;
-      --box-border: 243 244 246 / 0.1;
-      --box-sd: transparent;
-      --heading-1: 255 255 255;
-      --heading-2: 243 244 246;
-      --heading-3: 209 213 219;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background-color: rgb(var(--color-bg));
-      color: rgb(var(--heading-3));
-      font-family: 'Raleway', sans-serif;
-    }
-  </style>
-</head>
-<body class="overflow-x-hidden antialiased transition-colors duration-300">
-
-  <!-- Header / Navigation -->
-  <header class="absolute inset-x-0 top-0 z-50 py-6">
-    <div class="max-w-6xl mx-auto px-6">
-      <nav class="w-full flex justify-between gap-6 relative items-center">
-        <!-- Logo -->
-        <div class="min-w-max inline-flex relative">
-          <a href="#" class="relative flex items-center gap-3">
-            <div class="relative w-7 h-7 overflow-hidden flex rounded-xl">
-              <span class="absolute w-4 h-4 -top-1 -right-1 bg-green-500 rounded-md rotate-45"></span>
-              <span class="absolute w-4 h-4 -bottom-1 -right-1 bg-[#FCDC58] rounded-md rotate-45"></span>
-              <span class="absolute w-4 h-4 -bottom-1 -left-1 bg-[var(--color-primary)] rounded-md rotate-45"></span>
-              <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
-            </div>
-            <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              ${site.businessName}
-            </div>
-          </a>
-        </div>
-
-        <!-- Desktop Navigation Items -->
-        <div class="hidden lg:flex items-center gap-x-8">
-          <ul class="flex gap-x-6 text-sm font-medium text-[rgb(var(--heading-3))]">
-            <li><a href="#about-us" class="hover:text-[var(--color-primary)] transition-colors">About Us</a></li>
-            <li><a href="#features" class="hover:text-[var(--color-primary)] transition-colors">Features</a></li>
-            <li><a href="#services" class="hover:text-[var(--color-primary)] transition-colors">Services</a></li>
-            <li><a href="#contact" class="hover:text-[var(--color-primary)] transition-colors">Contact</a></li>
-          </ul>
-        </div>
-
-        <!-- Right Buttons (Theme toggle + CTA) -->
-        <div class="flex items-center gap-x-3">
-          <!-- Light/Dark Mode Switcher -->
-          <button id="theme-switch" class="outline-none flex relative text-[rgb(var(--heading-2))] rounded-full p-2 border border-[rgb(var(--box-border))] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-            <i class="fas fa-moon text-lg dark:hidden"></i>
-            <i class="fas fa-sun text-lg hidden dark:block"></i>
-          </button>
-          
-          <a href="https://wa.me/${site.phoneNumber}" class="hidden sm:inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-full bg-[var(--color-primary)] text-white hover:opacity-95 transition-all">
-            Get Started
-          </a>
-
-          <!-- Mobile Toggle menu button -->
-          <button id="mobile-toggle" class="lg:hidden p-2 rounded-lg text-[rgb(var(--heading-3))] focus:outline-none">
-            <i class="fas fa-bars text-xl" id="mobile-icon"></i>
-          </button>
-        </div>
-
-        <!-- Mobile Navigation Panel -->
-        <div id="mobile-nav" class="hidden absolute top-full left-0 right-0 mt-3 p-6 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-xl flex flex-col space-y-4 z-50 animate-fade-in">
-          <a href="#about-us" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">About Us</a>
-          <a href="#features" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Features</a>
-          <a href="#services" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Services</a>
-          <a href="#contact" class="mobile-nav-link text-sm font-semibold text-[rgb(var(--heading-3))] hover:text-[var(--color-primary)]">Contact</a>
-          <a href="https://wa.me/${site.phoneNumber}" class="mobile-nav-link inline-flex items-center justify-center w-full px-5 py-3 text-sm font-bold rounded-xl bg-[var(--color-primary)] text-white">Get Started</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="relative pt-32 lg:pt-36 pb-20">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
-      <!-- Glow Shapes -->
-      <div class="absolute w-full lg:w-1/2 inset-y-0 lg:right-0 pointer-events-none">
-        <span class="absolute -left-6 md:left-4 top-24 lg:top-28 w-24 h-24 rotate-90 skew-x-12 rounded-3xl bg-green-400 blur-xl opacity-40 lg:opacity-75 lg:block hidden"></span>
-        <span class="absolute right-4 bottom-12 w-24 h-24 rounded-3xl bg-[var(--color-primary)] blur-xl opacity-60"></span>
-      </div>
-      <span class="w-4/12 lg:w-2/12 aspect-square bg-gradient-to-tr from-[var(--color-primary)] to-green-400 absolute -top-5 lg:left-0 rounded-full skew-y-12 blur-2xl opacity-20 pointer-events-none"></span>
-
-      <!-- Content -->
-      <div class="relative flex flex-col items-center text-center lg:text-left lg:items-start lg:max-w-none max-w-3xl mx-auto lg:mx-0 lg:flex-1 lg:w-1/2">
-        <h1 class="text-3xl/tight sm:text-4xl/tight md:text-5xl/tight xl:text-6xl/tight font-bold text-[rgb(var(--heading-1))] leading-tight">
-          ${heroTitleHtml}
-        </h1>
-        <p class="mt-8 text-base text-[rgb(var(--heading-3))] leading-relaxed max-w-xl">
-          ${subtitle}
-        </p>
-
-        <!-- Dynamic Action Form -->
-        <div class="mt-10 w-full flex max-w-md mx-auto lg:mx-0">
-          <form action="https://wa.me/${site.phoneNumber}" class="py-1.5 pl-6 w-full pr-1.5 flex gap-3 items-center shadow-lg border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] rounded-full focus-within:border-[var(--color-primary)] transition-all">
-            <span class="min-w-max pr-2 border-r border-[rgb(var(--box-border))] text-[rgb(var(--heading-3))]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V19.5z" />
-              </svg>
-            </span>
-            <input type="text" placeholder="Interested? Send a message..." readonly class="w-full py-3 outline-none bg-transparent text-sm cursor-pointer text-[rgb(var(--heading-2))] font-medium">
-            <button class="min-w-max text-white bg-[var(--color-primary)] hover:opacity-90 px-6 py-3 rounded-full font-semibold transition-all">
-              Get Started
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Image -->
-      <div class="flex flex-1 lg:w-1/2 lg:h-auto relative lg:max-w-none lg:mx-0 mx-auto max-w-3xl w-full">
-        <img src="/public/images/image1.webp" alt="Hero banner image" class="w-full aspect-[4/3] lg:aspect-square rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))]">
-      </div>
-    </div>
-  </section>
-
-  <!-- Number/Stats Section -->
-  <section class="relative pb-24">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="mx-auto lg:mx-0 p-6 sm:p-8 rounded-3xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] shadow-lg md:divide-x divide-[rgb(var(--box-border))] grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div class="text-center">
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">12+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Created projects</p>
-        </div>
-        <div class="text-center">
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">200+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Projects</p>
-        </div>
-        <div class="text-center">
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">120</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Happy Client</p>
-        </div>
-        <div class="text-center">
-          <h2 class="font-bold text-2xl sm:text-3xl md:text-4xl text-[rgb(var(--heading-1))]">5+</h2>
-          <p class="mt-2 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">Years</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Trusted By Section -->
-  <section class="pb-20">
-    <div class="mx-auto max-w-7xl w-full px-5 sm:px-8 md:px-14 lg:px-5 space-y-8">
-      <div class="text-center max-w-3xl mx-auto">
-        <h2 class="text-[rgb(var(--heading-1))] font-semibold text-2xl sm:text-3xl md:text-4xl">
-          Trusted by companies like
-        </h2>
-      </div>
-      <div class="flex justify-center flex-wrap gap-4">
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/public/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/public/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/public/logos/paypallogo.png" width="100" height="60" alt="paypal" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/public/logos/spotify.png" width="100" height="60" alt="spotify" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-        <div class="p-4 sm:p-5 rounded-xl bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] group">
-          <img src="/public/logos/slack.png" width="100" height="60" alt="slack" class="h-7 sm:h-10 w-auto ease-linear duration-300 grayscale group-hover:!grayscale-0 group-hover:scale-105">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Services / Products Section -->
-  <section id="services" class="py-24 relative">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">What we offer</h2>
-        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-      </div>
-
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-        ${site.services.map((item, i) => {
-          let desc = item.description || '';
-          if (desc.length < 80) {
-            desc = `${desc} We take pride in providing this professional service built on years of expertise. We focus on delivering top-tier details, client consultation, and custom adjustments to fit your exact goals.`;
-          }
-          return `<a href="https://wa.me/${site.phoneNumber}?text=${encodeURIComponent('Hi! I am interested in ' + item.name)}" 
-             class="p-5 sm:p-6 lg:p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg shadow-box-shadow relative overflow-hidden flex flex-col justify-between hover:scale-[1.01] hover:shadow-xl transition-all duration-300 group">
-            <div>
-              <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                </svg>
-              </div>
-              <div class="mt-6 space-y-4 relative">
-                <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] group-hover:text-[var(--color-primary)] transition-colors">
-                  ${item.name}
-                </h3>
-                <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">
-                  ${desc}
-                </p>
-              </div>
-            </div>
-            <span class="absolute w-32 aspect-square -bottom-16 -right-16 bg-[var(--color-primary)]/10 rounded-full"></span>
-          </a>`;
-        }).join('')}
-      </div>
-    </div>
-  </section>
-
-  <!-- About Us Section -->
-  <section id="about-us" class="py-24 border-y border-[rgb(var(--box-border))]">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
-      <!-- Left image -->
-      <div class="flex-1 flex w-full lg:w-1/2">
-        <div class="w-full relative">
-          <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
-          <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-          <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-          <img src="/public/images/dev-with-c-1.webp" alt="About story banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
-        </div>
-      </div>
-
-      <!-- Right text -->
-      <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">
-          ${site.storyTitle || 'We help drive your business forward faster'}
-        </h2>
-        <p class="mt-8 text-base text-[rgb(var(--heading-3))] leading-relaxed">
-          ${story}
-        </p>
-
-        <!-- Mission / Vision Cards -->
-        <div class="pt-8 w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
-            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-              </svg>
-            </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Mission</h4>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">To deliver top-tier ${site.category.toLowerCase()} services that enhance our customers' lives and businesses with reliability, excellence, and care.</p>
-          </div>
-
-          <div class="p-5 rounded-2xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-sm text-left">
-            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <h4 class="font-semibold text-lg text-[rgb(var(--heading-2))] mt-6 mb-4">Vision</h4>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed">To be the leading provider of ${site.category.toLowerCase()} solutions, recognized for our commitment to excellence, innovation, and client satisfaction.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section id="features" class="py-24 border-b border-[rgb(var(--box-border))]">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-12 items-center">
-      <!-- Left content -->
-      <div class="flex-grow lg:w-1/2 flex flex-col items-start text-left">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))] leading-tight">Why Choose Us</h2>
-        <p class="mt-6 text-base text-[rgb(var(--heading-3))] leading-relaxed">We are committed to delivering excellence and building long-term relationships based on outstanding results.</p>
-        
-        <ul class="mt-8 space-y-6 font-medium text-[rgb(var(--heading-3))] w-full">
-          ${(site.features || [
-            { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards.' },
-            { title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Our crew consists of highly trained, certified, and passionate professionals.' },
-            { title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision, taking the time to understand your exact requirements.' }
-          ]).map((feat: any) => `
-            <li class="flex items-start gap-4">
-              <span class="font-bold bg-[rgb(var(--color-box))] border border-[rgb(var(--box-border))] rounded-full w-8 h-8 text-[var(--color-primary)] inline-flex justify-center items-center shrink-0 shadow-sm">&checkmark;</span>
-              <div>
-                <h4 class="font-semibold text-base text-[rgb(var(--heading-2))]">${feat.title}</h4>
-                <p class="text-sm text-[rgb(var(--heading-3))] mt-1">${feat.description}</p>
-              </div>
-            </li>
-          `).join('')}
-        </ul>
-      </div>
-
-      <!-- Right image -->
-      <div class="flex-1 flex w-full lg:w-1/2 relative">
-        <div class="absolute rotate-45 -left-5 md:-left-10 lg:-left-20 xl:-left-24 p-1 top-1/2 w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 blur-3xl opacity-35 pointer-events-none"></div>
-        <div class="absolute p-1 -top-4 md:-top-10 right-0 w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-orange-400 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-        <span class="absolute w-full aspect-[16/5] -skew-x-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-green-400 opacity-20 blur-2xl left-0 bottom-0 pointer-events-none"></span>
-        <img src="/public/images/dev-with-c.webp" alt="Feature showcase banner image" class="w-full aspect-[4/3] rounded-3xl object-cover shadow-xl border border-[rgb(var(--box-border))] relative z-10">
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="py-24 border-b border-[rgb(var(--box-border))]">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-[rgb(var(--heading-1))]">Contact Us</h2>
-        <p class="text-[rgb(var(--heading-3))] text-base max-w-lg mx-auto">Get in touch with us directly via phone, WhatsApp, or visit our location.</p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
-        <!-- Phone & WhatsApp Card -->
-        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
-          <div>
-            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
-              <i class="fas fa-phone-alt text-lg"></i>
-            </div>
-            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Phone & Chat</h3>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">Have any questions? Give us a call or send a message on WhatsApp.</p>
-          </div>
-          <div class="space-y-3">
-            <a href="tel:${site.phoneNumber}" class="block text-base font-bold text-[var(--color-primary)] hover:underline">${site.contactDetails?.phone || site.phoneNumber}</a>
-            <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center gap-2 text-sm font-semibold text-green-500 hover:underline">
-              <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-            </a>
-          </div>
-        </div>
-
-        <!-- Address Card -->
-        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
-          <div>
-            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
-              <i class="fas fa-map-marker-alt text-lg"></i>
-            </div>
-            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Our Location</h3>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">Visit us at our physical location. We'd love to welcome you.</p>
-          </div>
-          <p class="text-base font-bold text-[rgb(var(--heading-2))]">${site.contactDetails?.address || 'Local Business, India'}</p>
-        </div>
-
-        <!-- Business Hours Card -->
-        <div class="p-8 rounded-3xl border border-[rgb(var(--box-border))] bg-[rgb(var(--color-box))] shadow-lg flex flex-col justify-between hover:scale-[1.01] transition-all duration-300">
-          <div>
-            <div class="rounded-xl bg-gray-300 dark:bg-gray-950 p-3 text-[rgb(var(--heading-1))] w-max">
-              <i class="fas fa-clock text-lg"></i>
-            </div>
-            <h3 class="text-lg md:text-xl font-semibold text-[rgb(var(--heading-2))] mt-6 mb-4">Business Hours</h3>
-            <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mb-6">We are open during the following hours to assist you.</p>
-          </div>
-          <p class="text-base font-bold text-[rgb(var(--heading-2))]">${site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM'}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section id="cta" class="pb-24">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="w-full relative py-12 md:py-16 px-6 md:px-12 rounded-3xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent border border-[rgb(var(--box-border))] shadow-inner overflow-hidden">
-        <!-- Glows -->
-        <div class="absolute right-0 top-0 h-full w-full flex justify-end pointer-events-none">
-          <div class="w-28 h-28 overflow-hidden flex rounded-xl relative blur-2xl">
-            <span class="absolute w-16 h-16 -top-1 -right-1 bg-green-500 rounded-md rotate-45"></span>
-            <span class="absolute w-16 h-16 -bottom-1 -right-1 bg-[#FCDC58] rounded-md rotate-45"></span>
-            <span class="absolute w-16 h-16 -bottom-1 -left-1 bg-[var(--color-primary)] rounded-md rotate-45"></span>
-          </div>
-        </div>
-        <div class="absolute left-0 bottom-0 h-full w-full flex items-end pointer-events-none">
-          <div class="w-28 h-28 overflow-hidden flex rounded-xl relative blur-2xl">
-            <span class="absolute w-16 h-16 -top-1 -right-1 bg-green-500 rounded-md rotate-45"></span>
-            <span class="absolute w-16 h-16 -bottom-1 -right-1 bg-[#FCDC58] rounded-md rotate-45"></span>
-            <span class="absolute w-16 h-16 -bottom-1 -left-1 bg-[var(--color-primary)] rounded-md rotate-45"></span>
-          </div>
-        </div>
-
-        <div class="mx-auto text-center max-w-xl md:max-w-2xl relative z-10 flex flex-col items-center">
-          <h2 class="text-3xl/tight sm:text-4xl/tight md:text-5xl/tight font-bold text-[rgb(var(--heading-1))] leading-tight">
-            Connect with <span class="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 from-20% via-[var(--color-primary)] via-30% to-green-600">${site.businessName}</span> Today
-          </h2>
-          <p class="pt-6 text-sm text-[rgb(var(--heading-3))] leading-relaxed max-w-lg">
-            Ready to scale up? Message us on WhatsApp right now to let us know your requirements. Our specialists are online to guide you.
-          </p>
-          <div class="pt-8">
-            <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full bg-[var(--color-primary)] text-white hover:opacity-90 transition-all shadow-md">
-              Get In Touch
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="relative bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-900 dark:to-transparent pt-20 rounded-t-3xl border-t border-[rgb(var(--box-border))]">
-    <div class="max-w-6xl mx-auto px-6 pb-8 relative overflow-hidden">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10 text-left">
-        <div class="flex flex-col gap-4">
-          <a href="#" class="relative flex items-center gap-3">
-            <div class="relative w-7 h-7 overflow-hidden flex rounded-xl">
-              <span class="absolute w-4 h-4 -top-1 -right-1 bg-green-500 rounded-md rotate-45"></span>
-              <span class="absolute w-4 h-4 -bottom-1 -right-1 bg-[#FCDC58] rounded-md rotate-45"></span>
-              <span class="absolute w-4 h-4 -bottom-1 -left-1 bg-[var(--color-primary)] rounded-md rotate-45"></span>
-              <span class="absolute w-2 h-2 rounded-full bg-[rgb(var(--heading-1))] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></span>
-            </div>
-            <div class="inline-flex text-lg font-semibold text-[rgb(var(--heading-1))]">
-              ${site.businessName}
-            </div>
-          </a>
-          <p class="text-sm text-[rgb(var(--heading-3))] leading-relaxed mt-4">
-            Your trusted partner for premium ${site.category.toLowerCase()} services.
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Company</h4>
-          <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
-            <li><a href="#about-us" class="hover:text-[var(--color-primary)]">About Us</a></li>
-            <li><a href="#" class="hover:text-[var(--color-primary)]">Blog</a></li>
-            <li><a href="#" class="hover:text-[var(--color-primary)]">Jobs</a></li>
-          </ul>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <h4 class="font-bold text-[rgb(var(--heading-1))] text-base mb-2">Resources</h4>
-          <ul class="text-sm text-[rgb(var(--heading-3))] space-y-2 font-medium">
-            <li><a href="#" class="hover:text-[var(--color-primary)]">FAQs Support</a></li>
-            <li><a href="#testimonials" class="hover:text-[var(--color-primary)]">Guides</a></li>
-            <li><a href="#contact" class="hover:text-[var(--color-primary)] font-semibold text-[var(--color-primary)]">Contact Us</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="w-full h-px bg-[rgb(var(--box-border))] my-8"></div>
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs md:text-sm text-[rgb(var(--heading-3))] font-medium">
-        <div>
-          &copy; 2026 ${site.businessName}. All rights reserved.
-        </div>
-        <div>
-          Powered by The Gray Arc.
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Floating Sticky Contact Buttons -->
-  <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-    <!-- WhatsApp Sticky Button -->
-    <a href="https://wa.me/${site.phoneNumber}" target="_blank" rel="noopener noreferrer" 
-       class="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fab fa-whatsapp text-xl"></i>
-    </a>
-    <!-- Call Sticky Button -->
-    <a href="tel:${site.phoneNumber}" 
-       class="w-10 h-10 bg-[#00E676] hover:bg-[#00c853] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 group relative">
-      <i class="fas fa-phone text-base"></i>
-    </a>
-  </div>
-
-  <!-- Mobile Toggle Script & Light/Dark Theme Switcher Script -->
-  <script>
-    // 1. Mobile Menu Nav Toggle
-    const mobileBtn = document.getElementById('mobile-toggle');
-    const mobileNav = document.getElementById('mobile-nav');
-    const mobileIcon = document.getElementById('mobile-icon');
-    
-    if (mobileBtn && mobileNav && mobileIcon) {
-      mobileBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const isHidden = mobileNav.classList.contains('hidden');
-        if (isHidden) {
-          mobileNav.classList.remove('hidden');
-          mobileIcon.classList.remove('fa-bars');
-          mobileIcon.classList.add('fa-xmark');
-        } else {
-          mobileNav.classList.add('hidden');
-          mobileIcon.classList.remove('fa-xmark');
-          mobileIcon.classList.add('fa-bars');
-        }
-      });
-
-      // Close menu when links are clicked
-      const links = mobileNav.querySelectorAll('.mobile-nav-link');
-      links.forEach(link => {
-        link.addEventListener('click', () => {
-          mobileNav.classList.add('hidden');
-          mobileIcon.classList.remove('fa-xmark');
-          mobileIcon.classList.add('fa-bars');
-        });
-      });
-    }
-
-    // 2. Light / Dark Mode Toggle
-    const themeBtn = document.getElementById('theme-switch');
-    // Set initial theme from localStorage
-    if (localStorage.getItem('appTheme') === 'dark' || (!('appTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
+function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
+  const templatesDir = path.join(__dirname, '../../templates');
+  let finalId = templateId || 'GA001';
+
+  let dirPath = path.join(templatesDir, finalId);
+  if (!fs.existsSync(dirPath) || !fs.existsSync(path.join(dirPath, 'index.html'))) {
+    console.warn(`[Template Engine] Template ${finalId} not found, falling back...`);
+    const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+    if (folders.length > 0) {
+      finalId = folders[0];
+      dirPath = path.join(templatesDir, finalId);
     } else {
-      document.documentElement.classList.remove('dark');
+      return `<html><body class="bg-zinc-950 text-white flex items-center justify-center min-h-screen font-sans">
+        <div class="text-center">
+          <h1 class="text-2xl font-bold">No templates found</h1>
+          <p class="text-zinc-500 mt-2">Please upload a valid website template zip file.</p>
+        </div>
+      </body></html>`;
     }
+  }
 
-    if (themeBtn) {
-      themeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const doc = document.documentElement;
-        if (doc.classList.contains('dark')) {
-          doc.classList.remove('dark');
-          localStorage.setItem('appTheme', 'light');
-        } else {
-          doc.classList.add('dark');
-          localStorage.setItem('appTheme', 'dark');
-        }
-      });
-    }
-  </script>
+  const htmlPath = path.join(dirPath, 'index.html');
+  const cssPath = path.join(dirPath, 'style.css');
+  const jsPath = path.join(dirPath, 'script.js');
 
-</body>
-</html>`;
+  let html = fs.readFileSync(htmlPath, 'utf8');
+
+  // Inline CSS
+  if (fs.existsSync(cssPath)) {
+    const css = fs.readFileSync(cssPath, 'utf8');
+    html = html.replace('</head>', `<style>\n${css}\n</style>\n</head>`);
+  }
+
+  // Inline JS
+  if (fs.existsSync(jsPath)) {
+    const js = fs.readFileSync(jsPath, 'utf8');
+    html = html.replace('</body>', `<script>\n${js}\n</script>\n</body>`);
+  }
+
+  const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
+  const testimonialsHtml = renderTestimonialsSlider(site.testimonials || []);
+  const logoHtml = `<img src="https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(site.businessName)}?width=200&height=200&nologo=true" class="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10" alt="Logo">`;
+  const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
+
+  const imageBase = getCategoryImages(site.category || '');
+
+  // Perform substitutions
+  const replacements: Record<string, string> = {
+    '{{business_name}}': site.businessName,
+    '{{category}}': site.category || 'Professional Services',
+    '{{logo}}': logoHtml,
+    '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
+    '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
+    '{{hero_image}}': imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
+    '{{about_title}}': site.storyTitle || 'About Our Company',
+    '{{about_content}}': formatParagraphs(site.storyContent || 'We operate at the intersection of traditional craftsmanship and modern technology, ensuring absolute perfection.'),
+    '{{about_image}}': imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
+    '{{phone}}': site.phoneNumber || '',
+    '{{phone_clean}}': cleanPhone,
+    '{{email}}': site.contactDetails?.email || 'contact@mybusiness.com',
+    '{{address}}': site.contactDetails?.address || 'Available locally & online',
+    '{{services_grid}}': servicesGridHtml,
+    '{{testimonials_slider}}': testimonialsHtml,
+    '{{feature_1_title}}': site.features?.[0]?.title || 'Consultation',
+    '{{feature_1_desc}}': site.features?.[0]?.description || 'We assess your needs and provide a transparent custom estimate.',
+    '{{feature_2_title}}': site.features?.[1]?.title || 'Execution',
+    '{{feature_2_desc}}': site.features?.[1]?.description || 'Our certified crew executes the project utilizing high quality tools.',
+    '{{feature_3_title}}': site.features?.[2]?.title || 'Walkthrough',
+    '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.'
+  };
+
+  for (const [key, value] of Object.entries(replacements)) {
+    html = html.split(key).join(value);
+  }
+
+  return html;
 }
 
-function renderPremiumWebsite(site: SiteConfig, templateName?: string): string {
-  if (templateName === 'grayarc') {
-    return renderGrayArcTemplate(site);
-  }
-  if (templateName === 'taxi') {
-    return renderTaxiTemplate(site);
-  }
-  if (templateName === 'nimbus') {
-    return renderNimbusTemplate(site);
-  }
-  if (templateName === 'astroship') {
-    return renderAstroshipTemplate(site);
-  }
-  if (templateName === 'story') {
-    return renderStoryTemplate(site);
-  }
-  return renderNaturePortfolioTemplate(site);
+function renderServicesGrid(services: Array<{ name: string; description: string; price?: string }>, category: string, phone: string, site: SiteConfig): string {
+  if (services.length === 0) return '';
+
+  let gridItems = '';
+  services.forEach((s, idx) => {
+    if (idx >= 4) return;
+    
+    const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(s.name)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+    
+    if (idx === 0) {
+      gridItems += `
+        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="0">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500 mix-blend-overlay">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
+            <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
+                    <i data-lucide="zap" class="w-7 h-7"></i>
+                </div>
+                <h4 class="text-3xl font-bold text-white mb-3">${s.name}</h4>
+                <p class="text-gray-300 max-w-md">${s.description}</p>
+                <div class="flex justify-between items-center mt-6">
+                    <span class="text-gold-500 font-extrabold text-xl">${s.price || '₹Contact Us'}</span>
+                    <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="px-6 py-2 rounded-full bg-gold-500 text-dark-900 font-bold hover:scale-105 transition-all text-sm">Enquire</a>
+                </div>
+            </div>
+        </div>
+      `;
+    } else if (idx === 3) {
+      gridItems += `
+        <div class="md:col-span-3 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer flex flex-col md:flex-row items-center p-8 gap-8" data-aos="zoom-in" data-aos-delay="300">
+            <div class="absolute inset-0 bg-gradient-to-r from-dark-800 to-transparent opacity-80 z-0"></div>
+            <div class="bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center text-gold-500 shrink-0 border border-white/10 relative z-10">
+                <i data-lucide="shield" class="w-8 h-8"></i>
+            </div>
+            <div class="relative z-10 flex-1">
+                <h4 class="text-2xl font-bold text-white mb-2">${s.name}</h4>
+                <p class="text-gray-400">${s.description}</p>
+                <p class="text-gold-500 font-extrabold mt-2 text-lg">${s.price || '₹Contact Us'}</p>
+            </div>
+            <div class="relative z-10">
+                <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all">
+                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+      `;
+    } else {
+      gridItems += `
+        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer p-8 flex flex-col justify-end" data-aos="zoom-in" data-aos-delay="${idx * 100}">
+            <div class="absolute inset-0 bg-dark-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative z-10">
+                <div class="bg-white/5 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 border border-white/10">
+                    <i data-lucide="${idx === 1 ? 'droplets' : 'thermometer-sun'}" class="w-6 h-6"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-2">${s.name}</h4>
+                <p class="text-gray-400 text-sm mb-4">${s.description}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-gold-500 font-bold text-sm">${s.price || '₹Contact Us'}</span>
+                    <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
+                </div>
+            </div>
+        </div>
+      `;
+    }
+  });
+
+  return `<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">\n${gridItems}\n</div>`;
 }
 
+function renderTestimonialsSlider(testimonials: SiteTestimonial[]): string {
+  if (testimonials.length === 0) return '';
+  let items = '';
+  testimonials.forEach((t) => {
+    const initials = (t.name || 'C').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    items += `
+      <div class="min-w-[100%] md:min-w-[50%] lg:min-w-[33.333%] snap-center">
+          <div class="glass p-8 rounded-3xl border border-white/5 h-full flex flex-col">
+              <div class="flex gap-1 text-gold-500 mb-6">
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+              </div>
+              <p class="text-gray-300 text-lg mb-8 flex-1 italic">"${t.content}"</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center text-white font-bold border border-white/10">${initials}</div>
+                  <div>
+                      <h5 class="text-white font-bold">${t.name}</h5>
+                      <p class="text-sm text-gray-500">${t.role || 'Verified Client'}</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+    `;
+  });
 
-function getSemanticServiceImage(serviceName: string, category: string, index: number): string {
-  const name = (serviceName || '').toLowerCase();
-  const cat = (category || '').toLowerCase();
-
-  // Bakery / Food
-  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('cupcake') || cat.includes('dessert') || cat.includes('food') || cat.includes('bread') || cat.includes('cafe') || cat.includes('baking') || cat.includes('baker')) {
-    if (name.includes('cupcake') || name.includes('muffin')) {
-      const options = [
-        'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=600&q=80&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=600&q=80&auto=format&fit=crop'
-      ];
-      return options[index % options.length];
-    }
-    if (name.includes('cake') || name.includes('fondant') || name.includes('pastry') || name.includes('dessert')) {
-      const options = [
-        'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1535141192574-5d4897c13636?w=600&q=80&auto=format&fit=crop'
-      ];
-      return options[index % options.length];
-    }
-    if (name.includes('bread') || name.includes('loaf') || name.includes('bun') || name.includes('croissant') || name.includes('bake')) {
-      const options = [
-        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80&auto=format&fit=crop'
-      ];
-      return options[index % options.length];
-    }
-    if (name.includes('cookie') || name.includes('biscuit') || name.includes('macaron')) {
-      const options = [
-        'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=600&q=80&auto=format&fit=crop'
-      ];
-      return options[index % options.length];
-    }
-    // Fallback bakery images
-    const bakeryDefaults = [
-      'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=600&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1556217477-d325251ece38?w=800&q=80&auto=format&fit=crop'
-    ];
-    return bakeryDefaults[index % bakeryDefaults.length];
-  }
-
-  // Salon / Beauty
-  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair') || cat.includes('nail')) {
-    if (name.includes('hair') || name.includes('cut') || name.includes('color') || name.includes('style') || name.includes('shave') || name.includes('barber')) {
-      return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80&auto=format&fit=crop';
-    }
-    if (name.includes('nail') || name.includes('mani') || name.includes('pedi')) {
-      return 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80&auto=format&fit=crop';
-    }
-    if (name.includes('massage') || name.includes('spa') || name.includes('facial') || name.includes('skin')) {
-      return 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80&auto=format&fit=crop';
-    }
-    if (name.includes('makeup') || name.includes('bridal') || name.includes('cosmetic')) {
-      return 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=600&q=80&auto=format&fit=crop';
-    }
-    const salonDefaults = [
-      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop'
-    ];
-    return salonDefaults[index % salonDefaults.length];
-  }
-
-  // Gym / Fitness
-  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('train')) {
-    if (name.includes('yoga') || name.includes('stretch') || name.includes('pilates') || name.includes('meditation')) {
-      return 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80&auto=format&fit=crop';
-    }
-    if (name.includes('cardio') || name.includes('run') || name.includes('treadmill') || name.includes('cycling') || name.includes('spin')) {
-      return 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&q=80&auto=format&fit=crop';
-    }
-    if (name.includes('weight') || name.includes('lift') || name.includes('strength') || name.includes('crossfit') || name.includes('gym')) {
-      return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80&auto=format&fit=crop';
-    }
-    const fitnessDefaults = [
-      'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&q=80&auto=format&fit=crop'
-    ];
-    return fitnessDefaults[index % fitnessDefaults.length];
-  }
-
-  // Clinic / Health
-  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical') || cat.includes('physio')) {
-    if (name.includes('teeth') || name.includes('dental') || name.includes('dentist') || name.includes('ortho') || name.includes('root')) {
-      return 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80&auto=format&fit=crop';
-    }
-    const clinicDefaults = [
-      'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80&auto=format&fit=crop'
-    ];
-    return clinicDefaults[index % clinicDefaults.length];
-  }
-
-  // Default Fallback
-  const defaultCategoryImages = getCategoryImages(category);
-  if (defaultCategoryImages && defaultCategoryImages.products && defaultCategoryImages.products.length > 0) {
-    return defaultCategoryImages.products[index % defaultCategoryImages.products.length];
-  }
-  
-  return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80&auto=format&fit=crop';
+  return `<div class="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory pb-8" id="testimonial-slider">\n${items}\n</div>`;
 }
 
-function renderNaturePortfolioTemplate(site: SiteConfig): string {
-  const images = getCategoryImages(site.category || '');
-  
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 50) {
-    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 100) {
-    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-  
-  const currentYear = new Date().getFullYear();
-
-  return `<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${site.businessName} - Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-        body { font-family: 'Nunito', sans-serif; background-color: #fbfcf7; color: #2d431f; overflow-x: hidden; }
-        .text-brand-dark { color: #355322; }
-        .text-brand-primary { color: #4b7833; }
-        .text-brand-light { color: #6a8c4f; }
-        .bg-brand-primary { background-color: #4b7833; }
-        .bg-brand-primary:hover { background-color: #3b6028; }
-        .bg-brand-secondary { background-color: #9dbf83; }
-        .bg-brand-light { background-color: #f0f5e9; }
-        .pill-shadow { box-shadow: 0 10px 40px -10px rgba(75, 120, 51, 0.2); }
-        .card-shadow { box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-shadow:hover { box-shadow: 0 30px 50px -15px rgba(75, 120, 51, 0.15); transform: translateY(-12px); }
-        .fab-hover:hover { transform: scale(1.1) translateY(-5px); }
-        .scroll-reveal { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
-        .delay-100 { transition-delay: 100ms; }
-        .delay-200 { transition-delay: 200ms; }
-        .delay-300 { transition-delay: 300ms; }
-        @keyframes float-slow { 0%, 100% { transform: translateY(0px) rotate(-6deg); } 50% { transform: translateY(-20px) rotate(2deg); } }
-        @keyframes float-fast { 0%, 100% { transform: translateY(0px) rotate(12deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
-        .animate-float-1 { animation: float-slow 6s ease-in-out infinite; }
-        .animate-float-2 { animation: float-fast 4s ease-in-out infinite; }
-        @keyframes spin-slow { to { transform: rotate(360deg); } }
-        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
-    </style>
-</head>
-<body class="antialiased relative" x-data="{ mobileMenuOpen: false }">
-
-    <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end">
-        <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/40 fab-hover transition-all duration-300 z-50 border-2 border-white">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </a>
-        <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" class="w-14 h-14 bg-[#4b7833] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#4b7833]/40 fab-hover transition-all duration-300 z-50 border-2 border-white">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-        </a>
-    </div>
-
-    <div class="relative px-4 sm:px-6 pt-4 pb-24 max-w-[1600px] mx-auto">
-        <nav class="absolute top-8 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl bg-[#fbfcf7]/95 backdrop-blur-md rounded-full px-6 py-4 flex justify-between items-center z-50 shadow-sm border border-white/50">
-            <div class="text-xl sm:text-2xl font-extrabold text-[#4b7833] tracking-tight hover:scale-105 transition-transform cursor-pointer truncate max-w-[160px] sm:max-w-none">${site.businessName}</div>
-            <div class="hidden lg:flex items-center space-x-10 text-[15px] font-bold text-[#455736]">
-                <a href="#about" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">About</a>
-                <a href="#services" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Services</a>
-                <a href="#process" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Process</a>
-                <a href="#work" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Work</a>
-                <a href="#contact" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Contact</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <a href="#contact" class="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary text-white text-sm font-bold transition hover:-translate-y-1 shadow-lg shadow-[#4b7833]/30">Hire Me Today</a>
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden text-[#455736] p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-        </nav>
-
-        <div x-show="mobileMenuOpen" x-cloak class="lg:hidden fixed inset-x-4 top-24 bg-white rounded-3xl shadow-2xl z-[100] overflow-hidden border border-gray-100" @click.outside="mobileMenuOpen = false">
-            <div class="flex flex-col p-6 space-y-4">
-                <a href="#about" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">About</a>
-                <a href="#services" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Services</a>
-                <a href="#process" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Process</a>
-                <a href="#work" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Work</a>
-                <a href="#contact" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Contact</a>
-            </div>
-        </div>
-
-        <div class="relative w-full h-[600px] sm:h-[800px] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden group">
-            <img src="${images.hero || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2000'}" alt="Workspace" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-110">
-            <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"></div>
-            <div class="relative z-20 h-full flex flex-col justify-center px-6 sm:px-16 md:px-24 max-w-4xl pt-20">
-                <div class="scroll-reveal inline-flex items-center gap-2 bg-brand-primary/90 text-white px-4 py-1.5 rounded-full text-sm font-bold w-max mb-6 backdrop-blur-sm shadow-[0_0_20px_rgba(75,120,51,0.5)]">
-                    <svg class="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                    ${site.category || 'Professional Services'}
-                </div>
-                <h1 class="scroll-reveal delay-100 text-3xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1]">
-                    ${site.heroTitle || site.businessName}
-                </h1>
-                <p class="scroll-reveal delay-200 text-white/90 text-base sm:text-lg md:text-xl font-medium max-w-2xl mb-10 leading-relaxed">
-                    ${subtitle}
-                </p>
-                <div class="scroll-reveal delay-300 flex flex-wrap gap-4">
-                    <a href="#work" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold text-base sm:text-lg hover:bg-[#3b6028] hover:-translate-y-1 transition-all border-2 border-transparent shadow-[0_10px_30px_rgba(75,120,51,0.4)]">Explore My Work</a>
-                    <a href="#about" class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-bold text-base sm:text-lg hover:bg-white/20 hover:-translate-y-1 transition-all border-2 border-white/20">Read My Story</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="absolute -bottom-16 sm:-bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl bg-brand-secondary p-2 sm:p-4 rounded-[2rem] sm:rounded-full pill-shadow z-30 transform hover:-translate-y-2 transition-transform duration-500">
-            <div class="bg-white rounded-[1.8rem] sm:rounded-full grid grid-cols-2 md:grid-cols-4 p-4 text-center gap-y-4 md:gap-y-0">
-                <div class="px-2 py-2 border-r border-b border-gray-100 md:border-b-0 hover:scale-105 transition-transform">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">10+</div>
-                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Years Exp</div>
-                </div>
-                <div class="px-2 py-2 border-b md:border-b-0 md:border-r border-gray-100 hover:scale-105 transition-transform">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">500+</div>
-                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Happy Clients</div>
-                </div>
-                <div class="px-2 py-2 border-r border-gray-100 md:border-r-0 hover:scale-105 transition-transform">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">100%</div>
-                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Satisfaction</div>
-                </div>
-                <div class="px-2 py-2 hover:scale-105 transition-transform">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">24/7</div>
-                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Support</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <section id="about" class="max-w-7xl mx-auto px-6 py-24 sm:py-32 mt-20 sm:mt-10">
-        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            <div class="relative pl-6 pt-6 scroll-reveal">
-                <div class="absolute inset-0 border-2 border-dashed border-[#9dbf83] rounded-full scale-110 animate-spin-slow opacity-50 z-0"></div>
-                <div class="rounded-[2.5rem] overflow-hidden border-[12px] border-white card-shadow relative z-10">
-                    <img src="${images.about || 'https://images.unsplash.com/photo-1554046920-90dc5823ca0d?q=80&w=1000'}" alt="${site.businessName}" class="w-full h-[350px] sm:h-[500px] md:h-[650px] object-cover hover:scale-105 transition-transform duration-[10s]">
-                </div>
-                <div class="absolute top-0 left-0 bg-brand-primary text-white w-24 h-24 sm:w-36 sm:h-36 rounded-full flex flex-col items-center justify-center border-8 border-[#fbfcf7] shadow-xl animate-float-1 z-20">
-                    <svg class="w-6 h-6 sm:w-10 sm:h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <span class="text-xs sm:text-base font-bold text-center leading-tight">Expert<br>Professional</span>
-                </div>
-                <div class="absolute -bottom-6 -right-6 bg-white w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-xl border-8 border-[#fbfcf7] animate-float-2 z-20">
-                    <span class="text-3xl sm:text-5xl drop-shadow-md">✨</span>
-                </div>
-            </div>
-            <div class="scroll-reveal delay-200">
-                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">The Journey Behind the Craft</span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6 leading-tight">
-                    ${site.storyTitle || "Our Story"}
-                </h2>
-                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed mb-6">
-                    ${story}
-                </p>
-                <div class="flex flex-wrap items-center gap-6">
-                    <a href="#contact" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-[#3b6028] hover:-translate-y-1 transition-all shadow-lg shadow-[#4b7833]/30 group w-max">
-                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Contact for Details
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="services" class="bg-brand-light py-24 sm:py-32 rounded-[3rem] sm:rounded-[4rem] mx-2 sm:mx-6 mb-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-20 max-w-3xl mx-auto scroll-reveal">
-                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Core Competencies</span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Comprehensive Solutions</h2>
-                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">Explore our core offerings and professional services.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                ${site.services.map((service, index) => `
-                <div class="bg-white rounded-[2.5rem] p-6 pb-10 card-shadow group scroll-reveal delay-${index * 100} flex flex-col h-full border border-gray-100 cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
-                    <div class="overflow-hidden rounded-[1.5rem] mb-8 relative h-64 shrink-0">
-                        <div class="absolute inset-0 bg-brand-primary/30 group-hover:bg-transparent transition duration-500 z-10"></div>
-                        <img src="${getSemanticServiceImage(service.name, site.category || '', index)}" alt="${service.name}" class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-[10s]">
-                    </div>
-                    <div class="px-2 flex flex-col flex-grow">
-                        <div class="flex justify-between items-start mb-2 gap-2">
-                           <h3 class="text-xl sm:text-2xl font-extrabold text-brand-dark group-hover:text-brand-primary transition-colors">${service.name}</h3>
-                        </div>
-                        <p class="text-[#6b7b59] font-medium mb-6 leading-relaxed flex-grow">
-                            ${service.description || 'Professional service tailored to your specific requirements.'}
-                        </p>
-                        <div class="text-sm font-bold text-[#4b7833] uppercase tracking-wider mt-auto group-hover:underline">Order via WhatsApp →</div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <section id="process" class="py-24 sm:py-32 bg-white relative z-10">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-24 max-w-3xl mx-auto scroll-reveal">
-                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block">Proven Methodology</span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">A Workflow Built for Success</h2>
-                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">A seamless workflow designed to deliver the best results.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-16 relative">
-                <div class="hidden md:block absolute top-16 left-1/6 w-2/3 h-1 bg-gradient-to-r from-brand-primary via-brand-secondary to-[#355322] z-0 rounded-full opacity-30 transform translate-x-1/4"></div>
-                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-100 group">
-                    <div class="w-32 h-32 rounded-full bg-brand-primary text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">1</div>
-                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Consultation</h3>
-                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">We begin by understanding your exact needs and vision.</p>
-                </div>
-                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-200 group">
-                    <div class="w-32 h-32 rounded-full bg-brand-secondary text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">2</div>
-                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Execution</h3>
-                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">Our specialists work meticulously to deliver exceptional quality.</p>
-                </div>
-                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-300 group">
-                    <div class="w-32 h-32 rounded-full bg-[#355322] text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">3</div>
-                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Delivery</h3>
-                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">You receive the final result, guaranteed to exceed expectations.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="work" class="bg-brand-light py-24 sm:py-32 rounded-[3rem] sm:rounded-[4rem] mx-2 sm:mx-6 my-12 border border-[#9dbf83]/20">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6 scroll-reveal">
-                <div class="max-w-2xl">
-                    <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Featured Case Studies</span>
-                    <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Showcasing Digital Excellence</h2>
-                    <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">A curated glimpse into some of our favorite projects and client success stories.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                ${site.services.slice(0,2).map((service, index) => `
-                <div class="group cursor-pointer scroll-reveal delay-${index * 100} bg-white rounded-[3rem] p-4 pb-8 card-shadow border border-gray-100 ${index % 2 === 0 ? 'md:mt-16 mt-0' : ''}">
-                    <div class="overflow-hidden rounded-[2.5rem] mb-8 relative">
-                        <div class="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/20 transition-colors duration-500 z-10"></div>
-                        <img src="${getSemanticServiceImage(service.name, site.category || '', index + 2)}" alt="${service.name}" class="w-full h-[250px] sm:h-[350px] object-cover group-hover:scale-110 transition-transform duration-700">
-                    </div>
-                    <div class="flex justify-between items-start px-6">
-                        <div class="max-w-md pr-4">
-                            <h3 class="text-2xl sm:text-3xl font-extrabold text-brand-dark mb-3 group-hover:text-brand-primary transition-colors">${service.name}</h3>
-                            <p class="text-[#6b7b59] font-medium leading-relaxed">${service.description || 'Premium quality and exceptional delivery.'}</p>
-                        </div>
-                        <div class="w-14 h-14 rounded-full bg-white border border-[#9dbf83] text-[#4b7833] flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all shadow-md shrink-0 group-hover:rotate-45">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 sm:py-32">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-20 max-w-2xl mx-auto scroll-reveal">
-                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Client Success Stories</span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Don't Just Take My Word For It</h2>
-                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">Read what our clients have to say about working with us.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                ${(site.testimonials || [
-                  { name: 'Sarah M.', role: 'Loyal Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined.' },
-                  { name: 'David R.', role: 'Business Owner', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. Five stars!' }
-                ]).slice(0, 2).map((review, index) => `
-                <div class="bg-white p-6 sm:p-12 rounded-[3rem] card-shadow border border-gray-100 relative scroll-reveal delay-${index * 100} hover:scale-[1.02] transition-transform">
-                    <div class="absolute top-10 right-10 text-9xl text-brand-secondary/20 font-serif opacity-50 group-hover:scale-110 transition-transform">"</div>
-                    <div class="text-[#9dbf83] flex mb-8 relative z-10 gap-1">
-                        ${'<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>'.repeat(5)}
-                    </div>
-                    <p class="text-[#355322] text-lg sm:text-xl font-bold leading-loose mb-10 relative z-10 italic">
-                        "${review.content}"
-                    </p>
-                    <div class="flex items-center gap-5 border-t border-gray-100 pt-6">
-                        <div class="w-16 h-16 rounded-full bg-brand-primary text-white flex items-center justify-center text-2xl font-bold shadow-sm">${review.name.charAt(0)}</div>
-                        <div>
-                            <h5 class="font-extrabold text-brand-dark text-lg">${review.name}</h5>
-                            <span class="text-sm font-bold text-[#6a8c4f] uppercase tracking-wider">${review.role || 'Verified Client'}</span>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    <footer id="contact" class="bg-brand-primary text-white rounded-t-[3rem] sm:rounded-t-[4rem] mx-2 sm:mx-6 px-6 pt-28 pb-16 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none animate-spin-slow"></div>
-        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-black/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto relative z-10 scroll-reveal">
-            <div class="text-center mb-24 max-w-4xl mx-auto">
-                <span class="text-brand-secondary font-bold uppercase tracking-widest text-sm mb-6 block hover:scale-105 transition-transform inline-block">Let's Connect</span>
-                <h2 class="text-4xl sm:text-7xl font-extrabold mb-10 leading-tight">Ready to build something extraordinary?</h2>
-                <p class="text-brand-light text-lg sm:text-xl mb-12 text-white/90 leading-relaxed max-w-3xl mx-auto">We take on a limited number of new clients to ensure everyone receives our absolute best. Inquire below to check availability.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-6">
-                    <a href="mailto:${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}" class="inline-flex items-center justify-center bg-white text-brand-primary px-12 py-5 rounded-full font-extrabold text-xl hover:scale-105 hover:-translate-y-2 transition-all shadow-2xl shadow-black/20">
-                        ${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}
-                    </a>
-                    <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center bg-transparent border-2 border-white/40 text-white px-12 py-5 rounded-full font-extrabold text-xl hover:bg-white/10 hover:-translate-y-2 transition-all">
-                        Book a Strategy Call
-                    </a>
-                </div>
-            </div>
-            <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/20 pt-10 gap-8 text-base font-medium text-white/70">
-                <div>&copy; ${currentYear} ${site.businessName}. All rights reserved. Designed with precision and care.</div>
-                <div class="flex gap-8">
-                    <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="hover:text-white transition hover:-translate-y-1 inline-block">WhatsApp</a>
-                    <a href="tel:${site.phoneNumber}" class="hover:text-white transition hover:-translate-y-1 inline-block">Call</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-            document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
-        });
-    </script>
-</body>
-</html>`;
+function formatParagraphs(content: string): string {
+  return content.split('\n').filter(p => p.trim()).map(p => `<p class="text-gray-400 text-lg leading-relaxed">${p}</p>`).join('\n');
 }
-
 
 interface CategoryImages {
   hero: string;
   about: string;
   products: string[];
 }
-
-function renderStoryTemplate(site: SiteConfig): string {
-  const images = getCategoryImages(site.category || '');
-  
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 50) {
-    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 100) {
-    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-  
-  const currentYear = new Date().getFullYear();
-
-  return `<!DOCTYPE HTML>
-<!--
-	Story by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>${site.businessName} - Story</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="/public/templates/story/assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="/public/templates/story/assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
-
-		<!-- Wrapper -->
-			<div id="wrapper" class="divided">
-
-				<!-- One: Hero -->
-					<section class="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
-						<div class="content">
-							<h1>${site.businessName}</h1>
-							<p class="major">${site.heroTitle || site.category || 'Professional Services'}</p>
-							<p>${subtitle}</p>
-							<ul class="actions stacked">
-								<li><a href="#first" class="button big wide smooth-scroll-middle">Get Started</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="${images.hero || '/public/templates/story/images/banner.jpg'}" alt="" />
-						</div>
-					</section>
-
-				<!-- Two: About -->
-					<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
-						<div class="content">
-							<h2>${site.storyTitle || 'About Us'}</h2>
-							<p>${story}</p>
-							<ul class="actions stacked">
-								<li><a href="#services" class="button">Explore Services</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="${images.about || '/public/templates/story/images/spotlight01.jpg'}" alt="" />
-						</div>
-					</section>
-
-				<!-- Three & Four: Interactive Showcases (First 2 Services) -->
-				${site.services.slice(0, 2).map((service, index) => `
-					<section class="spotlight style1 orient-${index % 2 === 0 ? 'left' : 'right'} content-align-left image-position-center onscroll-image-fade-in">
-						<div class="content">
-							<h2>${service.name}</h2>
-							<p>${service.description || 'Premium service tailored to your requirements.'}</p>
-							<ul class="actions stacked">
-								<li><a href="https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}" target="_blank" class="button">Order ${service.name}</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="${getSemanticServiceImage(service.name, site.category || '', index + 1)}" alt="${service.name}" />
-						</div>
-					</section>
-				`).join('')}
-
-				<!-- Five: Gallery (Full Catalog) -->
-					<section id="services" class="wrapper style1 align-center">
-						<div class="inner">
-							<h2>Our Catalog & Services</h2>
-							<p>Explore our core offerings and order directly via WhatsApp.</p>
-						</div>
-
-						<!-- Gallery -->
-							<div class="gallery style2 medium lightbox onscroll-fade-in">
-							${site.services.map((service, index) => `
-								<article>
-									<a href="${getSemanticServiceImage(service.name, site.category || '', index)}" class="image">
-										<img src="${getSemanticServiceImage(service.name, site.category || '', index)}" alt="${service.name}" />
-									</a>
-									<div class="caption">
-										<h3>${service.name}</h3>
-										<p>${service.description || 'Premium quality offering.'}</p>
-										<ul class="actions fixed">
-											<li><span class="button small" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">Order via WhatsApp</span></li>
-										</ul>
-									</div>
-								</article>
-							`).join('')}
-							</div>
-
-					</section>
-
-				<!-- Six: Features -->
-					<section class="wrapper style1 align-center">
-						<div class="inner">
-							<h2>Why Choose Us</h2>
-							<p>We are committed to delivering excellence and building long-term relationships based on outstanding results.</p>
-							<div class="items style1 medium onscroll-fade-in">
-							${(site.features || [
-								{ title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure the highest standards.' },
-								{ title: 'Experienced Specialists', description: 'Our professionals bring years of expertise and dedication to every client request. Highly trained and certified.' },
-								{ title: 'Client Centric Partnership', description: 'Your satisfaction is our primary goal. We tailor our services to match your vision, taking the time to understand your exact requirements.' }
-							]).map((feat, index) => {
-								const icons = ['gem', 'bolt', 'leaf', 'cog', 'envelope', 'paper-plane'];
-								const icon = icons[index % icons.length];
-								return `
-									<section>
-										<span class="icon style2 major fa-${icon}"></span>
-										<h3>${feat.title}</h3>
-										<p>${feat.description}</p>
-									</section>
-								`;
-							}).join('')}
-							</div>
-						</div>
-					</section>
-
-				<!-- Seven: Contact -->
-					<section id="contact" class="wrapper style1 align-center">
-						<div class="inner medium">
-							<h2>Get in Touch</h2>
-							<form method="post" action="#" onsubmit="event.preventDefault(); window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('name').value + '. ' + document.getElementById('message').value), '_blank')">
-								<div class="fields">
-									<div class="field half">
-										<label for="name">Name</label>
-										<input type="text" name="name" id="name" required />
-									</div>
-									<div class="field half">
-										<label for="email">Email</label>
-										<input type="email" name="email" id="email" required />
-									</div>
-									<div class="field">
-										<label for="message">Message</label>
-										<textarea name="message" id="message" rows="6" required></textarea>
-									</div>
-								</div>
-								<ul class="actions special">
-									<li><input type="submit" name="submit" id="submit" value="Send Message via WhatsApp" /></li>
-								</ul>
-							</form>
-
-						</div>
-					</section>
-
-				<!-- Footer -->
-					<footer class="wrapper style1 align-center">
-						<div class="inner">
-							<p>&copy; ${currentYear} ${site.businessName}. All rights reserved.</p>
-							<p>Design: <a href="https://html5up.net">HTML5 UP</a>. Powered by The Gray Arc.</p>
-						</div>
-					</footer>
-
-			</div>
-
-		<!-- Floating Sticky Contact Buttons -->
-		<div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
-			<a href="https://wa.me/${site.phoneNumber}" target="_blank" style="width: 56px; height: 56px; background-color: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(37,211,102,0.4); border: 2px solid white; text-decoration: none;">
-				<svg style="width: 32px; height: 32px; margin: auto;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-			</a>
-			<a href="tel:${site.contactDetails?.phone || site.phoneNumber}" style="width: 56px; height: 56px; background-color: #4b7833; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(75,120,51,0.4); border: 2px solid white; text-decoration: none;">
-				<svg style="width: 28px; height: 28px; margin: auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-			</a>
-		</div>
-
-		<!-- Scripts -->
-			<script src="/public/templates/story/assets/js/jquery.min.js"></script>
-			<script src="/public/templates/story/assets/js/jquery.scrollex.min.js"></script>
-			<script src="/public/templates/story/assets/js/jquery.scrolly.min.js"></script>
-			<script src="/public/templates/story/assets/js/browser.min.js"></script>
-			<script src="/public/templates/story/assets/js/breakpoints.min.js"></script>
-			<script src="/public/templates/story/assets/js/util.js"></script>
-			<script src="/public/templates/story/assets/js/main.js"></script>
-
-	</body>
-</html>`;
-}
-
-
-function renderAstroshipTemplate(site: SiteConfig): string {
-  const images = getCategoryImages(site.category || '');
-  
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 50) {
-    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 100) {
-    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-  
-  const currentYear = new Date().getFullYear();
-
-  return `<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/public/templates/astroship/favicon.svg"><title>${site.businessName} - Astroship</title><link rel="stylesheet" href="/public/templates/astroship/_astro/about.BzqdUs8y.css"></head> <body> <div class="max-w-(--breakpoint-xl) mx-auto px-5">  <header class="flex flex-col lg:flex-row justify-between items-center my-5">  <div class="flex w-full lg:w-auto items-center justify-between"> <a href="#" class="text-lg"><span class="font-bold text-slate-800">${site.businessName}</span> </a> <div class="block lg:hidden"> <button id="astronav-menu" aria-label="Toggle Menu">  <svg fill="currentColor" class="w-4 h-4 text-gray-800" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <title>Toggle Menu</title> <path class="astronav-close-icon astronav-toggle hidden" fill-rule="evenodd" clip-rule="evenodd" d="M18.278 16.864a1 1 0 01-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 01-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 011.414-1.414l4.829 4.828 4.828-4.828a1 1 0 111.414 1.414l-4.828 4.829 4.828 4.828z"></path> <path class="astronav-open-icon astronav-toggle" fill-rule="evenodd" d="M4 5h16a1 1 0 010 2H4a1 1 0 110-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2z"></path> </svg>  </button> </div> </div> <nav class="astronav-items astronav-toggle hidden w-full lg:w-auto mt-2 lg:flex lg:mt-0">  <ul class="flex flex-col lg:flex-row lg:gap-3"> <li> <a href="#about" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> About</span>  </a> </li><li> <a href="#services" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> Services</span>  </a> </li><li> <a href="#contact" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> Contact</span>  </a> </li> </ul>  </nav>  <script>(function(){const closeOnClick = false;
-
-["DOMContentLoaded", "astro:after-swap"].forEach((event) => {
-  document.addEventListener(event, addListeners);
-});
-
-function cloneAndReplace(element) {
-  const clone = element.cloneNode(true);
-  element.parentNode.replaceChild(clone, element);
-}
-
-function addListeners() {
-  const oldMenuButton = document.getElementById("astronav-menu");
-  if (oldMenuButton) {
-    cloneAndReplace(oldMenuButton);
-  }
-
-  const menuButton = document.getElementById("astronav-menu");
-  menuButton && menuButton.addEventListener("click", toggleMobileNav);
-}
-
-function toggleMobileNav() {
-  [...document.querySelectorAll(".astronav-toggle")].forEach((el) => {
-    el.classList.toggle("hidden");
-  });
-}
-})();</script> <div class="hidden lg:flex items-center gap-4"> <a href="tel:${site.phoneNumber}" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-4 py-2 bg-black text-white hover:bg-gray-800 border-2 border-transparent">Call Now</a> </div> </header>  </div>  
-
-  <div class="max-w-(--breakpoint-xl) mx-auto px-5">  
-    <main class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24"> 
-      <div class="py-6 md:order-1 hidden md:block"> 
-        <img src="${images.hero || '/public/templates/astroship/_astro/hero.DlKDY3ml_ZQyPaD.png'}" alt="Hero Image" width="520" height="424" class="rounded-3xl shadow-2xl object-cover h-[350px] w-[500px]">
-      </div> 
-      <div> 
-        <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
-          ${site.heroTitle || site.businessName}
-        </h1> 
-        <p class="text-lg mt-4 text-slate-600 max-w-xl">
-          ${subtitle}
-        </p> 
-        <div class="mt-6 flex flex-col sm:flex-row gap-3"> 
-          <a href="#services" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-5 py-2.5 bg-black text-white hover:bg-gray-800 border-2 border-transparent flex gap-1 items-center justify-center">
-            Explore Services
-          </a> 
-          <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-5 py-2.5 bg-white border-2 border-black hover:bg-gray-100 text-black flex gap-1 items-center justify-center">
-            Order via WhatsApp
-          </a> 
-        </div> 
-      </div> 
-    </main> 
-
-    <!-- About Section -->
-    <div id="about" class="py-16 border-t border-slate-100">
-      <div class="max-w-3xl">
-        <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">${site.storyTitle || 'About Us'}</h2>
-        <p class="text-lg mt-4 text-slate-600 leading-relaxed">${story}</p>
-      </div>
-    </div>
-
-    <!-- Services Section -->
-    <div id="services" class="mt-16 md:mt-24 border-t border-slate-100 pt-16"> 
-      <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">
-        Professional Services & Catalog
-      </h2> 
-      <p class="text-lg mt-4 text-slate-600">
-        Choose from our core professional offerings. Tap any service to place an order via WhatsApp.
-      </p> 
-    </div> 
-
-    <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16"> 
-      ${site.services.map((service, index) => {
-        const icons = ['briefcase', 'window-alt', 'data', 'bot', 'file-find', 'user'];
-        const icon = icons[index % icons.length];
-        return `
-          <div class="flex gap-4 items-start cursor-pointer group" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')"> 
-            <div class="mt-1 bg-black rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center"> 
-              <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
-                <symbol id="ai:bx:bxs-briefcase" viewBox="0 0 24 24"><path d="M20 6h-3V4c0-1.103-.897-2-2-2H9c-1.103 0-2 .897-2 2v2H4c-1.103 0-2 .897-2 2v3h20V8c0-1.103-.897-2-2-2zM9 4h6v2H9V4zm5 10h-4v-2H2v7c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2v-7h-8v2z" fill="currentColor"/></symbol>
-                <symbol id="ai:bx:bxs-window-alt" viewBox="0 0 24 24"><path d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zm-3 3h2v2h-2V6zm-3 0h2v2h-2V6zM4 19v-9h16.001l.001 9H4z" fill="currentColor"/></symbol>
-                <symbol id="ai:bx:bxs-data" viewBox="0 0 24 24"><path d="M20 6c0-2.168-3.663-4-8-4S4 3.832 4 6v2c0 2.168 3.663 4 8 4s8-1.832 8-4V6zm-8 13c-4.337 0-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3c0 2.168-3.663 4-8 4z" fill="currentColor"/><path d="M20 10c0 2.168-3.663 4-8 4s-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3z" fill="currentColor"/></symbol>
-                <symbol id="ai:bx:bxs-bot" viewBox="0 0 24 24"><path d="M21 10.975V8a2 2 0 0 0-2-2h-6V4.688c.305-.274.5-.668.5-1.11a1.5 1.5 0 0 0-3 0c0 .442.195.836.5 1.11V6H5a2 2 0 0 0-2 2v2.998l-.072.005A.999.999 0 0 0 2 12v2a1 1 0 0 0 1 1v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a1 1 0 0 0 1-1v-1.938a1.004 1.004 0 0 0-.072-.455c-.202-.488-.635-.605-.928-.632zM7 12c0-1.104.672-2 1.5-2s1.5.896 1.5 2s-.672 2-1.5 2S7 13.104 7 12zm8.998 6c-1.001-.003-7.997 0-7.998 0v-2s7.001-.002 8.002 0l-.004 2zm-.498-4c-.828 0-1.5-.896-1.5-2s.672-2 1.5-2s1.5.896 1.5 2s-.672 2-1.5 2z" fill="currentColor"/></symbol>
-                <symbol id="ai:bx:bxs-file-find" viewBox="0 0 24 24"><path d="M6 22h12c.178 0 .348-.03.512-.074l-3.759-3.759A4.966 4.966 0 0 1 12 19c-2.757 0-5-2.243-5-5s2.243-5 5-5s5 2.243 5 5a4.964 4.964 0 0 1-.833 2.753l3.759 3.759c.044-.164.074-.334.074-.512V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z" fill="currentColor"/><circle cx="12" cy="14" r="3" fill="currentColor"/></symbol>
-                <symbol id="ai:bx:bxs-user" viewBox="0 0 24 24"><path d="M7.5 6.5C7.5 8.981 9.519 11 12 11s4.5-2.019 4.5-4.5S14.481 2 12 2S7.5 4.019 7.5 6.5zM20 21h1v-1c0-3.859-3.141-7-7-7h-4c-3.86 0-7 3.141-7 7v1h17z" fill="currentColor"/></symbol>
-                <use href="#ai:bx:bxs-${icon}"></use>
-              </svg> 
-            </div> 
-            <div> 
-              <h3 class="font-semibold text-lg group-hover:text-indigo-600 transition-colors">${service.name}</h3>  
-              <p class="text-slate-500 mt-2 leading-relaxed">${service.description || 'Professional service tailored to your requirements.'}</p> 
-            </div> 
-          </div>
-        `;
-      }).join('')}
-    </div> 
-
-    <!-- Contact Form Section -->
-    <div id="contact" class="bg-black p-8 md:px-20 md:py-16 mt-24 mx-auto max-w-5xl rounded-2xl text-center"> 
-      <h2 class="text-white text-4xl md:text-5xl tracking-tight font-bold">
-        Get in Touch Today
-      </h2> 
-      <p class="text-slate-400 mt-4 text-lg max-w-lg mx-auto">
-        Have questions? Fill out the fields below to send an instant message straight to our WhatsApp.
-      </p> 
-      <form class="mt-8 max-w-md mx-auto flex flex-col gap-4 text-left" onsubmit="event.preventDefault(); window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('name').value + '. ' + document.getElementById('message').value), '_blank')">
-        <div>
-          <label for="name" class="block text-slate-300 text-sm font-semibold mb-1">Your Name</label>
-          <input type="text" id="name" required class="w-full bg-slate-900 border border-slate-800 rounded px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
-        </div>
-        <div>
-          <label for="message" class="block text-slate-300 text-sm font-semibold mb-1">Your Message</label>
-          <textarea id="message" required rows="4" class="w-full bg-slate-900 border border-slate-800 rounded px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
-        </div>
-        <button type="submit" class="mt-2 rounded-md text-center transition px-5 py-3 bg-indigo-600 text-white hover:bg-indigo-500 font-semibold border-2 border-transparent w-full">
-          Send Message via WhatsApp
-        </button>
-      </form> 
-    </div>  
-
-  </div>  
-
-  <footer class="my-20 border-t border-slate-100 pt-10"> 
-    <p class="text-center text-sm text-slate-500">
-      Copyright &copy; ${currentYear} ${site.businessName}. All rights reserved.
-    </p> 
-    <p class="text-center text-xs text-slate-500 mt-1">
-      Powered by The Gray Arc. Design from Web3Templates.
-    </p> 
-  </footer>  
-
-  <!-- Floating Sticky Contact Buttons -->
-  <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
-    <a href="https://wa.me/${site.phoneNumber}" target="_blank" style="width: 56px; height: 56px; background-color: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(37,211,102,0.4); border: 2px solid white; text-decoration: none;">
-      <svg style="width: 32px; height: 32px; margin: auto;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    </a>
-    <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" style="width: 56px; height: 56px; background-color: #4b7833; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(75,120,51,0.4); border: 2px solid white; text-decoration: none;">
-      <svg style="width: 28px; height: 28px; margin: auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-    </a>
-  </div>
-
- </body> </html>`;
-}
-
-
-function renderNimbusTemplate(site: SiteConfig): string {
-  const images = getCategoryImages(site.category || '');
-  
-  let subtitle = site.heroSubtitle || '';
-  if (subtitle.length < 50) {
-    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
-  }
-
-  let story = site.storyContent || site.aboutText || '';
-  if (story.length < 100) {
-    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
-  }
-  
-  const currentYear = new Date().getFullYear();
-
-  // Setup services data
-  const services = site.services || [];
-  const service1 = services[0] || { name: 'Premium Service', description: 'Tailored solutions designed for your exact business requirements.' };
-  const service2 = services[1] || { name: 'Quality Delivery', description: 'Exceptional craftsmanship and attention to detail in every project.' };
-  const service3 = services[2] || { name: '24/7 Support', description: 'Dedicated consultation and support round the clock.' };
-
-  // Scrolling marquee services list
-  const marqueeItems = services.length > 0 ? services.map(s => s.name) : [service1.name, service2.name, service3.name, 'Quality Guaranteed', 'WhatsApp Support'];
-  const marqueeText = marqueeItems.map(item => `<span>${item}</span>`).join('<span class="mx-8 opacity-30">•</span>');
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${site.businessName} — Live Site</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.1/tailwind.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          ink: '#0A0C10',
-          panel: '#12151C',
-          panel2: '#171B24',
-          line: '#232833',
-          mist: '#8A8F98',
-          bone: '#E9EAEE',
-          violet: '#7C6CF6',
-          cyan: '#4FD1C5',
-        },
-        fontFamily: {
-          display: ['"Space Grotesk"', 'sans-serif'],
-          body: ['"Inter"', 'sans-serif'],
-          mono: ['"JetBrains Mono"', 'monospace'],
-        },
-      },
-    },
-  }
-</script>
-<style>
-  html { scroll-behavior: smooth; }
-  body { background: #0A0C10; }
-  .mesh {
-    background:
-      radial-gradient(600px circle at 15% 20%, rgba(124,108,246,0.20), transparent 60%),
-      radial-gradient(500px circle at 85% 10%, rgba(79,209,197,0.15), transparent 55%),
-      radial-gradient(700px circle at 50% 100%, rgba(124,108,246,0.10), transparent 60%);
-  }
-  .glass {
-    background: rgba(23,27,36,0.55);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-  .grad-text {
-    background: linear-gradient(90deg, #7C6CF6, #4FD1C5);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal.in { opacity: 1; transform: translateY(0); }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    #pulse-path { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
-  }
-  #pulse-path {
-    stroke-dasharray: 900;
-    stroke-dashoffset: 900;
-    animation: draw 2.4s ease-out forwards 0.5s;
-  }
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  .marquee-track { animation: scroll 26s linear infinite; }
-  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  a:focus-visible, button:focus-visible { outline: 2px solid #4FD1C5; outline-offset: 3px; }
-</style>
-</head>
-<body class="bg-ink text-bone font-body antialiased">
-
-<!-- NAV -->
-<header class="fixed top-0 inset-x-0 z-50 glass">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="#" class="flex items-center gap-2 font-display font-semibold text-lg">
-      <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-violet to-cyan"></span>
-      ${site.businessName}
-    </a>
-    <nav class="hidden md:flex items-center gap-8 text-sm text-mist">
-      <a href="#about" class="hover:text-bone transition">About</a>
-      <a href="#services" class="hover:text-bone transition">Services</a>
-      <a href="#contact" class="hover:text-bone transition">Contact</a>
-    </nav>
-    <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="text-sm font-medium px-4 py-2 rounded-full bg-bone text-ink hover:bg-white transition">
-      Chat Now
-    </a>
-  </div>
-</header>
-
-<!-- HERO -->
-<section class="relative mesh pt-40 pb-28 px-6 overflow-hidden">
-  <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-    <div>
-      <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-5">${site.category || 'Professional Services'}</p>
-      <h1 class="font-display text-5xl md:text-6xl leading-[1.05] font-semibold">
-        ${site.heroTitle || site.businessName}
-      </h1>
-      <p class="mt-6 text-mist text-lg max-w-md">
-        ${subtitle}
-      </p>
-      <div class="mt-9 flex flex-wrap items-center gap-4">
-        <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-6 py-3 rounded-full bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 transition">
-          Contact on WhatsApp
-        </a>
-        <a href="#services" class="px-6 py-3 rounded-full border border-line text-bone hover:border-mist transition">
-          Explore Catalog
-        </a>
-      </div>
-    </div>
-
-    <!-- Signature elements: Stats and Unsplash visual in a glass card -->
-    <div class="glass rounded-2xl p-6 shadow-2xl shadow-black/40 relative group overflow-hidden">
-      <div class="absolute inset-0 bg-cover bg-center opacity-20 filter blur-xs group-hover:scale-105 transition-transform duration-[10s]" style="background-image: url('${images.hero}');"></div>
-      <div class="relative z-10">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <p class="text-xs text-mist font-mono">BUSINESS STATUS</p>
-            <p class="font-display text-2xl font-semibold mt-1">Active & Online</p>
-          </div>
-          <span class="text-xs font-mono px-2 py-1 rounded-full bg-cyan/10 text-cyan">Live</span>
-        </div>
-        <div class="w-full h-36 rounded-xl overflow-hidden mb-4 relative border border-line">
-           <img src="${images.about || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80'}" alt="Workspace" class="w-full h-full object-cover">
-        </div>
-        <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="rounded-lg bg-panel2 py-3 border border-line">
-            <p class="text-xs text-mist">Experience</p>
-            <p class="font-mono text-sm mt-1 text-bone">10+ Years</p>
-          </div>
-          <div class="rounded-lg bg-panel2 py-3 border border-line">
-            <p class="text-xs text-mist">Satisfaction</p>
-            <p class="font-mono text-sm mt-1 text-bone">100%</p>
-          </div>
-          <div class="rounded-lg bg-panel2 py-3 border border-line">
-            <p class="text-xs text-mist">Support</p>
-            <p class="font-mono text-sm mt-1 text-bone">24/7</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICE MARQUEE -->
-<section class="border-y border-line py-8 overflow-hidden bg-panel/30">
-  <div class="flex whitespace-nowrap marquee-track text-mist font-display text-lg tracking-wide uppercase font-semibold">
-    <div class="flex gap-8 items-center">
-      ${marqueeText}
-    </div>
-    <div class="flex gap-8 items-center ml-16" aria-hidden="true">
-      ${marqueeText}
-    </div>
-  </div>
-</section>
-
-<!-- BENTO FEATURES (SERVICES & STORY) -->
-<section id="services" class="max-w-6xl mx-auto px-6 py-28">
-  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">What we offer</p>
-  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Our Premium Offerings & Catalog</h2>
-
-  <div class="grid md:grid-cols-3 gap-5 mt-14">
-    <!-- Large Bento Slot (Primary Service) -->
-    <div class="reveal md:col-span-2 md:row-span-2 glass rounded-2xl p-8 flex flex-col justify-between min-h-[340px] relative overflow-hidden group cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service1.name)}', '_blank')">
-      <div class="absolute inset-0 bg-cover bg-center opacity-10 group-hover:scale-105 transition-transform duration-[10s]" style="background-image: url('${getSemanticServiceImage(service1.name, site.category || '', 0)}');"></div>
-      <div class="relative z-10 flex flex-col h-full justify-between">
-        <div>
-          <span class="px-3 py-1 text-xs font-mono rounded-full bg-violet/20 text-violet border border-violet/40">Featured Service</span>
-          <h3 class="font-display text-3xl font-semibold mb-3 mt-4">${service1.name}</h3>
-          <p class="text-mist max-w-md">${service1.description}</p>
-        </div>
-        <div class="mt-8 flex justify-between items-center">
-          <span class="text-cyan font-mono font-semibold text-lg">Order via WhatsApp →</span>
-          <div class="w-12 h-12 rounded-full bg-bone text-ink flex items-center justify-center font-bold">01</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Medium Bento Slot 2 -->
-    <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between min-h-[170px] cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service2.name)}', '_blank')">
-      <div>
-        <h3 class="font-display text-xl font-semibold mb-2">${service2.name}</h3>
-        <p class="text-mist text-sm">${service2.description}</p>
-      </div>
-      <span class="text-xs font-mono text-cyan mt-4 block">Order Now →</span>
-    </div>
-
-    <!-- Medium Bento Slot 3 -->
-    <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between min-h-[170px] cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service3.name)}', '_blank')">
-      <div>
-        <h3 class="font-display text-xl font-semibold mb-2">${service3.name}</h3>
-        <p class="text-mist text-sm">${service3.description}</p>
-      </div>
-      <span class="text-xs font-mono text-cyan mt-4 block">Order Now →</span>
-    </div>
-
-    <!-- Full Width Bento Slot (Story & About Us) -->
-    <div id="about" class="reveal md:col-span-3 glass rounded-2xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-10 border border-line relative overflow-hidden group">
-      <div class="absolute inset-0 bg-cover bg-center opacity-5 pointer-events-none" style="background-image: url('${images.about}');"></div>
-      <div class="relative z-10 max-w-2xl">
-        <span class="font-mono text-xs tracking-widest text-cyan uppercase">Our Story</span>
-        <h3 class="font-display text-2xl font-semibold mb-3 mt-2">${site.storyTitle || 'About Us'}</h3>
-        <p class="text-mist text-sm leading-relaxed">${story}</p>
-      </div>
-      <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="shrink-0 px-6 py-3 rounded-full bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 transition text-sm relative z-10">Chat with us →</a>
-    </div>
-  </div>
-</section>
-
-<!-- CATALOG GRID (Additional services if any) -->
-${services.length > 3 ? `
-<section class="max-w-6xl mx-auto px-6 py-12 border-t border-line">
-  <div class="grid md:grid-cols-3 gap-6">
-    ${services.slice(3).map((service, index) => `
-      <div class="reveal glass rounded-2xl p-6 border border-line hover:border-violet/40 transition-colors flex flex-col justify-between min-h-[160px] cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
-        <div>
-          <h3 class="font-display text-lg font-semibold mb-2">${service.name}</h3>
-          <p class="text-mist text-xs">${service.description || 'Premium quality service.'}</p>
-        </div>
-        <span class="text-xs font-mono text-cyan mt-4 block">Order via WhatsApp →</span>
-      </div>
-    `).join('')}
-  </div>
-</section>
-` : ''}
-
-<!-- TIMELINE/PROCESS -->
-<section class="max-w-6xl mx-auto px-6 py-28 border-t border-line">
-  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">Setup Workflow</p>
-  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Seamless process to get started.</h2>
-
-  <div class="grid md:grid-cols-3 gap-8 mt-14">
-    <div class="reveal">
-      <p class="font-display text-4xl text-violet mb-4">1</p>
-      <h3 class="font-semibold mb-2">Connect via WhatsApp</h3>
-      <p class="text-mist text-sm">Send us a message detailing your requirements. Our automated system handles routing instantly.</p>
-    </div>
-    <div class="reveal">
-      <p class="font-display text-4xl text-violet mb-4">2</p>
-      <h3 class="font-semibold mb-2">Confirm Details</h3>
-      <p class="text-mist text-sm">We clarify the specifications, catalog item details, and establish pricing transparency.</p>
-    </div>
-    <div class="reveal">
-      <p class="font-display text-4xl text-violet mb-4">3</p>
-      <h3 class="font-semibold mb-2">Meticulous Delivery</h3>
-      <p class="text-mist text-sm">Our team executes with maximum precision and delivers directly according to the agreed terms.</p>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS (GROWTH/Starter Layout) -->
-<section class="max-w-6xl mx-auto px-6 py-28 border-t border-line">
-  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">Client Reviews</p>
-  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Straightforward reviews from satisfied clients.</h2>
-
-  <div class="grid md:grid-cols-2 gap-6 mt-14">
-    ${(site.testimonials || [
-      { name: 'Sarah M.', role: 'Verified Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined.' },
-      { name: 'David R.', role: 'Business Owner', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. Five stars!' }
-    ]).slice(0, 2).map((review, index) => `
-      <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between border border-line">
-        <p class="text-bone/90 italic leading-relaxed">"${review.content}"</p>
-        <div class="mt-6 flex items-center gap-4 border-t border-line pt-4">
-          <div class="w-10 h-10 rounded-full bg-violet/20 text-violet flex items-center justify-center font-bold font-display">${review.name.charAt(0)}</div>
-          <div>
-            <h4 class="font-semibold text-sm">${review.name}</h4>
-            <span class="text-xs text-mist">${review.role || 'Client'}</span>
-          </div>
-        </div>
-      </div>
-    `).join('')}
-  </div>
-</section>
-
-<!-- CONTACT CTA -->
-<section id="contact" class="relative mesh px-6 py-28 border-t border-line">
-  <div class="max-w-3xl mx-auto text-center reveal">
-    <h2 class="font-display text-4xl md:text-5xl font-semibold leading-tight">
-      Ready to get started?
-    </h2>
-    <p class="text-mist mt-5">Fill in your message below to start a conversation directly on WhatsApp.</p>
-    
-    <form class="mt-10 max-w-md mx-auto flex flex-col gap-4 text-left glass p-6 rounded-2xl border border-line" onsubmit="event.preventDefault(); window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('name').value + '. ' + document.getElementById('message').value), '_blank')">
-      <div>
-        <label for="name" class="block text-slate-300 text-sm font-semibold mb-1">Your Name</label>
-        <input type="text" id="name" required class="w-full bg-panel border border-line rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan transition-colors" />
-      </div>
-      <div>
-        <label for="message" class="block text-slate-300 text-sm font-semibold mb-1">Your Message</label>
-        <textarea id="message" required rows="4" class="w-full bg-panel border border-line rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan transition-colors"></textarea>
-      </div>
-      <button type="submit" class="mt-2 rounded-full text-center transition px-5 py-3 bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 w-full">
-        Send Message via WhatsApp
-      </button>
-    </form>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="border-t border-line px-6 py-10">
-  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-mist">
-    <div class="flex items-center gap-2 font-display font-semibold text-bone">
-      <span class="w-2 h-2 rounded-full bg-gradient-to-br from-violet to-cyan"></span>
-      ${site.businessName}
-    </div>
-    <p>© ${currentYear} ${site.businessName}. All rights reserved.</p>
-    <p class="text-xs opacity-50">Design inspired by Web3Templates.</p>
-  </div>
-</footer>
-
-<!-- Floating Sticky Contact Buttons -->
-<div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
-  <a href="https://wa.me/${site.phoneNumber}" target="_blank" style="width: 56px; height: 56px; background-color: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(37,211,102,0.4); border: 2px solid white; text-decoration: none;">
-    <svg style="width: 32px; height: 32px; margin: auto;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" style="width: 56px; height: 56px; background-color: #4b7833; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(75,120,51,0.4); border: 2px solid white; text-decoration: none;">
-    <svg style="width: 28px; height: 28px; margin: auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-  </a>
-</div>
-
-<script>
-  const els = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-  }, { threshold: 0.15 });
-  els.forEach(el => io.observe(el));
-</script>
-
-</body>
-</html>`;
-}
-
-
-function renderTaxiTemplate(site: SiteConfig): string {
-  const isTaxi = (site.category || '').toLowerCase().includes('taxi') || 
-                 (site.category || '').toLowerCase().includes('cab') || 
-                 (site.category || '').toLowerCase().includes('transport');
-
-  const currentYear = new Date().getFullYear();
-  const services = site.services || [];
-  const images = getCategoryImages(site.category || '');
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${site.businessName} - Premium Service</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<style>
-  body { font-family: Outfit, sans-serif; }
-  .hero {
-    background: url("${images.hero || 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1600&q=80'}") center/cover;
-  }
-  .overlay { position: absolute; inset: 0; background: rgba(2,6,23,.82); }
-  .glass { background: rgba(255,255,255,.08); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.12); }
-  .card, .fleet { background: #111827; border: 1px solid rgba(250,204,21,.2); padding: 2rem; border-radius: 1rem; text-align: center; transition: .35s; }
-  .card:hover, .fleet:hover { transform: translateY(-8px); box-shadow: 0 0 30px rgba(250,204,21,.25); border-color: rgba(250,204,21,.8); }
-  .stickyBtn { width: 58px; height: 58px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 28px; animation: pulse 2s infinite; text-decoration: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-  @keyframes pulse { 0% { transform: scale(1) } 50% { transform: scale(1.08) } 100% { transform: scale(1) } }
-</style>
-</head>
-<body class="bg-slate-950 text-white scroll-smooth">
-
-<nav class="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/10">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-yellow-400">${site.businessName}</h1>
-    <div class="hidden md:flex gap-8">
-      <a href="#home" class="hover:text-yellow-400 transition-colors">Home</a>
-      <a href="#services" class="hover:text-yellow-400 transition-colors">Services</a>
-      <a href="#fleet" class="hover:text-yellow-400 transition-colors">${isTaxi ? 'Fleet' : 'Catalog'}</a>
-      <a href="#reviews" class="hover:text-yellow-400 transition-colors">Reviews</a>
-      <a href="#contact" class="hover:text-yellow-400 transition-colors">Contact</a>
-    </div>
-    <a href="#contact" class="bg-yellow-400 text-black px-5 py-2 rounded-full font-semibold hover:bg-yellow-300 transition-colors">${isTaxi ? 'Book Now' : 'Contact Us'}</a>
-  </div>
-</nav>
-
-<section id="home" class="min-h-screen flex items-center relative hero">
-  <div class="overlay"></div>
-  <div class="max-w-7xl mx-auto px-6 py-28 relative z-10 grid lg:grid-cols-2 gap-10 items-center">
-    <div data-aos="fade-right">
-      <span class="px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-300 font-medium">${site.category || 'Premium Service'}</span>
-      <h2 class="text-5xl md:text-6xl font-extrabold mt-6 leading-tight">${site.heroTitle || (isTaxi ? 'Premium Taxi Service You Can Trust' : site.businessName)}</h2>
-      <p class="text-slate-300 mt-6 text-lg leading-relaxed">${site.heroSubtitle || (isTaxi ? 'Professional drivers, fixed rates, and premium vehicle class for a comfortable ride.' : 'High-quality products, premium service, and friendly support tailored to your requirements.')}</p>
-      <div class="mt-8 flex flex-wrap gap-4">
-        <a href="#contact" class="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold hover:bg-yellow-300 transition-colors">${isTaxi ? 'Book Ride' : 'Order Now'}</a>
-        <a href="tel:${site.phoneNumber}" class="border border-yellow-400 text-yellow-400 px-8 py-4 rounded-full hover:bg-yellow-400 hover:text-black transition-all">Call Now</a>
-      </div>
-    </div>
-    <div data-aos="zoom-in">
-      <div class="glass p-8 rounded-3xl">
-        <h3 class="text-2xl font-bold mb-4">${isTaxi ? 'Quick Booking' : 'Quick Inquiry'}</h3>
-        ${isTaxi ? `
-          <input id="pickup" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Pickup Location">
-          <input id="destination" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Destination">
-          <button onclick="window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! I want to book a ride from ' + document.getElementById('pickup').value + ' to ' + document.getElementById('destination').value), '_blank')" class="w-full bg-yellow-400 text-black py-3 rounded-xl font-bold hover:bg-yellow-300 transition-colors">Get Fare via WhatsApp</button>
-        ` : `
-          <input id="enquiry_name" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Your Name">
-          <input id="enquiry_msg" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Your Message/Order Details">
-          <button onclick="window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('enquiry_name').value + '. ' + document.getElementById('enquiry_msg').value), '_blank')" class="w-full bg-yellow-400 text-black py-3 rounded-xl font-bold hover:bg-yellow-300 transition-colors">Send Inquiry</button>
-        `}
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WHY CHOOSE US -->
-<section class="py-24 max-w-7xl mx-auto px-6" id="services">
-  <h2 class="text-4xl font-bold text-center mb-12">Why Choose Us</h2>
-  <div class="grid md:grid-cols-4 gap-6">
-    <div class="card" data-aos="fade-up">
-      <div class="text-4xl mb-4">🚖</div>
-      <h3 class="text-xl font-bold">${isTaxi ? '24/7 Taxi Service' : 'Premium Support'}</h3>
-    </div>
-    <div class="card" data-aos="fade-up" data-aos-delay="100">
-      <div class="text-4xl mb-4">💳</div>
-      <h3 class="text-xl font-bold">Fixed & Honest Pricing</h3>
-    </div>
-    <div class="card" data-aos="fade-up" data-aos-delay="200">
-      <div class="text-4xl mb-4">🛡️</div>
-      <h3 class="text-xl font-bold">${isTaxi ? 'Safe Drivers' : 'Certified Professionals'}</h3>
-    </div>
-    <div class="card" data-aos="fade-up" data-aos-delay="300">
-      <div class="text-4xl mb-4">⚡</div>
-      <h3 class="text-xl font-bold">${isTaxi ? 'Fast Pickup' : 'Instant Dispatch'}</h3>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES LIST -->
-<section class="py-24 bg-slate-900/50">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-4xl text-center font-bold mb-12">Our Services</h2>
-    <div class="grid md:grid-cols-3 gap-6">
-      ${services.map((service, index) => `
-        <div class="card cursor-pointer" data-aos="fade-up" data-aos-delay="${index * 50}" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
-          <div class="text-3xl mb-4">${['✈️', '🏙️', '🗺️', '🏢', '💒', '🏔️'][index % 6]}</div>
-          <h3 class="text-xl font-bold mb-2">${service.name}</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">${service.description || 'Professional service tailored to your business.'}</p>
-        </div>
-      `).join('')}
-    </div>
-  </div>
-</section>
-
-<!-- FLEET/CATALOG -->
-<section class="py-24 max-w-7xl mx-auto px-6" id="fleet">
-  <h2 class="text-4xl text-center font-bold mb-12">${isTaxi ? 'Our Fleet' : 'Our Catalog'}</h2>
-  <div class="grid md:grid-cols-4 gap-6">
-    ${(isTaxi ? [
-      { name: 'Sedan Class', price: '₹12/km' },
-      { name: 'SUV Comfort', price: '₹18/km' },
-      { name: 'Innova Premium', price: '₹22/km' },
-      { name: 'Luxury Traveller', price: '₹28/km' }
-    ] : services.slice(0, 4).map((s, idx) => ({ name: s.name, price: 'Premium' }))).map((item, index) => `
-      <div class="fleet bg-slate-900 border border-yellow-400/20 p-6 rounded-2xl text-center hover:-translate-y-2 hover:border-yellow-400 transition-all duration-300" data-aos="fade-up" data-aos-delay="${index * 100}">
-        <h3 class="font-bold text-lg">${item.name}</h3>
-        <span class="text-yellow-400 font-mono block mt-2 text-xl font-bold">${item.price}</span>
-      </div>
-    `).join('')}
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="py-24 bg-slate-900/50" id="reviews">
-  <div class="max-w-5xl mx-auto text-center px-6">
-    <h2 class="text-4xl font-bold mb-10">Happy Customers</h2>
-    <div class="glass p-10 rounded-3xl" data-aos="zoom-in">
-      <p class="text-2xl italic text-yellow-300 mb-4">★★★★★</p>
-      <p class="text-xl italic">"Excellent service, clean vehicle, and polite coordinator. Highly recommended for airport pickups and daily commutes!"</p>
-      <p class="text-slate-400 mt-6 text-sm">- Sarah Jenkins, Corporate Client</p>
-    </div>
-  </div>
-</section>
-
-<!-- HOW TO BOOK -->
-<section class="py-24 max-w-6xl mx-auto px-6">
-  <h2 class="text-4xl font-bold text-center mb-12">${isTaxi ? 'Book in 4 Easy Steps' : 'Order in 4 Easy Steps'}</h2>
-  <div class="grid md:grid-cols-4 gap-6 text-center">
-    <div class="card" data-aos="fade-right">${isTaxi ? '1. Submit Details' : '1. Select Items'}</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="100">${isTaxi ? '2. Confirm Booking' : '2. Confirm Order'}</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="200">${isTaxi ? '3. Fast Pickup' : '3. Fresh Delivery'}</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="300">${isTaxi ? '4. Enjoy Ride' : '4. Enjoy Order'}</div>
-  </div>
-</section>
-
-<!-- CONTACT CTA -->
-<section class="py-24 bg-yellow-400 text-black" id="contact">
-  <div class="max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
-    <h2 class="text-5xl font-extrabold">${isTaxi ? 'Need a Ride?' : 'Ready to Order?'}</h2>
-    <p class="mt-4 text-lg">Call or WhatsApp us anytime. We are online and ready to assist.</p>
-    <div class="mt-8 flex justify-center gap-4">
-      <a href="tel:${site.phoneNumber}" class="bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-slate-900 transition-colors">Call Now</a>
-      <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="bg-green-600 text-white px-8 py-4 rounded-full font-bold hover:bg-green-700 transition-colors">WhatsApp Us</a>
-    </div>
-  </div>
-</section>
-
-<footer class="py-8 text-center text-slate-400 border-t border-white/5 bg-black/30">
-  © ${currentYear} ${site.businessName}. All rights reserved.
-</footer>
-
-<!-- Floating Action Buttons -->
-<div class="fixed right-5 bottom-24 z-50 flex flex-col gap-3">
-  <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="stickyBtn bg-green-500 text-white flex items-center justify-center">
-    <svg style="width: 28px; height: 28px;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" class="stickyBtn bg-yellow-400 text-black flex items-center justify-center">
-    <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-  </a>
-</div>
-
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>
-  AOS.init({duration:800,once:true});
-</script>
-</body>
-</html>`;
-}
-
-
-function renderGrayArcTemplate(site: SiteConfig): string {
-  const category = (site.category || '').toLowerCase();
-  const isTaxi = category.includes('taxi') || category.includes('cab') || category.includes('transport');
-  const isFood = category.includes('bakery') || category.includes('cake') || category.includes('food') || category.includes('restaurant');
-  const isBeauty = category.includes('salon') || category.includes('spa') || category.includes('hair') || category.includes('beauty');
-
-  // Define colors based on category
-  let primaryColor = '#6366f1'; // Indigo
-  let secondaryColor = '#4f46e5';
-  if (isTaxi) {
-    primaryColor = '#facc15'; // Yellow
-    secondaryColor = '#eab308';
-  } else if (isFood) {
-    primaryColor = '#f59e0b'; // Amber
-    secondaryColor = '#d97706';
-  } else if (isBeauty) {
-    primaryColor = '#ec4899'; // Pink
-    secondaryColor = '#db2777';
-  }
-
-  const currentYear = new Date().getFullYear();
-  const services = site.services || [];
-  const images = getCategoryImages(site.category || '');
-
-  // Define dynamic features
-  let features = [
-    { title: '⭐ Premium Quality', desc: 'Excellence and top-tier quality in every detail.' },
-    { title: '🤝 Trusted Team', desc: 'Professional staff dedicated to your satisfaction.' },
-    { title: '📞 Instant Booking', desc: 'Quick support and order coordination via WhatsApp.' },
-    { title: '💡 Reliable Solutions', desc: 'Consistent, top-rated support for all clients.' }
-  ];
-  if (isTaxi) {
-    features = [
-      { title: '🚖 24/7 Availability', desc: 'Always online and ready to pick you up.' },
-      { title: '💳 Fixed Pricing', desc: 'Clear upfront rates with no hidden surcharges.' },
-      { title: '🛡️ Safe Drivers', desc: 'Experienced and background-checked drivers.' },
-      { title: '⚡ Express Booking', desc: 'Instant dispatch and short wait times.' }
-    ];
-  } else if (isFood) {
-    features = [
-      { title: '🍰 Baked Fresh', desc: 'Prepared daily with premium quality ingredients.' },
-      { title: '🎨 Custom Designs', desc: 'Cakes and treats tailored for your special events.' },
-      { title: '⚡ Quick Delivery', desc: 'Fast local delivery straight to your doorstep.' },
-      { title: '❤️ Secret Recipes', desc: 'Traditional recipes loved by all our customers.' }
-    ];
-  }
-
-  // Define dynamic FAQs
-  let faqs = [
-    { q: 'How can I get started?', a: `Just click the "Order Now" or WhatsApp button to chat directly with our team at ${site.businessName}.` },
-    { q: 'What are your operational hours?', a: 'We respond quickly during our business hours. Feel free to leave a message on WhatsApp anytime!' },
-    { q: 'What forms of payment do you accept?', a: 'We accept all major UPI apps, card payments, net banking, and cash.' }
-  ];
-  if (isTaxi) {
-    faqs = [
-      { q: 'How can I book a ride?', a: 'Simply send your pickup and destination locations via our WhatsApp quick booking form above.' },
-      { q: 'Are your rates fixed?', a: 'Yes, we offer transparent fixed pricing based on distance with zero surge charges.' },
-      { q: 'Do you offer outstation trips?', a: 'Yes, we offer airport transfers, outstation packages, and hourly local rentals.' }
-    ];
-  } else if (isFood) {
-    faqs = [
-      { q: 'Do you take custom cake orders?', a: 'Yes! We specialize in custom cakes for birthdays, weddings, and anniversaries. Contact us on WhatsApp to discuss your design.' },
-      { q: 'How far in advance should I order?', a: 'For standard cakes, 24 hours is enough. For custom cakes, we recommend ordering 3-5 days in advance.' },
-      { q: 'Do you offer home delivery?', a: 'Yes, we deliver across town. Delivery charges vary based on distance.' }
-    ];
-  }
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${site.businessName} | ${site.category || 'Premium Service'}</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<style>
-body{font-family:Outfit,sans-serif;background:#0f172a;color:#fff}
-:root{--primary:${primaryColor};--secondary:${secondaryColor};}
-.glass{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08)}
-.card{transition:.3s}.card:hover{transform:translateY(-8px);border-color:var(--primary)}
-.hero{background:linear-gradient(rgba(2,6,23,.75),rgba(2,6,23,.85)),url('${images.hero || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1600&q=80'}') center/cover}
-.stickyBtn{width:60px;height:60px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;box-shadow:0 10px 20px rgba(0,0,0,0.3)}
-</style>
-</head>
-<body class="scroll-smooth">
-<nav class="fixed w-full bg-black/40 backdrop-blur z-50 border-b border-white/5">
-<div class="max-w-7xl mx-auto flex justify-between p-5 items-center">
-<div class="flex items-center gap-3 font-bold text-2xl text-white">
-  <img src="https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(site.businessName)}?width=200&height=200&nologo=true" class="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10" alt="Logo">
-  <span>${site.businessName}</span>
-</div>
-<div class="hidden md:flex gap-8">
-<a href="#services" class="hover:text-[var(--primary)] transition-colors">Services</a>
-<a href="#gallery" class="hover:text-[var(--primary)] transition-colors">Gallery</a>
-<a href="#faq" class="hover:text-[var(--primary)] transition-colors">FAQ</a>
-<a href="#contact" class="hover:text-[var(--primary)] transition-colors">Contact</a>
-</div>
-<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-5 py-2 rounded-full bg-black text-white border border-white/10 font-semibold hover:bg-slate-900 transition-colors">Get Quote</a>
-</div></nav>
-
-<section class="hero min-h-screen flex items-center relative py-20">
-<div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
-<div data-aos="fade-right">
-<p class="uppercase tracking-widest text-sm font-semibold" style="color:var(--primary)">${site.category || 'Premium Service'}</p>
-<h1 class="text-5xl md:text-6xl font-extrabold mt-4 leading-tight">${site.heroTitle || site.businessName}</h1>
-<p class="mt-6 text-slate-300 text-lg leading-relaxed">${site.heroSubtitle || (isTaxi ? 'Airport transfers, outstation trips and corporate travel with professional drivers.' : 'Professional and reliable services customized to fit your specific business requirements.')}</p>
-<div class="mt-8 flex flex-wrap gap-4">
-<a href="#contact" class="px-8 py-4 rounded-full bg-black text-white border border-white/10 font-bold hover:bg-slate-900 transition-colors">Get Free Quote</a>
-<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors">WhatsApp Us</a>
-</div>
-</div>
-<div class="glass rounded-3xl p-8 shadow-2xl" data-aos="zoom-in">
-<h3 class="text-2xl font-bold mb-6">Quick Contact</h3>
-<div class="space-y-4 text-slate-200">
-  <p class="flex items-center gap-3">📞 <span class="font-mono">${site.phoneNumber}</span></p>
-  ${site.contactDetails?.address ? `<p class="flex items-center gap-3">📍 <span>${site.contactDetails.address}</span></p>` : ''}
-  ${site.contactDetails?.hours ? `<p class="flex items-center gap-3">🕐 <span>${site.contactDetails.hours}</span></p>` : ''}
-</div>
-</div>
-</div>
-</section>
-
-<!-- WHY CHOOSE US -->
-<section class="py-24 max-w-7xl mx-auto px-6">
-<h2 class="text-4xl font-bold text-center">Why Choose Us</h2>
-<div class="grid md:grid-cols-4 gap-6 mt-16">
-  ${features.map(f => `
-    <div class="glass card p-8 rounded-2xl border border-white/5">
-      <h3 class="font-bold text-xl mb-3 text-white">${f.title}</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">${f.desc}</p>
-    </div>
-  `).join('')}
-</div>
-</section>
-
-<!-- SERVICES -->
-<section id="services" class="py-24 bg-slate-900/60 border-y border-white/5">
-<div class="max-w-7xl mx-auto px-6">
-<h2 class="text-4xl font-bold text-center">Our Services & Catalog</h2>
-<div id="servicesGrid" class="grid md:grid-cols-3 gap-6 mt-16">
-  ${services.map((service, index) => `
-    <div class="glass p-6 rounded-2xl card border border-white/5 cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
-      <h3 class="font-bold text-xl text-white group-hover:text-[var(--primary)]">${service.name}</h3>
-      <p class="mt-3 text-slate-400 text-sm leading-relaxed">${service.description || 'Premium custom service designed to meet your requirements.'}</p>
-      <span class="mt-6 text-sm font-semibold block" style="color:var(--primary)">Enquire Now →</span>
-    </div>
-  `).join('')}
-</div>
-</div></section>
-
-<!-- HOW IT WORKS -->
-<section class="py-24 max-w-7xl mx-auto px-6">
-<h2 class="text-4xl font-bold text-center">How It Works</h2>
-<div class="grid md:grid-cols-4 gap-6 mt-16 text-center">
-<div class="glass p-8 rounded-2xl border border-white/5">1. Contact</div>
-<div class="glass p-8 rounded-2xl border border-white/5">2. Quote</div>
-<div class="glass p-8 rounded-2xl border border-white/5">3. Schedule</div>
-<div class="glass p-8 rounded-2xl border border-white/5">4. Done</div>
-</div></section>
-
-<!-- GALLERY -->
-<section id="gallery" class="py-24 bg-slate-900/60 border-y border-white/5">
-<div class="max-w-7xl mx-auto px-6">
-<h2 class="text-4xl font-bold text-center">Gallery</h2>
-<div class="grid md:grid-cols-3 gap-6 mt-16">
-<img src="${images.about || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
-<img src="${images.hero || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
-<img src="${images.products[0] || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80'}" class="rounded-2xl h-[280px] w-full object-cover shadow-lg border border-white/10">
-</div></div></section>
-
-<!-- PROMO CALL OUT -->
-<section class="py-24 max-w-5xl mx-auto px-6 text-center">
-<div class="glass p-12 rounded-3xl border border-white/10">
-<h2 class="text-4xl font-bold text-white">Ready to grow your business?</h2>
-<p class="mt-6 text-slate-300 text-lg leading-relaxed">Get in touch with ${site.businessName} today on WhatsApp and let us take care of the rest!</p>
-</div></section>
-
-<!-- FAQ -->
-<section id="faq" class="py-24 max-w-4xl mx-auto px-6">
-<h2 class="text-4xl font-bold text-center mb-16">FAQ</h2>
-<div id="faqList">
-  ${faqs.map(f => `
-    <details class="glass p-6 mb-4 rounded-2xl border border-white/5 group">
-      <summary class="font-bold text-lg cursor-pointer list-none flex justify-between items-center text-white">
-        <span>${f.q}</span>
-        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
-      </summary>
-      <p class="mt-4 text-slate-400 leading-relaxed text-sm">${f.a}</p>
-    </details>
-  `).join('')}
-</div>
-</section>
-
-<footer id="contact" class="bg-black py-12 text-center border-t border-white/5 text-slate-500">
-<p class="font-bold text-white text-lg">${site.businessName}</p>
-<p class="mt-2 text-sm">${site.phoneNumber}</p>
-${site.contactDetails?.address ? `<p class="mt-1 text-sm">${site.contactDetails.address}</p>` : ''}
-</footer>
-
-<!-- Floating Action Buttons -->
-<div class="fixed right-5 bottom-24 z-50 flex flex-col gap-3">
-<a href="https://wa.me/${site.phoneNumber}" target="_blank" class="stickyBtn bg-green-500 text-white">💬</a>
-<a href="tel:${site.phoneNumber}" class="stickyBtn bg-black text-white border border-white/10">📞</a>
-</div>
-
-<script>
-AOS.init({ duration: 800, once: true });
-</script>
-</body>
-</html>`;
-}
-
 
 function getCategoryImages(category: string): CategoryImages {
   const cat = category.toLowerCase();
@@ -3162,7 +713,6 @@ function getCategoryImages(category: string): CategoryImages {
     };
   }
   
-  // Default: Professional business imagery
   return {
     hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80&auto=format&fit=crop',
     about: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80&auto=format&fit=crop',
@@ -3202,7 +752,7 @@ function renderSubscriptionPendingPage(site: SiteConfig): string {
     <style>body{font-family:'Inter',sans-serif}</style></head>
     <body class="bg-zinc-950 flex items-center justify-center min-h-screen px-4">
       <div class="text-center p-10 bg-zinc-900 border border-zinc-800 rounded-3xl max-w-lg">
-        <div class="w-16 h-16 bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center rounded-full mx-auto mb-6 text-2xl">⚠</div>
+        <div class="w-16 h-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center rounded-full mx-auto mb-6 text-2xl">⚠</div>
         <h1 class="text-2xl font-bold text-white mb-3">Trial Expired</h1>
         <p class="text-zinc-400 text-sm mb-8">The 30-day free trial for <strong class="text-white">${site.businessName}</strong> has ended. Reactivate your website for just ₹399/month.</p>
         <a href="/pay/subscribe?siteId=${site.id}" class="inline-block bg-white text-zinc-900 font-bold py-4 px-8 rounded-xl hover:bg-zinc-100 transition">
@@ -3238,7 +788,6 @@ function renderPaymentPage(type: string, siteId: string, domain?: string, paymen
       </div>`;
   }
 
-  // Determine if we need WHOIS Form
   const showWhoisForm = isDomain || hasAddon;
 
   return `<!DOCTYPE html><html><head>

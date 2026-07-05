@@ -7,6 +7,8 @@ import { createDomainPaymentLink, createSubscriptionLink, createCustomDomainSubs
 import { checkDomainAvailability, suggestAlternativeDomains } from '../services/domains';
 import crypto from 'crypto';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -950,10 +952,36 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       console.warn(`[Logo Generator] Warning: logo generation timed out or failed, but continuing:`, e.message);
     }
 
-    // Apply selected template
-    if (session.answers.template) {
-      siteConfig.template = session.answers.template;
+    // Apply selected template or auto-match it using metadata.json suitability mapping
+    let selectedTemplate = session.answers.template;
+    if (!selectedTemplate) {
+      try {
+        const templatesDir = path.join(__dirname, '../../templates');
+        if (fs.existsSync(templatesDir)) {
+          const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+          const categoryLower = (session.answers.category || '').toLowerCase();
+          
+          for (const folder of folders) {
+            const metaPath = path.join(templatesDir, folder, 'metadata.json');
+            if (fs.existsSync(metaPath)) {
+              const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+              if (Array.isArray(meta.industries)) {
+                const match = meta.industries.some((ind: string) => categoryLower.includes(ind.toLowerCase()));
+                if (match) {
+                  selectedTemplate = folder;
+                  console.log(`[Auto-Match] Category "${session.answers.category}" matched template "${folder}" via metadata.`);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } catch (err: any) {
+        console.error(`[Auto-Match] Failed to match template via metadata:`, err.message);
+      }
     }
+
+    siteConfig.template = selectedTemplate || 'GA001';
 
     await db.saveSite(siteConfig);
     await db.deleteSession(from);

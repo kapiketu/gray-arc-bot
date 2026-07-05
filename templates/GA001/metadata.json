@@ -1,0 +1,14 @@
+{
+  "template_id": "GA001",
+  "template_name": "Service Pro",
+  "version": "1.0.0",
+  "purpose": "Premium landing page for local service businesses.",
+  "supported_industries": [
+    "Electrician", "Plumber", "AC Repair", "Pest Control", 
+    "Cleaning Services", "Painting", "Solar", "CCTV", 
+    "Movers", "Locksmith", "Home Repair", "Security Services", 
+    "General Local Service Businesses"
+  ],
+  "description": "A luxury, dark-themed, highly converting landing page template featuring glassmorphism, asymmetrical bento-grid layouts, smooth scroll animations, and a minimal high-converting contact flow.",
+  "technologies": ["HTML5", "Tailwind CSS", "Vanilla JavaScript", "AOS Animations", "Lucide Icons"]
+}
