@@ -706,21 +706,28 @@ async function handleChatFlow(input: UserInput) {
 
     case 'EDIT_CONTACT':
       if (existingSite) {
-        await sendTextMessage(from, '🔄 Updating contact details...');
-        try {
-          const editResult = await modifyWebsiteConfig(existingSite, `Update my contact details to: ${text}`);
-          if (editResult.success && Object.keys(editResult.updatedConfig).length > 0) {
-            const updatedSite = { ...existingSite, ...editResult.updatedConfig };
-            await db.saveSite(updatedSite);
-            const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-            await sendTextMessage(from, `✅ Contact details updated!\n\n🔗 ${siteUrl}`);
-          } else {
-            await sendTextMessage(from, editResult.summary);
-          }
-        } catch (error) {
-          await sendTextMessage(from, '❌ Failed to update contact details. Please try again.');
+        // Direct parsing — no AI needed for contact details
+        const lines = text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
+        
+        // Extract phone number (digits with optional + prefix)
+        const phoneMatch = text.match(/[\+]?[\d\s\-]{7,15}/);
+        if (phoneMatch) {
+          existingSite.contactDetails.phone = phoneMatch[0].trim();
         }
+
+        // Remaining lines → address and hours
+        const nonPhoneLines = lines.filter((l: string) => !l.match(/^[\+]?[\d\s\-]{7,15}$/));
+        if (nonPhoneLines.length >= 2) {
+          existingSite.contactDetails.address = nonPhoneLines[0];
+          existingSite.contactDetails.hours = nonPhoneLines.slice(1).join(', ');
+        } else if (nonPhoneLines.length === 1) {
+          existingSite.contactDetails.address = nonPhoneLines[0];
+        }
+
+        await db.saveSite(existingSite);
         await db.deleteSession(from);
+        const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
+        await sendTextMessage(from, `✅ Contact details updated!\n\n📞 ${existingSite.contactDetails.phone}\n📍 ${existingSite.contactDetails.address}\n🕐 ${existingSite.contactDetails.hours}\n\n🔗 ${siteUrl}`);
       }
       break;
 
