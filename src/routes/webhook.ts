@@ -822,7 +822,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       // Send Domain Purchase Payment CTA
       await sendCTAUrlMessage(
         from,
-        `To link your custom domain (*${targetDomain}*), tap below to pay the ₹${domainPrice} upfront domain charge:\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`,
+        `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Pricing Breakdown:*\n• Custom Domain: *₹${domainPrice}* (one-time)\n• Website Subscription: *₹399/month*\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`,
         'Pay & Link Domain',
         payment.paymentUrl
       );

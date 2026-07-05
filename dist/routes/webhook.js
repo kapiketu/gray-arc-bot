@@ -636,7 +636,7 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
             // Send Preview Link CTA
             await (0, whatsapp_1.sendCTAUrlMessage)(from, `🎉 *Congratulations! Your website preview is ready!*\n\n🎁 Your *30-Day Free Trial* is now active on the preview link.\n\nTap below to view it:`, 'View Preview Site', subdomainUrl);
             // Send Domain Purchase Payment CTA
-            await (0, whatsapp_1.sendCTAUrlMessage)(from, `To link your custom domain (*${targetDomain}*), tap below to pay the ₹${domainPrice} upfront domain charge:\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`, 'Pay & Link Domain', payment.paymentUrl);
+            await (0, whatsapp_1.sendCTAUrlMessage)(from, `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Pricing Breakdown:*\n• Custom Domain: *₹${domainPrice}* (one-time)\n• Website Subscription: *₹399/month*\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`, 'Pay & Link Domain', payment.paymentUrl);
         }
         else {
             const subscription = await (0, billing_1.createSubscriptionLink)(siteConfig.id);
