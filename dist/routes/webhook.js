@@ -535,6 +535,7 @@ async function handleChatFlow(input) {
             }
             session.answers.customDomainRequested = cleanedDomain;
             session.answers.domainPrice = checkResult.price || 500;
+            await (0, whatsapp_1.sendTextMessage)(from, `✅ *${cleanedDomain}* is available!`);
             await buildAndPublishSite(from, session, true);
             break;
         // ─── EDIT STEPS (for existing sites) ───
@@ -631,7 +632,10 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
             siteConfig.customDomain = targetDomain;
             siteConfig.domainStatus = 'pending_payment';
             await db_1.db.saveSite(siteConfig);
-            await (0, whatsapp_1.sendTextMessage)(from, `🎉 *Congratulations! Your website preview is ready!*\n\n🔗 View it here: ${subdomainUrl}\n\nTo link your custom domain (*${targetDomain}*), click this secure link to pay the ₹${domainPrice} upfront domain charge:\n💳 Pay Here: ${payment.paymentUrl}\n\n*Note*: Your 30-day free trial is active on the preview link. Once domain payment succeeds, your custom domain will activate!`);
+            // Send Preview Link CTA
+            await (0, whatsapp_1.sendCTAUrlMessage)(from, `🎉 *Congratulations! Your website preview is ready!*\n\n🎁 Your *30-Day Free Trial* is now active on the preview link.\n\nTap below to view it:`, 'View Preview Site', subdomainUrl);
+            // Send Domain Purchase Payment CTA
+            await (0, whatsapp_1.sendCTAUrlMessage)(from, `To link your custom domain (*${targetDomain}*), tap below to pay the ₹${domainPrice} upfront domain charge:\n\n*Note*: Once payment succeeds, your custom domain will activate automatically!`, 'Pay & Link Domain', payment.paymentUrl);
         }
         else {
             const subscription = await (0, billing_1.createSubscriptionLink)(siteConfig.id);
