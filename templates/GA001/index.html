@@ -42,9 +42,9 @@
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-6 px-6 lg:px-12">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" class="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                {{logo}}
-                <span>{{business_name}}</span>
-            </a>
+    {{logo}}
+    <span>{{business_name}}</span>
+</a>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-8 font-medium text-sm">
@@ -76,18 +76,14 @@
                     <span class="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
                     Available for Emergency Calls
                 </div>
-                <h1 class="text-5xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
-                    {{hero_title}}
-                </h1>
-                <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">
-                    {{hero_subtitle}}
-                </p>
+                <h1 class="text-5xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">{{hero_title}}</h1>
+                <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">{{hero_subtitle}}</p>
                 <div class="flex flex-wrap items-center gap-4">
                     <a href="#contact" class="btn-primary px-8 py-4 rounded-full text-dark-900 font-bold text-lg transition-transform hover:scale-105 flex items-center gap-2">
                         Book Service <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </a>
                     <a href="tel:{{phone}}" class="px-8 py-4 rounded-full glass border border-white/20 text-white font-bold text-lg transition-all hover:bg-white/10 flex items-center gap-2">
-                        <i data-lucide="phone" class="w-5 h-5 text-gold-500"></i> {{phone}}
+    <i data-lucide="phone" class="w-5 h-5 text-gold-500"></i> {{phone}}
                     </a>
                 </div>
             </div>
@@ -96,10 +92,10 @@
             <div class="hidden lg:block relative" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
                 <div class="glass p-8 rounded-3xl border border-white/10 shadow-2xl relative z-10 ml-auto max-w-md backdrop-blur-xl">
                     <div class="flex items-center gap-4 mb-6">
-                        <img src="{{about_image}}" alt="Lead Expert" class="w-16 h-16 rounded-full border-2 border-gold-500 object-cover">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150&h=150" alt="Lead Technician" class="w-16 h-16 rounded-full border-2 border-gold-500 object-cover">
                         <div>
-                            <h3 class="text-white font-bold text-lg">Our Crew</h3>
-                            <p class="text-gold-500 text-sm">{{category}} Experts</p>
+                            <h3 class="text-white font-bold text-lg">Michael R.</h3>
+                            <p class="text-gold-500 text-sm">Lead Service Expert</p>
                         </div>
                     </div>
                     <div class="space-y-4">
@@ -176,8 +172,8 @@
                 <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">About The Company</h2>
                 <h3 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">{{about_title}}</h3>
                 <div class="text-gray-400 text-lg mb-8 leading-relaxed space-y-4">
-                    {{about_content}}
-                </div>
+    {{about_content}}
+</div>
                 <ul class="space-y-4 mb-10">
                     <li class="flex items-center gap-3 text-white">
                         <i data-lucide="check-circle-2" class="text-gold-500 w-5 h-5"></i> 100% Satisfaction Guarantee
@@ -204,6 +200,7 @@
                 <h3 class="text-4xl md:text-5xl font-extrabold text-white">Premium Service Offerings</h3>
             </div>
 
+            <!-- Bento Grid -->
             {{services_grid}}
         </div>
     </section>
@@ -312,6 +309,7 @@
                 <h3 class="text-4xl md:text-5xl font-extrabold text-white">Don't Just Take Our Word.</h3>
             </div>
             
+            <!-- Slider Container -->
             {{testimonials_slider}}
         </div>
     </section>
@@ -353,14 +351,23 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div class="md:col-span-2">
                 <a href="#" class="text-2xl font-bold text-white tracking-tight flex items-center gap-3 mb-6">
-                    {{logo}}
-                    <span>{{business_name}}</span>
-                </a>
-                <p class="text-gray-500 max-w-sm mb-6">Premium {{category}} solutions, setting the standard for quality and reliability.</p>
+    {{logo}}
+    <span>{{business_name}}</span>
+</a>
+                <p class="text-gray-500 max-w-sm mb-6">The premier choice for {{category}} maintenance, setting the standard for quality and reliability.</p>
                 <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all"><i data-lucide="facebook" class="w-5 h-5"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all"><i data-lucide="instagram" class="w-5 h-5"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <!-- Facebook -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <!-- Twitter -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                    </a>
                 </div>
             </div>
             <div>
