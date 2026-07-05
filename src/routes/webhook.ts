@@ -4,7 +4,7 @@ import { db, Session } from '../services/db';
 import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage } from '../services/whatsapp';
 import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
 import { createDomainPaymentLink, createSubscriptionLink, processPaymentWebhook } from '../services/billing';
-import { checkDomainAvailability } from '../services/domains';
+import { checkDomainAvailability, suggestAlternativeDomains } from '../services/domains';
 import crypto from 'crypto';
 
 dotenv.config();
@@ -677,9 +677,15 @@ async function handleChatFlow(input: UserInput) {
       await sendTextMessage(from, `🔍 Checking availability for *${cleanedDomain}*...`);
       const checkResult = await checkDomainAvailability(cleanedDomain);
       if (!checkResult.available) {
+        const alternatives = await suggestAlternativeDomains(cleanedDomain);
+        let altMsg = '';
+        if (alternatives.length > 0) {
+          altMsg = `\n\n💡 *Available Alternatives:*\n` + alternatives.map(d => `👉 *${d}*`).join('\n');
+        }
+        
         await sendTextMessage(
           from,
-          `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*\n\nPlease type another domain name (e.g., sweet-treats.in):`
+          `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*${altMsg}\n\nPlease type another domain name to search:`
         );
         break;
       }

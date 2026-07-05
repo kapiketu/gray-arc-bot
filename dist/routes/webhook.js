@@ -525,7 +525,12 @@ async function handleChatFlow(input) {
             await (0, whatsapp_1.sendTextMessage)(from, `🔍 Checking availability for *${cleanedDomain}*...`);
             const checkResult = await (0, domains_1.checkDomainAvailability)(cleanedDomain);
             if (!checkResult.available) {
-                await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*\n\nPlease type another domain name (e.g., sweet-treats.in):`);
+                const alternatives = await (0, domains_1.suggestAlternativeDomains)(cleanedDomain);
+                let altMsg = '';
+                if (alternatives.length > 0) {
+                    altMsg = `\n\n💡 *Available Alternatives:*\n` + alternatives.map(d => `👉 *${d}*`).join('\n');
+                }
+                await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*${altMsg}\n\nPlease type another domain name to search:`);
                 break;
             }
             session.answers.customDomainRequested = cleanedDomain;

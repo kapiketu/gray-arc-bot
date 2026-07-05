@@ -175,3 +175,34 @@ function getContactInfo(phone: string) {
     organization: 'The Gray Arc'
   };
 }
+
+/**
+ * Suggests available alternative domains (e.g. .in, .co.in, .net) if the primary domain is taken.
+ */
+export async function suggestAlternativeDomains(domain: string): Promise<string[]> {
+  const parts = domain.split('.');
+  const name = parts[0];
+  if (!name) return [];
+
+  const alternativeTLDs = ['in', 'co.in', 'net', 'co', 'org'];
+  const candidates = alternativeTLDs
+    .map(ext => `${name}.${ext}`)
+    .filter(d => d !== domain);
+
+  // Check availability concurrently
+  const checks = await Promise.all(
+    candidates.map(async (candidate) => {
+      try {
+        const res = await checkDomainAvailability(candidate);
+        return { domain: candidate, available: res.available };
+      } catch {
+        return { domain: candidate, available: false };
+      }
+    })
+  );
+
+  return checks
+    .filter(c => c.available)
+    .map(c => c.domain)
+    .slice(0, 3); // return up to 3 options
+}
