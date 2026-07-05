@@ -533,20 +533,24 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
 function renderServicesGrid(services: Array<{ name: string; description: string; price?: string }>, category: string, phone: string, site: SiteConfig): string {
   if (services.length === 0) return '';
 
+  const icons = ['zap', 'droplets', 'thermometer-sun', 'shield', 'sparkles', 'star'];
   let gridItems = '';
   services.forEach((s, idx) => {
-    if (idx >= 4) return;
+    if (idx >= 6) return;
     
     const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(s.name)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
-    
+    const icon = icons[idx % icons.length];
+    const delay = idx * 100;
+
     if (idx === 0) {
+      // Featured card — larger span
       gridItems += `
-        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="0">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500 mix-blend-overlay">
+        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
             <div class="absolute inset-0 p-8 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
-                    <i data-lucide="zap" class="w-7 h-7"></i>
+                    <i data-lucide="${icon}" class="w-7 h-7"></i>
                 </div>
                 <h4 class="text-3xl font-bold text-white mb-3">${s.name}</h4>
                 <p class="text-gray-300 max-w-md">${s.description}</p>
@@ -557,35 +561,18 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
             </div>
         </div>
       `;
-    } else if (idx === 3) {
-      gridItems += `
-        <div class="md:col-span-3 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer flex flex-col md:flex-row items-center p-8 gap-8" data-aos="zoom-in" data-aos-delay="300">
-            <div class="absolute inset-0 bg-gradient-to-r from-dark-800 to-transparent opacity-80 z-0"></div>
-            <div class="bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center text-gold-500 shrink-0 border border-white/10 relative z-10">
-                <i data-lucide="shield" class="w-8 h-8"></i>
-            </div>
-            <div class="relative z-10 flex-1">
-                <h4 class="text-2xl font-bold text-white mb-2">${s.name}</h4>
-                <p class="text-gray-400">${s.description}</p>
-                <p class="text-gold-500 font-extrabold mt-2 text-lg">${s.price || 'Contact Us'}</p>
-            </div>
-            <div class="relative z-10">
-                <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all">
-                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                </a>
-            </div>
-        </div>
-      `;
     } else {
+      // All other cards — same background image treatment
       gridItems += `
-        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer p-8 flex flex-col justify-end" data-aos="zoom-in" data-aos-delay="${idx * 100}">
-            <div class="absolute inset-0 bg-dark-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative z-10">
-                <div class="bg-white/5 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 border border-white/10">
-                    <i data-lucide="${idx === 1 ? 'droplets' : 'thermometer-sun'}" class="w-6 h-6"></i>
+        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">
+                    <i data-lucide="${icon}" class="w-6 h-6"></i>
                 </div>
                 <h4 class="text-xl font-bold text-white mb-2">${s.name}</h4>
-                <p class="text-gray-400 text-sm mb-4">${s.description}</p>
+                <p class="text-gray-300 text-sm mb-4 line-clamp-2">${s.description}</p>
                 <div class="flex justify-between items-center">
                     <span class="text-gold-500 font-bold text-sm">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
