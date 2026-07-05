@@ -309,7 +309,8 @@ async function viewerRoutes(fastify) {
             const site = await db_1.db.getSite(body.siteId);
             if (site) {
                 const hasCustomDomain = !!site.customDomain;
-                const previewLink = `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
+                const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`;
+                const previewLink = `${BASE_URL}/site/${site.id}`;
                 if (hasCustomDomain) {
                     // 1. Send immediate payment confirmation message mentioning 30 minutes activation time
                     const immediateText = `Your payment of subscription + domain is successful! ✅\n\nWe are now setting up your domain *${site.customDomain}*. It will be fully active within 30 minutes.\n\nIn the meantime, you can preview your website here: ${previewLink}`;
@@ -1439,7 +1440,333 @@ function renderPremiumWebsite(site, templateName) {
     if (templateName === 'namari' || templateName === 'agency' || templateName === 'astro') {
         return renderAstroAgencyTemplate(site);
     }
+    if (templateName === 'portfolio' || templateName === 'nature') {
+        return renderNaturePortfolioTemplate(site);
+    }
     return renderPremiumClassicTemplate(site);
+}
+function renderNaturePortfolioTemplate(site) {
+    const images = getCategoryImages(site.category);
+    let subtitle = site.heroSubtitle || '';
+    if (subtitle.length < 50) {
+        subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
+    }
+    let story = site.storyContent || site.aboutText || '';
+    if (story.length < 100) {
+        story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
+    }
+    const currentYear = new Date().getFullYear();
+    return `<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${site.businessName} - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; background-color: #fbfcf7; color: #2d431f; overflow-x: hidden; }
+        .text-brand-dark { color: #355322; }
+        .text-brand-primary { color: #4b7833; }
+        .text-brand-light { color: #6a8c4f; }
+        .bg-brand-primary { background-color: #4b7833; }
+        .bg-brand-primary:hover { background-color: #3b6028; }
+        .bg-brand-secondary { background-color: #9dbf83; }
+        .bg-brand-light { background-color: #f0f5e9; }
+        .pill-shadow { box-shadow: 0 10px 40px -10px rgba(75, 120, 51, 0.2); }
+        .card-shadow { box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-shadow:hover { box-shadow: 0 30px 50px -15px rgba(75, 120, 51, 0.15); transform: translateY(-12px); }
+        .fab-hover:hover { transform: scale(1.1) translateY(-5px); }
+        .scroll-reveal { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        @keyframes float-slow { 0%, 100% { transform: translateY(0px) rotate(-6deg); } 50% { transform: translateY(-20px) rotate(2deg); } }
+        @keyframes float-fast { 0%, 100% { transform: translateY(0px) rotate(12deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
+        .animate-float-1 { animation: float-slow 6s ease-in-out infinite; }
+        .animate-float-2 { animation: float-fast 4s ease-in-out infinite; }
+        @keyframes spin-slow { to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+    </style>
+</head>
+<body class="antialiased relative" x-data="{ mobileMenuOpen: false }">
+
+    <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end">
+        <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/40 fab-hover transition-all duration-300 z-50 border-2 border-white">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" class="w-14 h-14 bg-[#4b7833] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#4b7833]/40 fab-hover transition-all duration-300 z-50 border-2 border-white">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+        </a>
+    </div>
+
+    <div class="relative px-4 sm:px-6 pt-4 pb-24 max-w-[1600px] mx-auto">
+        <nav class="absolute top-8 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl bg-[#fbfcf7]/95 backdrop-blur-md rounded-full px-6 py-4 flex justify-between items-center z-50 shadow-sm border border-white/50">
+            <div class="text-2xl font-extrabold text-[#4b7833] tracking-tight hover:scale-105 transition-transform cursor-pointer">${site.businessName}</div>
+            <div class="hidden lg:flex items-center space-x-10 text-[15px] font-bold text-[#455736]">
+                <a href="#about" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">About</a>
+                <a href="#services" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Services</a>
+                <a href="#process" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Process</a>
+                <a href="#work" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Work</a>
+                <a href="#contact" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Contact</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#contact" class="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary text-white text-sm font-bold transition hover:-translate-y-1 shadow-lg shadow-[#4b7833]/30">Hire Me Today</a>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden text-[#455736] p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+
+        <div x-show="mobileMenuOpen" x-cloak class="lg:hidden fixed inset-x-4 top-24 bg-white rounded-3xl shadow-2xl z-[100] overflow-hidden border border-gray-100" @click.outside="mobileMenuOpen = false">
+            <div class="flex flex-col p-6 space-y-4">
+                <a href="#about" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">About</a>
+                <a href="#services" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Services</a>
+                <a href="#process" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Process</a>
+                <a href="#work" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Work</a>
+                <a href="#contact" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#455736] hover:text-[#4b7833]">Contact</a>
+            </div>
+        </div>
+
+        <div class="relative w-full h-[700px] sm:h-[800px] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden group">
+            <img src="${images.hero || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2000'}" alt="Workspace" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-110">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"></div>
+            <div class="relative z-20 h-full flex flex-col justify-center px-6 sm:px-16 md:px-24 max-w-4xl pt-20">
+                <div class="scroll-reveal inline-flex items-center gap-2 bg-brand-primary/90 text-white px-4 py-1.5 rounded-full text-sm font-bold w-max mb-6 backdrop-blur-sm shadow-[0_0_20px_rgba(75,120,51,0.5)]">
+                    <svg class="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    ${site.category || 'Professional Services'}
+                </div>
+                <h1 class="scroll-reveal delay-100 text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1]">
+                    ${site.heroTitle || site.businessName}
+                </h1>
+                <p class="scroll-reveal delay-200 text-white/90 text-lg md:text-xl font-medium max-w-2xl mb-10 leading-relaxed">
+                    ${subtitle}
+                </p>
+                <div class="scroll-reveal delay-300 flex flex-wrap gap-4">
+                    <a href="#work" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#3b6028] hover:-translate-y-1 transition-all border-2 border-transparent shadow-[0_10px_30px_rgba(75,120,51,0.4)]">Explore My Work</a>
+                    <a href="#about" class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 hover:-translate-y-1 transition-all border-2 border-white/20">Read My Story</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl bg-brand-secondary p-3 sm:p-4 rounded-[2rem] sm:rounded-full pill-shadow z-30 transform hover:-translate-y-2 transition-transform duration-500">
+            <div class="bg-white rounded-xl sm:rounded-full grid grid-cols-2 md:grid-cols-4 p-4 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-y-4">
+                <div class="px-2 py-2 hover:scale-105 transition-transform">
+                    <div class="text-3xl font-extrabold text-brand-dark">10+</div>
+                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Years Exp</div>
+                </div>
+                <div class="px-2 py-2 hover:scale-105 transition-transform">
+                    <div class="text-3xl font-extrabold text-brand-dark">500+</div>
+                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Happy Clients</div>
+                </div>
+                <div class="px-2 py-2 hover:scale-105 transition-transform">
+                    <div class="text-3xl font-extrabold text-brand-dark">100%</div>
+                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Satisfaction</div>
+                </div>
+                <div class="px-2 py-2 hover:scale-105 transition-transform">
+                    <div class="text-3xl font-extrabold text-brand-dark">24/7</div>
+                    <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Support</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="about" class="max-w-7xl mx-auto px-6 py-24 sm:py-32 mt-10">
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div class="relative pl-6 pt-6 scroll-reveal">
+                <div class="absolute inset-0 border-2 border-dashed border-[#9dbf83] rounded-full scale-110 animate-spin-slow opacity-50 z-0"></div>
+                <div class="rounded-[2.5rem] overflow-hidden border-[12px] border-white card-shadow relative z-10">
+                    <img src="${images.about || 'https://images.unsplash.com/photo-1554046920-90dc5823ca0d?q=80&w=1000'}" alt="${site.businessName}" class="w-full h-[500px] sm:h-[650px] object-cover hover:scale-105 transition-transform duration-[10s]">
+                </div>
+                <div class="absolute top-0 left-0 bg-brand-primary text-white w-28 h-28 sm:w-36 sm:h-36 rounded-full flex flex-col items-center justify-center border-8 border-[#fbfcf7] shadow-xl animate-float-1 z-20">
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span class="text-sm sm:text-base font-bold text-center leading-tight">Expert<br>Professional</span>
+                </div>
+                <div class="absolute -bottom-6 -right-6 bg-white w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-xl border-8 border-[#fbfcf7] animate-float-2 z-20">
+                    <span class="text-4xl sm:text-5xl drop-shadow-md">✨</span>
+                </div>
+            </div>
+            <div class="scroll-reveal delay-200">
+                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">The Journey Behind the Craft</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6 leading-tight">
+                    ${site.storyTitle || "Our Story"}
+                </h2>
+                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed mb-6">
+                    ${story}
+                </p>
+                <div class="flex flex-wrap items-center gap-6">
+                    <a href="#contact" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-[#3b6028] hover:-translate-y-1 transition-all shadow-lg shadow-[#4b7833]/30 group w-max">
+                        <svg class="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Contact for Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="bg-brand-light py-24 sm:py-32 rounded-[3rem] sm:rounded-[4rem] mx-2 sm:mx-6 mb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-20 max-w-3xl mx-auto scroll-reveal">
+                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Core Competencies</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Comprehensive Solutions</h2>
+                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">Explore our core offerings and professional services.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                ${site.services.map((service, index) => `
+                <div class="bg-white rounded-[2.5rem] p-6 pb-10 card-shadow group scroll-reveal delay-${index * 100} flex flex-col h-full border border-gray-100 cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
+                    <div class="overflow-hidden rounded-[1.5rem] mb-8 relative h-64 shrink-0">
+                        <div class="absolute inset-0 bg-brand-primary/30 group-hover:bg-transparent transition duration-500 z-10"></div>
+                        <img src="${images.products[index % images.products.length]}" alt="${service.name}" class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-[10s]">
+                    </div>
+                    <div class="px-2 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2 gap-2">
+                           <h3 class="text-2xl font-extrabold text-brand-dark group-hover:text-brand-primary transition-colors">${service.name}</h3>
+                        </div>
+                        <p class="text-[#6b7b59] font-medium mb-6 leading-relaxed flex-grow">
+                            ${service.description || 'Professional service tailored to your specific requirements.'}
+                        </p>
+                        <div class="text-sm font-bold text-[#4b7833] uppercase tracking-wider mt-auto group-hover:underline">Order via WhatsApp →</div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="py-24 sm:py-32 bg-white relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-24 max-w-3xl mx-auto scroll-reveal">
+                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block">Proven Methodology</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">A Workflow Built for Success</h2>
+                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">A seamless workflow designed to deliver the best results.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-12 sm:gap-16 relative">
+                <div class="hidden md:block absolute top-16 left-1/6 w-2/3 h-1 bg-gradient-to-r from-brand-primary via-brand-secondary to-[#355322] z-0 rounded-full opacity-30 transform translate-x-1/4"></div>
+                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-100 group">
+                    <div class="w-32 h-32 rounded-full bg-brand-primary text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">1</div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Consultation</h3>
+                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">We begin by understanding your exact needs and vision.</p>
+                </div>
+                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-200 group">
+                    <div class="w-32 h-32 rounded-full bg-brand-secondary text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">2</div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Execution</h3>
+                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">Our specialists work meticulously to deliver exceptional quality.</p>
+                </div>
+                <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-300 group">
+                    <div class="w-32 h-32 rounded-full bg-[#355322] text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">3</div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Delivery</h3>
+                    <p class="text-[#6b7b59] font-medium leading-relaxed max-w-sm">You receive the final result, guaranteed to exceed expectations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="bg-brand-light py-24 sm:py-32 rounded-[3rem] sm:rounded-[4rem] mx-2 sm:mx-6 my-12 border border-[#9dbf83]/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6 scroll-reveal">
+                <div class="max-w-2xl">
+                    <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Featured Case Studies</span>
+                    <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Showcasing Digital Excellence</h2>
+                    <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">A curated glimpse into some of our favorite projects and client success stories.</p>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12">
+                ${site.services.slice(0, 2).map((service, index) => `
+                <div class="group cursor-pointer scroll-reveal delay-${index * 100} bg-white rounded-[3rem] p-4 pb-8 card-shadow border border-gray-100 ${index % 2 === 0 ? 'md:mt-16 mt-0' : ''}">
+                    <div class="overflow-hidden rounded-[2.5rem] mb-8 relative">
+                        <div class="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/20 transition-colors duration-500 z-10"></div>
+                        <img src="${images.products[(index + 2) % images.products.length]}" alt="${service.name}" class="w-full h-[350px] object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="flex justify-between items-start px-6">
+                        <div class="max-w-md pr-4">
+                            <h3 class="text-3xl font-extrabold text-brand-dark mb-3 group-hover:text-brand-primary transition-colors">${service.name}</h3>
+                            <p class="text-[#6b7b59] font-medium leading-relaxed">${service.description || 'Premium quality and exceptional delivery.'}</p>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-white border border-[#9dbf83] text-[#4b7833] flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all shadow-md shrink-0 group-hover:rotate-45">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 sm:py-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20 max-w-2xl mx-auto scroll-reveal">
+                <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Client Success Stories</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Don't Just Take My Word For It</h2>
+                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">Read what our clients have to say about working with us.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-10">
+                ${(site.testimonials || [
+        { name: 'Sarah M.', role: 'Loyal Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined.' },
+        { name: 'David R.', role: 'Business Owner', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. Five stars!' }
+    ]).slice(0, 2).map((review, index) => `
+                <div class="bg-white p-12 rounded-[3rem] card-shadow border border-gray-100 relative scroll-reveal delay-${index * 100} hover:scale-[1.02] transition-transform">
+                    <div class="absolute top-10 right-10 text-9xl text-brand-secondary/20 font-serif opacity-50 group-hover:scale-110 transition-transform">"</div>
+                    <div class="text-[#9dbf83] flex mb-8 relative z-10 gap-1">
+                        ${'<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>'.repeat(5)}
+                    </div>
+                    <p class="text-[#355322] text-xl font-bold leading-loose mb-10 relative z-10 italic">
+                        "${review.content}"
+                    </p>
+                    <div class="flex items-center gap-5 border-t border-gray-100 pt-6">
+                        <div class="w-16 h-16 rounded-full bg-brand-primary text-white flex items-center justify-center text-2xl font-bold shadow-sm">${review.name.charAt(0)}</div>
+                        <div>
+                            <h5 class="font-extrabold text-brand-dark text-lg">${review.name}</h5>
+                            <span class="text-sm font-bold text-[#6a8c4f] uppercase tracking-wider">${review.role || 'Verified Client'}</span>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-brand-primary text-white rounded-t-[3rem] sm:rounded-t-[4rem] mx-2 sm:mx-6 px-6 pt-28 pb-16 overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none animate-spin-slow"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-black/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto relative z-10 scroll-reveal">
+            <div class="text-center mb-24 max-w-4xl mx-auto">
+                <span class="text-brand-secondary font-bold uppercase tracking-widest text-sm mb-6 block hover:scale-105 transition-transform inline-block">Let's Connect</span>
+                <h2 class="text-5xl sm:text-7xl font-extrabold mb-10 leading-tight">Ready to build something extraordinary?</h2>
+                <p class="text-brand-light text-xl mb-12 text-white/90 leading-relaxed max-w-3xl mx-auto">We take on a limited number of new clients to ensure everyone receives our absolute best. Inquire below to check availability.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-6">
+                    <a href="mailto:${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}" class="inline-flex items-center justify-center bg-white text-brand-primary px-12 py-5 rounded-full font-extrabold text-xl hover:scale-105 hover:-translate-y-2 transition-all shadow-2xl shadow-black/20">
+                        ${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}
+                    </a>
+                    <a href="https://wa.me/${site.phoneNumber}" class="inline-flex items-center justify-center bg-transparent border-2 border-white/40 text-white px-12 py-5 rounded-full font-extrabold text-xl hover:bg-white/10 hover:-translate-y-2 transition-all">
+                        Book a Strategy Call
+                    </a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/20 pt-10 gap-8 text-base font-medium text-white/70">
+                <div>&copy; ${currentYear} ${site.businessName}. All rights reserved. Designed with precision and care.</div>
+                <div class="flex gap-8">
+                    <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="hover:text-white transition hover:-translate-y-1 inline-block">WhatsApp</a>
+                    <a href="tel:${site.phoneNumber}" class="hover:text-white transition hover:-translate-y-1 inline-block">Call</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>`;
 }
 function getCategoryImages(category) {
     const cat = category.toLowerCase();
