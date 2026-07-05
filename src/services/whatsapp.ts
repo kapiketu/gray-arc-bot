@@ -258,8 +258,7 @@ export async function sendFlowMessage(
           flow_cta: buttonLabel,
           flow_action: 'navigate',
           flow_action_payload: {
-            screen: screenName,
-            data: {}
+            screen: screenName
           }
         }
       }
