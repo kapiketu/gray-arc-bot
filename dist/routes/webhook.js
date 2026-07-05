@@ -260,6 +260,24 @@ async function handleChatFlow(input) {
             await sendEditMenu(from);
             return;
         }
+        // Alternative domain button selection
+        if (buttonId?.startsWith('alt_dom:')) {
+            if (!session)
+                return;
+            const selectedDomain = buttonId.replace('alt_dom:', '');
+            await (0, whatsapp_1.sendTextMessage)(from, `🔍 Checking availability for *${selectedDomain}*...`);
+            const checkResult = await (0, domains_1.checkDomainAvailability)(selectedDomain);
+            if (checkResult.available) {
+                session.answers.customDomainRequested = selectedDomain;
+                session.answers.domainPrice = checkResult.price || 500;
+                await (0, whatsapp_1.sendTextMessage)(from, `✅ *${selectedDomain}* is available for *₹${checkResult.price || 500}*!`);
+                await buildAndPublishSite(from, session, true);
+            }
+            else {
+                await (0, whatsapp_1.sendTextMessage)(from, `❌ Sorry, *${selectedDomain}* is no longer available. Please type another domain name to search:`);
+            }
+            return;
+        }
         // Category selection from list
         if (buttonId?.startsWith('cat_')) {
             if (!session || session.step !== 'AWAITING_CATEGORY') {
@@ -526,11 +544,18 @@ async function handleChatFlow(input) {
             const checkResult = await (0, domains_1.checkDomainAvailability)(cleanedDomain);
             if (!checkResult.available) {
                 const alternatives = await (0, domains_1.suggestAlternativeDomains)(cleanedDomain);
-                let altMsg = '';
-                if (alternatives.length > 0) {
-                    altMsg = `\n\n💡 *Available Alternatives:*\n` + alternatives.map(d => `👉 *${d}*`).join('\n');
+                const buttonAlts = alternatives.filter(d => d.length <= 20).slice(0, 3);
+                if (buttonAlts.length > 0) {
+                    const buttons = buttonAlts.map(d => ({ id: `alt_dom:${d}`, title: d }));
+                    await (0, whatsapp_1.sendButtonMessage)(from, `❌ *${cleanedDomain}* is already taken.\nReason: *${checkResult.reason || 'Not available'}*\n\n💡 Tap one of these available alternatives to choose it instantly, or type a new domain to search:`, buttons, 'Domain Options');
                 }
-                await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*${altMsg}\n\nPlease type another domain name to search:`);
+                else {
+                    let altMsg = '';
+                    if (alternatives.length > 0) {
+                        altMsg = `\n\n💡 *Available Alternatives:*\n` + alternatives.map(d => `👉 *${d}*`).join('\n');
+                    }
+                    await (0, whatsapp_1.sendTextMessage)(from, `❌ *${cleanedDomain}* is already taken or invalid.\nReason: *${checkResult.reason || 'Not available'}*${altMsg}\n\nPlease type another domain name to search:`);
+                }
                 break;
             }
             const price = checkResult.price || 500;
