@@ -1439,8 +1439,105 @@ function renderAstroAgencyTemplate(site) {
 function renderPremiumWebsite(site, templateName) {
     return renderNaturePortfolioTemplate(site);
 }
+function getSemanticServiceImage(serviceName, category, index) {
+    const name = (serviceName || '').toLowerCase();
+    const cat = (category || '').toLowerCase();
+    // Bakery / Food
+    if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('cupcake') || cat.includes('dessert') || cat.includes('food') || cat.includes('bread') || cat.includes('cafe') || cat.includes('baking') || cat.includes('baker')) {
+        if (name.includes('cupcake') || name.includes('muffin')) {
+            const options = [
+                'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=600&q=80&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=600&q=80&auto=format&fit=crop'
+            ];
+            return options[index % options.length];
+        }
+        if (name.includes('cake') || name.includes('fondant') || name.includes('pastry') || name.includes('dessert')) {
+            const options = [
+                'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1535141192574-5d4897c13636?w=600&q=80&auto=format&fit=crop'
+            ];
+            return options[index % options.length];
+        }
+        if (name.includes('bread') || name.includes('loaf') || name.includes('bun') || name.includes('croissant') || name.includes('bake')) {
+            const options = [
+                'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80&auto=format&fit=crop'
+            ];
+            return options[index % options.length];
+        }
+        if (name.includes('cookie') || name.includes('biscuit') || name.includes('macaron')) {
+            const options = [
+                'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=600&q=80&auto=format&fit=crop'
+            ];
+            return options[index % options.length];
+        }
+        // Fallback bakery images
+        const bakeryDefaults = [
+            'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=600&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1556217477-d325251ece38?w=800&q=80&auto=format&fit=crop'
+        ];
+        return bakeryDefaults[index % bakeryDefaults.length];
+    }
+    // Salon / Beauty
+    if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair') || cat.includes('nail')) {
+        if (name.includes('hair') || name.includes('cut') || name.includes('color') || name.includes('style') || name.includes('shave') || name.includes('barber')) {
+            return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80&auto=format&fit=crop';
+        }
+        if (name.includes('nail') || name.includes('mani') || name.includes('pedi')) {
+            return 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80&auto=format&fit=crop';
+        }
+        if (name.includes('massage') || name.includes('spa') || name.includes('facial') || name.includes('skin')) {
+            return 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80&auto=format&fit=crop';
+        }
+        if (name.includes('makeup') || name.includes('bridal') || name.includes('cosmetic')) {
+            return 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=600&q=80&auto=format&fit=crop';
+        }
+        const salonDefaults = [
+            'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop'
+        ];
+        return salonDefaults[index % salonDefaults.length];
+    }
+    // Gym / Fitness
+    if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('train')) {
+        if (name.includes('yoga') || name.includes('stretch') || name.includes('pilates') || name.includes('meditation')) {
+            return 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80&auto=format&fit=crop';
+        }
+        if (name.includes('cardio') || name.includes('run') || name.includes('treadmill') || name.includes('cycling') || name.includes('spin')) {
+            return 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&q=80&auto=format&fit=crop';
+        }
+        if (name.includes('weight') || name.includes('lift') || name.includes('strength') || name.includes('crossfit') || name.includes('gym')) {
+            return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80&auto=format&fit=crop';
+        }
+        const fitnessDefaults = [
+            'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&q=80&auto=format&fit=crop'
+        ];
+        return fitnessDefaults[index % fitnessDefaults.length];
+    }
+    // Clinic / Health
+    if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical') || cat.includes('physio')) {
+        if (name.includes('teeth') || name.includes('dental') || name.includes('dentist') || name.includes('ortho') || name.includes('root')) {
+            return 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80&auto=format&fit=crop';
+        }
+        const clinicDefaults = [
+            'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80&auto=format&fit=crop'
+        ];
+        return clinicDefaults[index % clinicDefaults.length];
+    }
+    // Default Fallback
+    const defaultCategoryImages = getCategoryImages(category);
+    if (defaultCategoryImages && defaultCategoryImages.products && defaultCategoryImages.products.length > 0) {
+        return defaultCategoryImages.products[index % defaultCategoryImages.products.length];
+    }
+    return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80&auto=format&fit=crop';
+}
 function renderNaturePortfolioTemplate(site) {
-    const images = getCategoryImages(site.category);
+    const images = getCategoryImages(site.category || '');
     let subtitle = site.heroSubtitle || '';
     if (subtitle.length < 50) {
         subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
@@ -1460,6 +1557,7 @@ function renderNaturePortfolioTemplate(site) {
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        [x-cloak] { display: none !important; }
         body { font-family: 'Nunito', sans-serif; background-color: #fbfcf7; color: #2d431f; overflow-x: hidden; }
         .text-brand-dark { color: #355322; }
         .text-brand-primary { color: #4b7833; }
@@ -1498,7 +1596,7 @@ function renderNaturePortfolioTemplate(site) {
 
     <div class="relative px-4 sm:px-6 pt-4 pb-24 max-w-[1600px] mx-auto">
         <nav class="absolute top-8 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl bg-[#fbfcf7]/95 backdrop-blur-md rounded-full px-6 py-4 flex justify-between items-center z-50 shadow-sm border border-white/50">
-            <div class="text-2xl font-extrabold text-[#4b7833] tracking-tight hover:scale-105 transition-transform cursor-pointer">${site.businessName}</div>
+            <div class="text-xl sm:text-2xl font-extrabold text-[#4b7833] tracking-tight hover:scale-105 transition-transform cursor-pointer truncate max-w-[160px] sm:max-w-none">${site.businessName}</div>
             <div class="hidden lg:flex items-center space-x-10 text-[15px] font-bold text-[#455736]">
                 <a href="#about" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">About</a>
                 <a href="#services" class="hover:text-[#4b7833] hover:-translate-y-1 transition-transform inline-block">Services</a>
@@ -1524,7 +1622,7 @@ function renderNaturePortfolioTemplate(site) {
             </div>
         </div>
 
-        <div class="relative w-full h-[700px] sm:h-[800px] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden group">
+        <div class="relative w-full h-[600px] sm:h-[800px] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden group">
             <img src="${images.hero || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2000'}" alt="Workspace" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-110">
             <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"></div>
             <div class="relative z-20 h-full flex flex-col justify-center px-6 sm:px-16 md:px-24 max-w-4xl pt-20">
@@ -1532,62 +1630,62 @@ function renderNaturePortfolioTemplate(site) {
                     <svg class="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                     ${site.category || 'Professional Services'}
                 </div>
-                <h1 class="scroll-reveal delay-100 text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1]">
+                <h1 class="scroll-reveal delay-100 text-3xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1]">
                     ${site.heroTitle || site.businessName}
                 </h1>
-                <p class="scroll-reveal delay-200 text-white/90 text-lg md:text-xl font-medium max-w-2xl mb-10 leading-relaxed">
+                <p class="scroll-reveal delay-200 text-white/90 text-base sm:text-lg md:text-xl font-medium max-w-2xl mb-10 leading-relaxed">
                     ${subtitle}
                 </p>
                 <div class="scroll-reveal delay-300 flex flex-wrap gap-4">
-                    <a href="#work" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#3b6028] hover:-translate-y-1 transition-all border-2 border-transparent shadow-[0_10px_30px_rgba(75,120,51,0.4)]">Explore My Work</a>
-                    <a href="#about" class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 hover:-translate-y-1 transition-all border-2 border-white/20">Read My Story</a>
+                    <a href="#work" class="bg-brand-primary text-white px-8 py-4 rounded-full font-bold text-base sm:text-lg hover:bg-[#3b6028] hover:-translate-y-1 transition-all border-2 border-transparent shadow-[0_10px_30px_rgba(75,120,51,0.4)]">Explore My Work</a>
+                    <a href="#about" class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-bold text-base sm:text-lg hover:bg-white/20 hover:-translate-y-1 transition-all border-2 border-white/20">Read My Story</a>
                 </div>
             </div>
         </div>
 
-        <div class="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl bg-brand-secondary p-3 sm:p-4 rounded-[2rem] sm:rounded-full pill-shadow z-30 transform hover:-translate-y-2 transition-transform duration-500">
-            <div class="bg-white rounded-xl sm:rounded-full grid grid-cols-2 md:grid-cols-4 p-4 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-y-4">
-                <div class="px-2 py-2 hover:scale-105 transition-transform">
-                    <div class="text-3xl font-extrabold text-brand-dark">10+</div>
+        <div class="absolute -bottom-16 sm:-bottom-8 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl bg-brand-secondary p-2 sm:p-4 rounded-[2rem] sm:rounded-full pill-shadow z-30 transform hover:-translate-y-2 transition-transform duration-500">
+            <div class="bg-white rounded-[1.8rem] sm:rounded-full grid grid-cols-2 md:grid-cols-4 p-4 text-center gap-y-4 md:gap-y-0">
+                <div class="px-2 py-2 border-r border-b border-gray-100 md:border-b-0 hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">10+</div>
                     <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Years Exp</div>
                 </div>
-                <div class="px-2 py-2 hover:scale-105 transition-transform">
-                    <div class="text-3xl font-extrabold text-brand-dark">500+</div>
+                <div class="px-2 py-2 border-b md:border-b-0 md:border-r border-gray-100 hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">500+</div>
                     <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Happy Clients</div>
                 </div>
-                <div class="px-2 py-2 hover:scale-105 transition-transform">
-                    <div class="text-3xl font-extrabold text-brand-dark">100%</div>
+                <div class="px-2 py-2 border-r border-gray-100 md:border-r-0 hover:scale-105 transition-transform">
+                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">100%</div>
                     <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Satisfaction</div>
                 </div>
                 <div class="px-2 py-2 hover:scale-105 transition-transform">
-                    <div class="text-3xl font-extrabold text-brand-dark">24/7</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-dark">24/7</div>
                     <div class="text-xs sm:text-sm font-bold text-[#6a8c4f] uppercase tracking-wider mt-1">Support</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <section id="about" class="max-w-7xl mx-auto px-6 py-24 sm:py-32 mt-10">
+    <section id="about" class="max-w-7xl mx-auto px-6 py-24 sm:py-32 mt-20 sm:mt-10">
         <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div class="relative pl-6 pt-6 scroll-reveal">
                 <div class="absolute inset-0 border-2 border-dashed border-[#9dbf83] rounded-full scale-110 animate-spin-slow opacity-50 z-0"></div>
                 <div class="rounded-[2.5rem] overflow-hidden border-[12px] border-white card-shadow relative z-10">
-                    <img src="${images.about || 'https://images.unsplash.com/photo-1554046920-90dc5823ca0d?q=80&w=1000'}" alt="${site.businessName}" class="w-full h-[500px] sm:h-[650px] object-cover hover:scale-105 transition-transform duration-[10s]">
+                    <img src="${images.about || 'https://images.unsplash.com/photo-1554046920-90dc5823ca0d?q=80&w=1000'}" alt="${site.businessName}" class="w-full h-[350px] sm:h-[500px] md:h-[650px] object-cover hover:scale-105 transition-transform duration-[10s]">
                 </div>
-                <div class="absolute top-0 left-0 bg-brand-primary text-white w-28 h-28 sm:w-36 sm:h-36 rounded-full flex flex-col items-center justify-center border-8 border-[#fbfcf7] shadow-xl animate-float-1 z-20">
-                    <svg class="w-8 h-8 sm:w-10 sm:h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <span class="text-sm sm:text-base font-bold text-center leading-tight">Expert<br>Professional</span>
+                <div class="absolute top-0 left-0 bg-brand-primary text-white w-24 h-24 sm:w-36 sm:h-36 rounded-full flex flex-col items-center justify-center border-8 border-[#fbfcf7] shadow-xl animate-float-1 z-20">
+                    <svg class="w-6 h-6 sm:w-10 sm:h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span class="text-xs sm:text-base font-bold text-center leading-tight">Expert<br>Professional</span>
                 </div>
-                <div class="absolute -bottom-6 -right-6 bg-white w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-xl border-8 border-[#fbfcf7] animate-float-2 z-20">
-                    <span class="text-4xl sm:text-5xl drop-shadow-md">✨</span>
+                <div class="absolute -bottom-6 -right-6 bg-white w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-xl border-8 border-[#fbfcf7] animate-float-2 z-20">
+                    <span class="text-3xl sm:text-5xl drop-shadow-md">✨</span>
                 </div>
             </div>
             <div class="scroll-reveal delay-200">
                 <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">The Journey Behind the Craft</span>
-                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6 leading-tight">
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6 leading-tight">
                     ${site.storyTitle || "Our Story"}
                 </h2>
-                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed mb-6">
+                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed mb-6">
                     ${story}
                 </p>
                 <div class="flex flex-wrap items-center gap-6">
@@ -1604,19 +1702,19 @@ function renderNaturePortfolioTemplate(site) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="text-center mb-20 max-w-3xl mx-auto scroll-reveal">
                 <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Core Competencies</span>
-                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Comprehensive Solutions</h2>
-                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">Explore our core offerings and professional services.</p>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Comprehensive Solutions</h2>
+                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">Explore our core offerings and professional services.</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 ${site.services.map((service, index) => `
                 <div class="bg-white rounded-[2.5rem] p-6 pb-10 card-shadow group scroll-reveal delay-${index * 100} flex flex-col h-full border border-gray-100 cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
                     <div class="overflow-hidden rounded-[1.5rem] mb-8 relative h-64 shrink-0">
                         <div class="absolute inset-0 bg-brand-primary/30 group-hover:bg-transparent transition duration-500 z-10"></div>
-                        <img src="${images.products[index % images.products.length]}" alt="${service.name}" class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-[10s]">
+                        <img src="${getSemanticServiceImage(service.name, site.category || '', index)}" alt="${service.name}" class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-[10s]">
                     </div>
                     <div class="px-2 flex flex-col flex-grow">
                         <div class="flex justify-between items-start mb-2 gap-2">
-                           <h3 class="text-2xl font-extrabold text-brand-dark group-hover:text-brand-primary transition-colors">${service.name}</h3>
+                           <h3 class="text-xl sm:text-2xl font-extrabold text-brand-dark group-hover:text-brand-primary transition-colors">${service.name}</h3>
                         </div>
                         <p class="text-[#6b7b59] font-medium mb-6 leading-relaxed flex-grow">
                             ${service.description || 'Professional service tailored to your specific requirements.'}
@@ -1633,10 +1731,10 @@ function renderNaturePortfolioTemplate(site) {
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-24 max-w-3xl mx-auto scroll-reveal">
                 <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block">Proven Methodology</span>
-                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">A Workflow Built for Success</h2>
-                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">A seamless workflow designed to deliver the best results.</p>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">A Workflow Built for Success</h2>
+                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">A seamless workflow designed to deliver the best results.</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-12 sm:gap-16 relative">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-16 relative">
                 <div class="hidden md:block absolute top-16 left-1/6 w-2/3 h-1 bg-gradient-to-r from-brand-primary via-brand-secondary to-[#355322] z-0 rounded-full opacity-30 transform translate-x-1/4"></div>
                 <div class="relative z-10 flex flex-col items-center text-center scroll-reveal delay-100 group">
                     <div class="w-32 h-32 rounded-full bg-brand-primary text-white flex items-center justify-center text-4xl font-extrabold mb-8 shadow-[0_0_30px_rgba(75,120,51,0.3)] border-8 border-white group-hover:scale-110 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(75,120,51,0.5)] shrink-0">1</div>
@@ -1662,20 +1760,20 @@ function renderNaturePortfolioTemplate(site) {
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6 scroll-reveal">
                 <div class="max-w-2xl">
                     <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Featured Case Studies</span>
-                    <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Showcasing Digital Excellence</h2>
-                    <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">A curated glimpse into some of our favorite projects and client success stories.</p>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Showcasing Digital Excellence</h2>
+                    <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">A curated glimpse into some of our favorite projects and client success stories.</p>
                 </div>
             </div>
-            <div class="grid md:grid-cols-2 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 ${site.services.slice(0, 2).map((service, index) => `
                 <div class="group cursor-pointer scroll-reveal delay-${index * 100} bg-white rounded-[3rem] p-4 pb-8 card-shadow border border-gray-100 ${index % 2 === 0 ? 'md:mt-16 mt-0' : ''}">
                     <div class="overflow-hidden rounded-[2.5rem] mb-8 relative">
                         <div class="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/20 transition-colors duration-500 z-10"></div>
-                        <img src="${images.products[(index + 2) % images.products.length]}" alt="${service.name}" class="w-full h-[350px] object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="${getSemanticServiceImage(service.name, site.category || '', index + 2)}" alt="${service.name}" class="w-full h-[250px] sm:h-[350px] object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <div class="flex justify-between items-start px-6">
                         <div class="max-w-md pr-4">
-                            <h3 class="text-3xl font-extrabold text-brand-dark mb-3 group-hover:text-brand-primary transition-colors">${service.name}</h3>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-brand-dark mb-3 group-hover:text-brand-primary transition-colors">${service.name}</h3>
                             <p class="text-[#6b7b59] font-medium leading-relaxed">${service.description || 'Premium quality and exceptional delivery.'}</p>
                         </div>
                         <div class="w-14 h-14 rounded-full bg-white border border-[#9dbf83] text-[#4b7833] flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all shadow-md shrink-0 group-hover:rotate-45">
@@ -1692,20 +1790,20 @@ function renderNaturePortfolioTemplate(site) {
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20 max-w-2xl mx-auto scroll-reveal">
                 <span class="text-brand-primary font-bold uppercase tracking-widest text-sm mb-4 block inline-block hover:scale-105 transition-transform">Client Success Stories</span>
-                <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-dark mb-6">Don't Just Take My Word For It</h2>
-                <p class="text-[#6b7b59] text-lg font-medium leading-relaxed">Read what our clients have to say about working with us.</p>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-brand-dark mb-6">Don't Just Take My Word For It</h2>
+                <p class="text-[#6b7b59] text-base sm:text-lg font-medium leading-relaxed">Read what our clients have to say about working with us.</p>
             </div>
-            <div class="grid md:grid-cols-2 gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 ${(site.testimonials || [
         { name: 'Sarah M.', role: 'Loyal Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined.' },
         { name: 'David R.', role: 'Business Owner', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. Five stars!' }
     ]).slice(0, 2).map((review, index) => `
-                <div class="bg-white p-12 rounded-[3rem] card-shadow border border-gray-100 relative scroll-reveal delay-${index * 100} hover:scale-[1.02] transition-transform">
+                <div class="bg-white p-6 sm:p-12 rounded-[3rem] card-shadow border border-gray-100 relative scroll-reveal delay-${index * 100} hover:scale-[1.02] transition-transform">
                     <div class="absolute top-10 right-10 text-9xl text-brand-secondary/20 font-serif opacity-50 group-hover:scale-110 transition-transform">"</div>
                     <div class="text-[#9dbf83] flex mb-8 relative z-10 gap-1">
                         ${'<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>'.repeat(5)}
                     </div>
-                    <p class="text-[#355322] text-xl font-bold leading-loose mb-10 relative z-10 italic">
+                    <p class="text-[#355322] text-lg sm:text-xl font-bold leading-loose mb-10 relative z-10 italic">
                         "${review.content}"
                     </p>
                     <div class="flex items-center gap-5 border-t border-gray-100 pt-6">
@@ -1727,8 +1825,8 @@ function renderNaturePortfolioTemplate(site) {
         <div class="max-w-7xl mx-auto relative z-10 scroll-reveal">
             <div class="text-center mb-24 max-w-4xl mx-auto">
                 <span class="text-brand-secondary font-bold uppercase tracking-widest text-sm mb-6 block hover:scale-105 transition-transform inline-block">Let's Connect</span>
-                <h2 class="text-5xl sm:text-7xl font-extrabold mb-10 leading-tight">Ready to build something extraordinary?</h2>
-                <p class="text-brand-light text-xl mb-12 text-white/90 leading-relaxed max-w-3xl mx-auto">We take on a limited number of new clients to ensure everyone receives our absolute best. Inquire below to check availability.</p>
+                <h2 class="text-4xl sm:text-7xl font-extrabold mb-10 leading-tight">Ready to build something extraordinary?</h2>
+                <p class="text-brand-light text-lg sm:text-xl mb-12 text-white/90 leading-relaxed max-w-3xl mx-auto">We take on a limited number of new clients to ensure everyone receives our absolute best. Inquire below to check availability.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-6">
                     <a href="mailto:${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}" class="inline-flex items-center justify-center bg-white text-brand-primary px-12 py-5 rounded-full font-extrabold text-xl hover:scale-105 hover:-translate-y-2 transition-all shadow-2xl shadow-black/20">
                         ${site.contactDetails?.email || 'hello@' + (site.customDomain || 'company.com')}
