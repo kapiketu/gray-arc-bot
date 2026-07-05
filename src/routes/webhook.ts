@@ -607,6 +607,16 @@ async function handleChatFlow(input: UserInput) {
 
     case 'AWAITING_SERVICES':
       session.answers.services = text;
+      session.step = 'AWAITING_CONTACT';
+      await db.saveSession(session);
+      await sendTextMessage(
+        from,
+        `Got the services ✅\n\nNext, please type your *business contact details* (such as your address, phone number, and operating hours).\n\n(e.g., '123 Bakers Street, Mumbai\n📞 +91 98765 43210\n🕐 Monday - Saturday: 10 AM - 8 PM')`
+      );
+      break;
+
+    case 'AWAITING_CONTACT':
+      session.answers.contact = text;
       session.step = 'AWAITING_TEMPLATE';
       await db.saveSession(session);
       await sendTemplateSelector(from);
