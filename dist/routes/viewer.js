@@ -302,16 +302,35 @@ async function viewerRoutes(fastify) {
             const site = await db_1.db.getSite(body.siteId);
             if (site) {
                 const hasCustomDomain = !!site.customDomain;
-                const liveLink = hasCustomDomain ? `http://${site.customDomain}` : `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
-                const notificationText = hasCustomDomain
-                    ? `🎉 *Congratulations!*\n\nYour payment was successful. We have successfully registered your custom domain *${site.customDomain}*!\n\nIt is now active and live. Tap below to visit your website:`
-                    : `🎉 *Congratulations!*\n\nYour payment was successful and your website is now active! Tap below to visit your website:`;
-                await (0, whatsapp_1.sendCTAUrlMessage)(site.phoneNumber, notificationText, 'Open Website', liveLink);
-                console.log('[Pay Confirm] WhatsApp notification sent to:', site.phoneNumber);
+                const previewLink = `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
+                if (hasCustomDomain) {
+                    // 1. Send immediate payment confirmation message mentioning 30 minutes activation time
+                    const immediateText = `Your payment of subscription + domain is successful! ✅\n\nWe are now setting up your domain *${site.customDomain}*. It will be fully active within 30 minutes.\n\nIn the meantime, you can preview your website here: ${previewLink}`;
+                    await (0, whatsapp_1.sendTextMessage)(site.phoneNumber, immediateText);
+                    console.log('[Pay Confirm] Immediate payment success notification sent.');
+                    // 2. Delay the CTA button message by 2 minutes until DNS setup has propagated
+                    setTimeout(async () => {
+                        try {
+                            const liveLink = `http://${site.customDomain}`;
+                            const notificationText = `🎉 *Congratulations!*\n\nYour custom domain *${site.customDomain}* is now live! Tap below to open your website:`;
+                            await (0, whatsapp_1.sendCTAUrlMessage)(site.phoneNumber, notificationText, 'Open Website', liveLink);
+                            console.log('[Pay Confirm Delayed] WhatsApp live custom domain notification sent.');
+                        }
+                        catch (err) {
+                            console.error('[Pay Confirm Delayed] Failed to send delayed live notification:', err);
+                        }
+                    }, 120000); // 2 minutes delay
+                }
+                else {
+                    // If no custom domain (free subdomain only), send CTA link instantly
+                    const notificationText = `🎉 *Congratulations!*\n\nYour payment was successful and your website is now active! Tap below to visit your website:`;
+                    await (0, whatsapp_1.sendCTAUrlMessage)(site.phoneNumber, notificationText, 'Open Website', previewLink);
+                    console.log('[Pay Confirm] Immediate free subdomain activation notification sent.');
+                }
             }
         }
         catch (msgErr) {
-            console.error('[Pay Confirm] Failed to send payment confirmation WhatsApp message:', msgErr);
+            console.error('[Pay Confirm] Failed to send payment confirmation WhatsApp messages:', msgErr);
         }
         const isCustomDomain = !!body.domain;
         const customDomainUrl = isCustomDomain ? `http://${body.domain.replace(/^https?:\/\//i, '').trim()}` : '';
