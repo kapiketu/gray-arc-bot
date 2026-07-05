@@ -287,12 +287,19 @@ async function viewerRoutes(fastify) {
                         state: body.state || 'Maharashtra',
                         postalCode: body.postalCode || '400001'
                     };
-                    // 1. Purchase domain under registrant
-                    await (0, domains_1.purchaseDomain)(body.domain, site.phoneNumber, registrant);
-                    // 2. Automate CNAME DNS Setup
-                    await (0, domains_1.setupDomainDNS)(body.domain);
+                    const addonPrice = body.addon ? parseInt(body.addon) : 0;
+                    if (addonPrice > 0) {
+                        // 1. Purchase domain under registrant
+                        await (0, domains_1.purchaseDomain)(body.domain, site.phoneNumber, registrant);
+                        // 2. Automate CNAME DNS Setup
+                        await (0, domains_1.setupDomainDNS)(body.domain);
+                        site.domainStatus = 'paid';
+                    }
+                    else {
+                        console.log(`[Domain Service] Connecting existing owned domain: ${body.domain}`);
+                        site.domainStatus = 'active';
+                    }
                     site.customDomain = body.domain;
-                    site.domainStatus = 'paid';
                 }
                 await db_1.db.saveSite(site);
             }
@@ -333,6 +340,8 @@ async function viewerRoutes(fastify) {
             console.error('[Pay Confirm] Failed to send payment confirmation WhatsApp messages:', msgErr);
         }
         const isCustomDomain = !!body.domain;
+        const addonPrice = body.addon ? parseInt(body.addon) : 0;
+        const isPointedDomain = isCustomDomain && addonPrice === 0;
         const customDomainUrl = isCustomDomain ? `http://${body.domain.replace(/^https?:\/\//i, '').trim()}` : '';
         const previewUrl = `/site/${body.siteId}`;
         return reply.type('text/html').send(`
@@ -351,14 +360,29 @@ async function viewerRoutes(fastify) {
           
           ${isCustomDomain ? `
             <div class="bg-zinc-950 border border-zinc-800/80 rounded-2xl p-5 mb-8 text-left">
-              <span class="text-zinc-500 text-xs font-semibold uppercase tracking-wider block mb-1">Your Live Domain</span>
+              <span class="text-zinc-500 text-xs font-semibold uppercase tracking-wider block mb-1">
+                ${isPointedDomain ? 'Point Your Domain' : 'Your Live Domain'}
+              </span>
               <a href="${customDomainUrl}" target="_blank" class="text-blue-400 font-bold text-base hover:underline break-all block mb-3">${body.domain} →</a>
-              <p class="text-zinc-400 text-xs leading-relaxed">GoDaddy registration is complete. Global DNS propagation may take up to 2-3 minutes to reflect on all networks.</p>
+              
+              ${isPointedDomain ? `
+                <div class="text-zinc-400 text-xs leading-relaxed space-y-2 mt-2">
+                  <p class="font-semibold text-zinc-300">To complete connection, add this record in your domain registrar DNS settings:</p>
+                  <div class="bg-zinc-900 p-3 rounded-lg border border-zinc-800 space-y-1.5 font-mono text-[11px] text-zinc-300">
+                    <div><span class="text-zinc-500">Type:</span> CNAME</div>
+                    <div><span class="text-zinc-500">Name:</span> www</div>
+                    <div><span class="text-zinc-500">Points to:</span> gray-arc-bot-production.up.railway.app</div>
+                  </div>
+                  <p class="text-[10px] text-zinc-500">Once added, changes may take up to 30 minutes to propagate.</p>
+                </div>
+              ` : `
+                <p class="text-zinc-400 text-xs leading-relaxed">GoDaddy registration is complete. Global DNS propagation may take up to 2-3 minutes to reflect on all networks.</p>
+              `}
             </div>
             
             <div class="flex flex-col gap-3">
               <a href="${customDomainUrl}" target="_blank" class="w-full bg-white text-zinc-900 font-bold py-3.5 px-6 rounded-xl hover:bg-zinc-100 transition shadow-lg text-sm text-center">
-                Open Live Domain
+                ${isPointedDomain ? 'Open Website' : 'Open Live Domain'}
               </a>
               <a href="${previewUrl}" class="w-full bg-zinc-800 hover:bg-zinc-700/85 text-zinc-300 font-semibold py-3 px-6 rounded-xl transition text-sm text-center">
                 View Temporary Preview Site

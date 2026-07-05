@@ -24,6 +24,7 @@ export interface Session {
     template?: string;
     customDomainRequested?: string;
     domainPrice?: number;
+    domainType?: 'buy' | 'point';
   };
   lastActive: string;
 }

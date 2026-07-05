@@ -386,22 +386,35 @@ async function handleChatFlow(input: UserInput) {
         from,
         `Design selected: *${buttonId === 'tpl_astro' ? 'Modern Astro' : 'Premium Classic'}* ✅\n\nHow would you like to host your website?`,
         [
-          { id: 'host_custom', title: 'Custom Domain' },
+          { id: 'host_buy_custom', title: 'Buy New Domain' },
+          { id: 'host_point_custom', title: 'Connect My Domain' },
           { id: 'host_free', title: 'Free Subdomain' }
         ],
         'Hosting Option',
-        'Custom domain: ₹500 one-time'
+        'Buy new domain: ₹500 one-time'
       );
       return;
     }
 
-    // Hosting choice
-    if (buttonId === 'host_custom') {
+    // Hosting choice - Buy new custom domain
+    if (buttonId === 'host_buy_custom' || buttonId === 'host_custom') {
       if (!session) return;
+      session.answers.domainType = 'buy';
       session.step = 'AWAITING_DOMAIN_NAME';
       session.lastActive = new Date().toISOString();
       await db.saveSession(session);
-      await sendTextMessage(from, `Please type the *exact custom domain name* you want (e.g., mybakery.in or fitnessclub.com):`);
+      await sendTextMessage(from, `Please type the *exact custom domain name* you want to buy (e.g., mybakery.in or fitnessclub.com):`);
+      return;
+    }
+
+    // Hosting choice - Connect existing owned domain
+    if (buttonId === 'host_point_custom') {
+      if (!session) return;
+      session.answers.domainType = 'point';
+      session.step = 'AWAITING_DOMAIN_NAME';
+      session.lastActive = new Date().toISOString();
+      await db.saveSession(session);
+      await sendTextMessage(from, `Please type the *exact domain name* you already own that you want to connect (e.g., mybakery.com):`);
       return;
     }
 
@@ -692,6 +705,21 @@ async function handleChatFlow(input: UserInput) {
         .replace(/^www\./i, '')
         .split('/')[0];
       
+      const domainRegex = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}$/i;
+      if (!domainRegex.test(cleanedDomain)) {
+        await sendTextMessage(from, `❌ Invalid domain format. Please type a valid domain name (e.g. mybakery.com or fitnessclub.in):`);
+        break;
+      }
+
+      const isPointed = session.answers.domainType === 'point';
+      if (isPointed) {
+        session.answers.customDomainRequested = cleanedDomain;
+        session.answers.domainPrice = 0;
+        await sendTextMessage(from, `✅ Domain *${cleanedDomain}* registered for connection!`);
+        await buildAndPublishSite(from, session, true);
+        break;
+      }
+
       await sendTextMessage(from, `🔍 Checking availability for *${cleanedDomain}*...`);
       const checkResult = await checkDomainAvailability(cleanedDomain);
       if (!checkResult.available) {
@@ -849,9 +877,13 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       );
 
       // Send Domain Purchase & AutoPay Subscription CTA
+      const billingSummary = domainPrice > 0
+        ? `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹${399 + domainPrice}* (₹${domainPrice} domain + ₹399 subscription)\n• Future Months: *₹399/month* auto-debit.`
+        : `To connect your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹399* (₹399 monthly subscription)\n• Future Months: *₹399/month* auto-debit.\n\n*(No domain registration fee since you already own it)*`;
+
       await sendCTAUrlMessage(
         from,
-        `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹${399 + domainPrice}* (₹${domainPrice} domain + ₹399 subscription)\n• Future Months: *₹399/month* auto-debit.`,
+        billingSummary,
         'Pay & Activate',
         payment.paymentUrl
       );
