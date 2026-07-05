@@ -7,6 +7,7 @@ exports.sendTextMessage = sendTextMessage;
 exports.sendButtonMessage = sendButtonMessage;
 exports.sendListMessage = sendListMessage;
 exports.sendCTAUrlMessage = sendCTAUrlMessage;
+exports.sendFlowMessage = sendFlowMessage;
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -163,5 +164,52 @@ async function sendCTAUrlMessage(toPhoneNumber, bodyText, buttonLabel, url, head
     catch (error) {
         console.error('[WhatsApp Outbound] Error sending CTA URL:', error.response?.data || error.message);
         throw new Error('Failed to send WhatsApp CTA URL message');
+    }
+}
+// ────────────────────────────────────────────────────────
+// 6. SEND FLOW MESSAGE (native forms)
+// ────────────────────────────────────────────────────────
+async function sendFlowMessage(toPhoneNumber, bodyText, buttonLabel, flowId, flowToken, screenName, headerText, footerText) {
+    console.log(`[WhatsApp Outbound] Sending Flow to ${toPhoneNumber}: Flow ID: ${flowId}, Screen: ${screenName}`);
+    if (isMock()) {
+        console.warn('[WhatsApp Outbound] Mock mode — logging only.');
+        return;
+    }
+    const payload = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: toPhoneNumber,
+        type: 'interactive',
+        interactive: {
+            type: 'flow',
+            body: { text: bodyText },
+            action: {
+                name: 'flow',
+                parameters: {
+                    flow_token: flowToken,
+                    flow_id: flowId,
+                    flow_cta: buttonLabel,
+                    flow_action: 'navigate',
+                    flow_action_payload: {
+                        screen: screenName,
+                        data: {}
+                    }
+                }
+            }
+        }
+    };
+    if (headerText) {
+        payload.interactive.header = { type: 'text', text: headerText };
+    }
+    if (footerText) {
+        payload.interactive.footer = { text: footerText };
+    }
+    try {
+        const response = await axios_1.default.post(API_URL, payload, { headers: getHeaders() });
+        console.log('[WhatsApp Outbound] Flow sent. ID:', response.data.messages?.[0]?.id);
+    }
+    catch (error) {
+        console.error('[WhatsApp Outbound] Error sending Flow:', error.response?.data || error.message);
+        throw new Error('Failed to send WhatsApp Flow message');
     }
 }

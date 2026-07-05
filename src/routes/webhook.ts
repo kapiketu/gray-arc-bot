@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import dotenv from 'dotenv';
 import { db, Session } from '../services/db';
-import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage } from '../services/whatsapp';
+import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage, sendFlowMessage } from '../services/whatsapp';
 import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
 import { createDomainPaymentLink, createSubscriptionLink, createCustomDomainSubscriptionLink, processPaymentWebhook } from '../services/billing';
 import { checkDomainAvailability, suggestAlternativeDomains } from '../services/domains';
@@ -12,6 +12,7 @@ dotenv.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
+const WHATSAPP_FLOW_ID = process.env.WHATSAPP_FLOW_ID || '1234567890';
 
 // ────────────────────────────────────────────────────────
 // OFF-TOPIC DETECTION
@@ -59,8 +60,9 @@ function needsHumanHelp(text: string): boolean {
 interface UserInput {
   from: string;
   text: string;
-  type: 'text' | 'button_reply' | 'list_reply';
+  type: 'text' | 'button_reply' | 'list_reply' | 'flow_reply';
   buttonId?: string;  // e.g. "btn_create_website"
+  flowData?: any;     // Decoded form submission payload
 }
 
 function extractUserInput(value: any): UserInput | null {
@@ -96,6 +98,25 @@ function extractUserInput(value: any): UserInput | null {
       text: message.interactive.list_reply.title,
       type: 'list_reply',
       buttonId: message.interactive.list_reply.id
+    };
+  }
+
+  // 4. Flow reply (user submitted a native Flow form)
+  if (message.type === 'interactive' && message.interactive?.type === 'nfm_reply') {
+    let flowData: any = null;
+    try {
+      const responseJsonStr = message.interactive.nfm_reply.response_json;
+      if (responseJsonStr) {
+        flowData = JSON.parse(responseJsonStr);
+      }
+    } catch (e) {
+      console.error('[Webhook] Error parsing nfm_reply response_json:', e);
+    }
+    return {
+      from,
+      text: 'Flow submitted',
+      type: 'flow_reply',
+      flowData
     };
   }
 
@@ -293,9 +314,39 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
 // ────────────────────────────────────────────────────────
 
 async function handleChatFlow(input: UserInput) {
-  const { from, text, type, buttonId } = input;
+  const { from, text, type, buttonId, flowData } = input;
   let session = await db.getSession(from);
   const existingSite = await db.getSiteByPhone(from);
+
+  // ─── HANDLE FLOW FORM SUBMISSION ───
+  if (type === 'flow_reply') {
+    if (!session || session.step !== 'AWAITING_FLOW_DATA') {
+      await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
+      return;
+    }
+
+    if (!flowData) {
+      await sendTextMessage(from, `Failed to read form submission. Type *'reset'* to try again.`);
+      return;
+    }
+
+    // Save all form responses directly to the session answers!
+    session.answers.category = flowData.category || 'Professional Services';
+    session.answers.businessName = flowData.business_name || 'My Business';
+    session.answers.about = flowData.about || 'A premium local business.';
+    session.answers.services = flowData.services || '';
+    session.answers.email = flowData.email || '';
+    session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${from}\n📧 Email: ${flowData.email || ''}`;
+    
+    // Transition directly to template selection!
+    session.step = 'AWAITING_TEMPLATE';
+    session.lastActive = new Date().toISOString();
+    await db.saveSession(session);
+
+    // Send the template selector menu
+    await sendTemplateSelector(from);
+    return;
+  }
 
   // ─── HUMAN / DEVELOPER FALLBACK ───
   if (type === 'text' && needsHumanHelp(text)) {
@@ -317,12 +368,21 @@ async function handleChatFlow(input: UserInput) {
       }
       const newSession: Session = {
         phoneNumber: from,
-        step: 'AWAITING_CATEGORY',
+        step: 'AWAITING_FLOW_DATA',
         answers: {},
         lastActive: new Date().toISOString()
       };
       await db.saveSession(newSession);
-      await sendCategoryList(from);
+      
+      await sendFlowMessage(
+        from,
+        `Let's build your website! Tap the button below to fill out your business details in one go:`,
+        'Fill Details 📝',
+        WHATSAPP_FLOW_ID,
+        `flow_token_${Date.now()}`,
+        'BUSINESS_DETAILS',
+        'Website Builder'
+      );
       return;
     }
 
@@ -600,6 +660,18 @@ async function handleChatFlow(input: UserInput) {
 
   // ─── ONBOARDING STEPS (Text input responses) ───
   switch (session.step) {
+    
+    case 'AWAITING_FLOW_DATA':
+      await sendFlowMessage(
+        from,
+        `Please use the form to enter your details at once. Tap the button below to open the form:`,
+        'Fill Details 📝',
+        WHATSAPP_FLOW_ID,
+        `flow_token_${Date.now()}`,
+        'BUSINESS_DETAILS',
+        'Website Builder'
+      );
+      break;
     
     case 'AWAITING_CATEGORY':
       // User typed category as text instead of using the list menu

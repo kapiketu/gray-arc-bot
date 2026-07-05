@@ -15,6 +15,7 @@ dotenv_1.default.config();
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'GrayArcWebsites2026';
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
+const WHATSAPP_FLOW_ID = process.env.WHATSAPP_FLOW_ID || '1234567890';
 // ────────────────────────────────────────────────────────
 // OFF-TOPIC DETECTION
 // ────────────────────────────────────────────────────────
@@ -82,6 +83,25 @@ function extractUserInput(value) {
             text: message.interactive.list_reply.title,
             type: 'list_reply',
             buttonId: message.interactive.list_reply.id
+        };
+    }
+    // 4. Flow reply (user submitted a native Flow form)
+    if (message.type === 'interactive' && message.interactive?.type === 'nfm_reply') {
+        let flowData = null;
+        try {
+            const responseJsonStr = message.interactive.nfm_reply.response_json;
+            if (responseJsonStr) {
+                flowData = JSON.parse(responseJsonStr);
+            }
+        }
+        catch (e) {
+            console.error('[Webhook] Error parsing nfm_reply response_json:', e);
+        }
+        return {
+            from,
+            text: 'Flow submitted',
+            type: 'flow_reply',
+            flowData
         };
     }
     return null;
@@ -223,9 +243,34 @@ async function webhookRoutes(fastify) {
 // CORE CHAT FLOW — Interactive Menus + Text Input
 // ────────────────────────────────────────────────────────
 async function handleChatFlow(input) {
-    const { from, text, type, buttonId } = input;
+    const { from, text, type, buttonId, flowData } = input;
     let session = await db_1.db.getSession(from);
     const existingSite = await db_1.db.getSiteByPhone(from);
+    // ─── HANDLE FLOW FORM SUBMISSION ───
+    if (type === 'flow_reply') {
+        if (!session || session.step !== 'AWAITING_FLOW_DATA') {
+            await (0, whatsapp_1.sendTextMessage)(from, `Something went wrong. Type *'reset'* to start over.`);
+            return;
+        }
+        if (!flowData) {
+            await (0, whatsapp_1.sendTextMessage)(from, `Failed to read form submission. Type *'reset'* to try again.`);
+            return;
+        }
+        // Save all form responses directly to the session answers!
+        session.answers.category = flowData.category || 'Professional Services';
+        session.answers.businessName = flowData.business_name || 'My Business';
+        session.answers.about = flowData.about || 'A premium local business.';
+        session.answers.services = flowData.services || '';
+        session.answers.email = flowData.email || '';
+        session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${from}\n📧 Email: ${flowData.email || ''}`;
+        // Transition directly to template selection!
+        session.step = 'AWAITING_TEMPLATE';
+        session.lastActive = new Date().toISOString();
+        await db_1.db.saveSession(session);
+        // Send the template selector menu
+        await sendTemplateSelector(from);
+        return;
+    }
     // ─── HUMAN / DEVELOPER FALLBACK ───
     if (type === 'text' && needsHumanHelp(text)) {
         await (0, whatsapp_1.sendTextMessage)(from, `It looks like you might need help building your website, or you are looking for a fully custom website!\n\nYou can talk directly to our developer:\n\n👤 *Kapil*\n📞 +91 9693186322\n🌐 www.thegrayarc.com\n\nThey will be happy to assist you with a custom website development! 😊`);
@@ -241,12 +286,12 @@ async function handleChatFlow(input) {
             }
             const newSession = {
                 phoneNumber: from,
-                step: 'AWAITING_CATEGORY',
+                step: 'AWAITING_FLOW_DATA',
                 answers: {},
                 lastActive: new Date().toISOString()
             };
             await db_1.db.saveSession(newSession);
-            await sendCategoryList(from);
+            await (0, whatsapp_1.sendFlowMessage)(from, `Let's build your website! Tap the button below to fill out your business details in one go:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'BUSINESS_DETAILS', 'Website Builder');
             return;
         }
         // Welcome menu: Edit Website
@@ -484,6 +529,9 @@ async function handleChatFlow(input) {
     session.lastActive = new Date().toISOString();
     // ─── ONBOARDING STEPS (Text input responses) ───
     switch (session.step) {
+        case 'AWAITING_FLOW_DATA':
+            await (0, whatsapp_1.sendFlowMessage)(from, `Please use the form to enter your details at once. Tap the button below to open the form:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'BUSINESS_DETAILS', 'Website Builder');
+            break;
         case 'AWAITING_CATEGORY':
             // User typed category as text instead of using the list menu
             session.answers.category = text;

@@ -14,7 +14,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export interface Session {
   phoneNumber: string;
-  step: 'WELCOME' | 'AWAITING_CATEGORY' | 'AWAITING_NAME' | 'AWAITING_ABOUT' | 'AWAITING_SERVICES' | 'AWAITING_CONTACT' | 'AWAITING_TEMPLATE' | 'AWAITING_DOMAIN_CHOICE' | 'AWAITING_DOMAIN_NAME' | 'EDIT_NAME' | 'EDIT_ABOUT' | 'EDIT_SERVICES' | 'EDIT_CONTACT' | 'COMPLETED';
+  step: 'WELCOME' | 'AWAITING_CATEGORY' | 'AWAITING_NAME' | 'AWAITING_ABOUT' | 'AWAITING_SERVICES' | 'AWAITING_CONTACT' | 'AWAITING_TEMPLATE' | 'AWAITING_DOMAIN_CHOICE' | 'AWAITING_DOMAIN_NAME' | 'EDIT_NAME' | 'EDIT_ABOUT' | 'EDIT_SERVICES' | 'EDIT_CONTACT' | 'COMPLETED' | 'AWAITING_FLOW_DATA';
   answers: {
     category?: string;
     businessName?: string;
@@ -25,6 +25,7 @@ export interface Session {
     customDomainRequested?: string;
     domainPrice?: number;
     domainType?: 'buy' | 'point';
+    email?: string;
   };
   lastActive: string;
 }
