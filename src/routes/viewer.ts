@@ -550,7 +550,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
                 <h4 class="text-3xl font-bold text-white mb-3">${s.name}</h4>
                 <p class="text-gray-300 max-w-md">${s.description}</p>
                 <div class="flex justify-between items-center mt-6">
-                    <span class="text-gold-500 font-extrabold text-xl">${s.price || '₹Contact Us'}</span>
+                    <span class="text-gold-500 font-extrabold text-xl">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="px-6 py-2 rounded-full bg-gold-500 text-dark-900 font-bold hover:scale-105 transition-all text-sm">Enquire</a>
                 </div>
             </div>
@@ -566,7 +566,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
             <div class="relative z-10 flex-1">
                 <h4 class="text-2xl font-bold text-white mb-2">${s.name}</h4>
                 <p class="text-gray-400">${s.description}</p>
-                <p class="text-gold-500 font-extrabold mt-2 text-lg">${s.price || '₹Contact Us'}</p>
+                <p class="text-gold-500 font-extrabold mt-2 text-lg">${s.price || 'Contact Us'}</p>
             </div>
             <div class="relative z-10">
                 <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all">
@@ -586,7 +586,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
                 <h4 class="text-xl font-bold text-white mb-2">${s.name}</h4>
                 <p class="text-gray-400 text-sm mb-4">${s.description}</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-gold-500 font-bold text-sm">${s.price || '₹Contact Us'}</span>
+                    <span class="text-gold-500 font-bold text-sm">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
                 </div>
             </div>

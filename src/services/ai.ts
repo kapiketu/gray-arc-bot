@@ -28,17 +28,24 @@ function getMockWebsiteContent(
 ): SiteConfig {
   const slug = slugify(businessName) || `site-${Math.floor(Math.random() * 10000)}`;
   
-  // Parse services
+  // Parse services — split by newlines, commas, or semicolons
   const services: SiteProduct[] = [];
-  const lines = servicesRaw.split('\n');
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    const parts = line.split('-');
+  // First split by newline, then further split by commas if no newline separation
+  let rawItems: string[] = servicesRaw.split('\n').map(l => l.trim()).filter(l => l);
+  
+  // If only one line, try splitting by commas or semicolons
+  if (rawItems.length === 1 && (rawItems[0].includes(',') || rawItems[0].includes(';'))) {
+    rawItems = rawItems[0].split(/[,;]/).map(s => s.trim()).filter(s => s);
+  }
+  
+  for (const item of rawItems) {
+    if (!item) continue;
+    const parts = item.split('-');
     const name = parts[0]?.trim() || 'Service / Product';
-    const price = parts[1]?.trim() || '₹Contact Us';
+    const price = parts.length > 1 ? parts[1]?.trim() : 'Contact Us';
     services.push({
-      name,
-      price,
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      price: price || 'Contact Us',
       description: `Premium quality ${name.toLowerCase()} customized to your needs.`
     });
   }
@@ -170,8 +177,13 @@ export async function generateWebsiteConfig(
     1. WRITE EXTENSIVE AND LONG PARAGRAPHS: Even if the user provided very sparse input (e.g. description is just "best in town", or services is a short list of words), you MUST expand it heavily into rich, detailed, and highly informative marketing copy. 
     2. HERO SUBTITLE: Must be an engaging, detailed value-proposition statement of at least 35-50 words (2-3 full sentences) explaining the values and commitment of the business.
     3. OUR STORY CONTENT: Must be a rich, compelling brand narrative of at least 150-200 words (minimum 2 detailed paragraphs) detailing their foundation, expertise, customer-first standards, community impact, and quality dedication.
-    4. SERVICES: Parse the raw services. Ensure every service has a professional name, a price in Rupees (e.g. "₹499" or "₹1,200", default to "₹Contact Us" only if unclear), and a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
-    5. why CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
+    4. SERVICES (EXTREMELY IMPORTANT — READ CAREFULLY):
+       - The user may list services as comma-separated words (e.g. "gym, yoga, dance"), newline-separated, or with dashes.
+       - You MUST split them into SEPARATE individual service objects. NEVER combine multiple services into one.
+       - For example, if the user says "gym, yoga, dance", you MUST create 3 separate service objects: one for Gym, one for Yoga, and one for Dance.
+       - Each service must have a professional name, a price in Rupees (e.g. "₹499" or "₹1,200"). If the user did not provide a price, set price to "Contact Us" (without any currency symbol).
+       - Each service must have a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
+    5. WHY CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
     6. FAQs: Generate exactly 3 frequently asked questions and detailed answers (at least 35-50 words or 2-3 complete sentences per answer) providing helpful, concrete information about operating schedules, booking procedures, and locations.
     7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be at least 45-60 words (3-4 complete sentences) explaining the client's problem, how the business solved it, and their specific satisfaction.
     8. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
