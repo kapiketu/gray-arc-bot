@@ -262,7 +262,8 @@ async function handleChatFlow(input) {
         session.answers.about = flowData.about || 'A premium local business.';
         session.answers.services = flowData.services || '';
         session.answers.email = flowData.email || '';
-        session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${from}\n📧 Email: ${flowData.email || ''}`;
+        session.answers.phone = flowData.phone || from;
+        session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${flowData.phone || from}\n📧 Email: ${flowData.email || ''}`;
         // Transition directly to template selection!
         session.step = 'AWAITING_TEMPLATE';
         session.lastActive = new Date().toISOString();
@@ -292,7 +293,7 @@ async function handleChatFlow(input) {
             };
             await db_1.db.saveSession(newSession);
             try {
-                await (0, whatsapp_1.sendFlowMessage)(from, `Let's build your website! Tap the button below to fill out your business details in one go:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
+                await (0, whatsapp_1.sendFlowMessage)(from, `Let's build your website! Tap the button below to fill out your business details in one go:`, 'Submit Details', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
             }
             catch (flowError) {
                 console.error('[Flow Error] Failed to send Flow message, falling back to step-by-step chat flow:', flowError);
@@ -541,7 +542,7 @@ async function handleChatFlow(input) {
     // ─── ONBOARDING STEPS (Text input responses) ───
     switch (session.step) {
         case 'AWAITING_FLOW_DATA':
-            await (0, whatsapp_1.sendFlowMessage)(from, `Please use the form to enter your details at once. Tap the button below to open the form:`, 'Fill Details 📝', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
+            await (0, whatsapp_1.sendFlowMessage)(from, `Please use the form to enter your details at once. Tap the button below to open the form:`, 'Submit Details', WHATSAPP_FLOW_ID, `flow_token_${Date.now()}`, 'WELCOME_SCREEN', 'Website Builder');
             break;
         case 'AWAITING_CATEGORY':
             // User typed category as text instead of using the list menu
@@ -740,7 +741,7 @@ async function handleChatFlow(input) {
 async function buildAndPublishSite(from, session, isCustomDomain) {
     await (0, whatsapp_1.sendTextMessage)(from, `🛠️ *AI is now designing your website...*\nThis takes about 10-15 seconds. Please wait.`);
     try {
-        const siteConfig = await (0, ai_1.generateWebsiteConfig)(from, session.answers.businessName || 'My Business', session.answers.category || 'Local Shop', session.answers.about || 'A premium local business.', session.answers.services || '', session.answers.contact || '');
+        const siteConfig = await (0, ai_1.generateWebsiteConfig)(session.answers.phone || from, session.answers.businessName || 'My Business', session.answers.category || 'Local Shop', session.answers.about || 'A premium local business.', session.answers.services || '', session.answers.contact || '');
         // Apply selected template
         if (session.answers.template) {
             siteConfig.template = session.answers.template;

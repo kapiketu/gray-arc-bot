@@ -26,6 +26,7 @@ export interface Session {
     domainPrice?: number;
     domainType?: 'buy' | 'point';
     email?: string;
+    phone?: string;
   };
   lastActive: string;
 }

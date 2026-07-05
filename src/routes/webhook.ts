@@ -336,7 +336,8 @@ async function handleChatFlow(input: UserInput) {
     session.answers.about = flowData.about || 'A premium local business.';
     session.answers.services = flowData.services || '';
     session.answers.email = flowData.email || '';
-    session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${from}\n📧 Email: ${flowData.email || ''}`;
+    session.answers.phone = flowData.phone || from;
+    session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${flowData.phone || from}\n📧 Email: ${flowData.email || ''}`;
     
     // Transition directly to template selection!
     session.step = 'AWAITING_TEMPLATE';
@@ -378,7 +379,7 @@ async function handleChatFlow(input: UserInput) {
         await sendFlowMessage(
           from,
           `Let's build your website! Tap the button below to fill out your business details in one go:`,
-          'Fill Details 📝',
+          'Submit Details',
           WHATSAPP_FLOW_ID,
           `flow_token_${Date.now()}`,
           'WELCOME_SCREEN',
@@ -680,7 +681,7 @@ async function handleChatFlow(input: UserInput) {
       await sendFlowMessage(
         from,
         `Please use the form to enter your details at once. Tap the button below to open the form:`,
-        'Fill Details 📝',
+        'Submit Details',
         WHATSAPP_FLOW_ID,
         `flow_token_${Date.now()}`,
         'WELCOME_SCREEN',
@@ -930,7 +931,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
 
   try {
     const siteConfig = await generateWebsiteConfig(
-      from,
+      session.answers.phone || from,
       session.answers.businessName || 'My Business',
       session.answers.category || 'Local Shop',
       session.answers.about || 'A premium local business.',
