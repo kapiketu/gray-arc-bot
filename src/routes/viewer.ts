@@ -323,19 +323,44 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
       }
     }
 
+    const isCustomDomain = !!body.domain;
+    const customDomainUrl = isCustomDomain ? `http://${body.domain.replace(/^https?:\/\//i, '').trim()}` : '';
+    const previewUrl = `/site/${body.siteId}`;
+
     return reply.type('text/html').send(`
       <!DOCTYPE html><html><head>
       <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Payment Successful</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
       <style>body{font-family:'Inter',sans-serif}</style></head>
-      <body class="bg-zinc-950 flex items-center justify-center min-h-screen">
-        <div class="text-center p-10 bg-zinc-900 border border-zinc-800 rounded-3xl max-w-md">
+      <body class="bg-zinc-950 flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="text-center p-8 sm:p-10 bg-zinc-900 border border-zinc-800 rounded-3xl max-w-md w-full">
           <div class="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center rounded-full mx-auto mb-6 text-4xl">✓</div>
           <h1 class="text-2xl font-bold text-white mb-2">Payment Successful</h1>
-          <p class="text-zinc-400 text-sm mb-8">Your website has been activated.</p>
-          <a href="/site/${body.siteId}" class="inline-block bg-white text-zinc-900 font-semibold py-3 px-8 rounded-xl hover:bg-zinc-100 transition">View Website →</a>
+          <p class="text-zinc-400 text-sm mb-6">Your website has been activated successfully.</p>
+          
+          ${isCustomDomain ? `
+            <div class="bg-zinc-950 border border-zinc-800/80 rounded-2xl p-5 mb-8 text-left">
+              <span class="text-zinc-500 text-xs font-semibold uppercase tracking-wider block mb-1">Your Live Domain</span>
+              <a href="${customDomainUrl}" target="_blank" class="text-blue-400 font-bold text-base hover:underline break-all block mb-3">${body.domain} →</a>
+              <p class="text-zinc-400 text-xs leading-relaxed">GoDaddy registration is complete. Global DNS propagation may take up to 2-3 minutes to reflect on all networks.</p>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+              <a href="${customDomainUrl}" target="_blank" class="w-full bg-white text-zinc-900 font-bold py-3.5 px-6 rounded-xl hover:bg-zinc-100 transition shadow-lg text-sm text-center">
+                Open Live Domain
+              </a>
+              <a href="${previewUrl}" class="w-full bg-zinc-800 hover:bg-zinc-700/85 text-zinc-300 font-semibold py-3 px-6 rounded-xl transition text-sm text-center">
+                View Temporary Preview Site
+              </a>
+            </div>
+          ` : `
+            <a href="${previewUrl}" class="inline-block bg-white text-zinc-900 font-semibold py-3.5 px-8 rounded-xl hover:bg-zinc-100 transition shadow-lg text-sm">
+              View Website →
+            </a>
+          `}
         </div>
       </body></html>
     `);
