@@ -146,13 +146,12 @@ async function sendCategoryList(to: string) {
 async function sendTemplateSelector(to: string) {
   await sendButtonMessage(
     to,
-    `Almost done! Choose a design style for your website:`,
+    `Almost done! Confirm to use the premium *Nature Portfolio* design for your website:`,
     [
-      { id: 'tpl_astro', title: 'Modern Astro' },
-      { id: 'tpl_classic', title: 'Premium Classic' }
+      { id: 'tpl_portfolio', title: 'Confirm Design' }
     ],
     'Step 5 of 5',
-    'You can change this anytime later'
+    'Perfect for your business category'
   );
 }
 
@@ -167,8 +166,7 @@ async function sendSiteReadyMenu(to: string, siteUrl: string) {
     to,
     `Need to make changes?`,
     [
-      { id: 'btn_edit_details', title: 'Edit Details' },
-      { id: 'btn_change_template', title: 'Change Template' }
+      { id: 'btn_edit_details', title: 'Edit Details' }
     ]
   );
 }
@@ -185,7 +183,6 @@ async function sendEditMenu(to: string) {
         { id: 'edit_about', title: 'About / Description', description: 'Update your story text' },
         { id: 'edit_services', title: 'Services / Products', description: 'Add, remove, or change items' },
         { id: 'edit_contact', title: 'Contact Details', description: 'Phone, address, hours' },
-        { id: 'edit_template', title: 'Change Template', description: 'Switch your design style' },
         { id: 'edit_domain', title: 'Add Custom Domain', description: 'Link your own .com / .in' }
       ]
     }]
@@ -372,19 +369,19 @@ async function handleChatFlow(input: UserInput) {
     }
 
     // Template selection
-    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic') {
+    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio') {
       if (!session || session.step !== 'AWAITING_TEMPLATE') {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
       }
-      session.answers.template = buttonId === 'tpl_astro' ? 'astro' : 'classic';
+      session.answers.template = 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       session.lastActive = new Date().toISOString();
       await db.saveSession(session);
 
       await sendButtonMessage(
         from,
-        `Design selected: *${buttonId === 'tpl_astro' ? 'Modern Astro' : 'Premium Classic'}* ✅\n\nHow would you like to host your website?`,
+        `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`,
         [
           { id: 'host_buy_custom', title: 'Buy New Domain' },
           { id: 'host_point_custom', title: 'Connect My Domain' },
@@ -443,28 +440,7 @@ async function handleChatFlow(input: UserInput) {
 
     // Post-publish: Change Template
     if (buttonId === 'btn_change_template' || buttonId === 'edit_template') {
-      if (existingSite) {
-        await sendButtonMessage(
-          from,
-          `Choose a new design style for your website:`,
-          [
-            { id: 'switch_astro', title: 'Modern Astro' },
-            { id: 'switch_classic', title: 'Premium Classic' }
-          ]
-        );
-      }
-      return;
-    }
-
-    // Template switch (for existing sites)
-    if (buttonId === 'switch_astro' || buttonId === 'switch_classic') {
-      if (existingSite) {
-        const newTemplate = buttonId === 'switch_astro' ? 'astro' : 'classic';
-        existingSite.template = newTemplate;
-        await db.saveSite(existingSite);
-        const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-        await sendTextMessage(from, `✅ Template changed to *${newTemplate === 'astro' ? 'Modern Astro' : 'Premium Classic'}*!\n\n🔗 See it live: ${siteUrl}`);
-      }
+      await sendTextMessage(from, `ℹ️ *Nature Portfolio* is currently the only active design style to guarantee top-tier aesthetic and mobile optimization.`);
       return;
     }
 
@@ -544,8 +520,7 @@ async function handleChatFlow(input: UserInput) {
           from,
           `Need to make changes?`,
           [
-            { id: 'btn_edit_details', title: 'Edit Details' },
-            { id: 'btn_change_template', title: 'Change Template' }
+            { id: 'btn_edit_details', title: 'Edit Details' }
           ]
         );
         return;
@@ -655,18 +630,12 @@ async function handleChatFlow(input: UserInput) {
       break;
 
     case 'AWAITING_TEMPLATE':
-      // User typed template choice as text instead of using buttons
-      const templateChoice = text.toLowerCase();
-      if (templateChoice.includes('astro') || templateChoice.includes('modern')) {
-        session.answers.template = 'astro';
-      } else {
-        session.answers.template = 'classic';
-      }
+      session.answers.template = 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       await db.saveSession(session);
       await sendButtonMessage(
         from,
-        `Design selected ✅\n\nHow would you like to host your website?`,
+        `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`,
         [
           { id: 'host_custom', title: 'Custom Domain' },
           { id: 'host_free', title: 'Free Subdomain' }

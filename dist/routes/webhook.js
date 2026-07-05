@@ -113,16 +113,14 @@ async function sendCategoryList(to) {
         }], 'Step 1 of 5');
 }
 async function sendTemplateSelector(to) {
-    await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Choose a design style for your website:`, [
-        { id: 'tpl_astro', title: 'Modern Astro' },
-        { id: 'tpl_classic', title: 'Premium Classic' }
-    ], 'Step 5 of 5', 'You can change this anytime later');
+    await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Confirm to use the premium *Nature Portfolio* design for your website:`, [
+        { id: 'tpl_portfolio', title: 'Confirm Design' }
+    ], 'Step 5 of 5', 'Perfect for your business category');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
     await (0, whatsapp_1.sendCTAUrlMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`, 'View Live Site', siteUrl);
     await (0, whatsapp_1.sendButtonMessage)(to, `Need to make changes?`, [
-        { id: 'btn_edit_details', title: 'Edit Details' },
-        { id: 'btn_change_template', title: 'Change Template' }
+        { id: 'btn_edit_details', title: 'Edit Details' }
     ]);
 }
 async function sendEditMenu(to) {
@@ -133,7 +131,6 @@ async function sendEditMenu(to) {
                 { id: 'edit_about', title: 'About / Description', description: 'Update your story text' },
                 { id: 'edit_services', title: 'Services / Products', description: 'Add, remove, or change items' },
                 { id: 'edit_contact', title: 'Contact Details', description: 'Phone, address, hours' },
-                { id: 'edit_template', title: 'Change Template', description: 'Switch your design style' },
                 { id: 'edit_domain', title: 'Add Custom Domain', description: 'Link your own .com / .in' }
             ]
         }]);
@@ -293,16 +290,16 @@ async function handleChatFlow(input) {
             return;
         }
         // Template selection
-        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic') {
+        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio') {
             if (!session || session.step !== 'AWAITING_TEMPLATE') {
                 await (0, whatsapp_1.sendTextMessage)(from, `Something went wrong. Type *'reset'* to start over.`);
                 return;
             }
-            session.answers.template = buttonId === 'tpl_astro' ? 'astro' : 'classic';
+            session.answers.template = 'portfolio';
             session.step = 'AWAITING_DOMAIN_CHOICE';
             session.lastActive = new Date().toISOString();
             await db_1.db.saveSession(session);
-            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${buttonId === 'tpl_astro' ? 'Modern Astro' : 'Premium Classic'}* ✅\n\nHow would you like to host your website?`, [
+            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`, [
                 { id: 'host_buy_custom', title: 'Buy New Domain' },
                 { id: 'host_point_custom', title: 'Connect My Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
@@ -354,23 +351,7 @@ async function handleChatFlow(input) {
         }
         // Post-publish: Change Template
         if (buttonId === 'btn_change_template' || buttonId === 'edit_template') {
-            if (existingSite) {
-                await (0, whatsapp_1.sendButtonMessage)(from, `Choose a new design style for your website:`, [
-                    { id: 'switch_astro', title: 'Modern Astro' },
-                    { id: 'switch_classic', title: 'Premium Classic' }
-                ]);
-            }
-            return;
-        }
-        // Template switch (for existing sites)
-        if (buttonId === 'switch_astro' || buttonId === 'switch_classic') {
-            if (existingSite) {
-                const newTemplate = buttonId === 'switch_astro' ? 'astro' : 'classic';
-                existingSite.template = newTemplate;
-                await db_1.db.saveSite(existingSite);
-                const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-                await (0, whatsapp_1.sendTextMessage)(from, `✅ Template changed to *${newTemplate === 'astro' ? 'Modern Astro' : 'Premium Classic'}*!\n\n🔗 See it live: ${siteUrl}`);
-            }
+            await (0, whatsapp_1.sendTextMessage)(from, `ℹ️ *Nature Portfolio* is currently the only active design style to guarantee top-tier aesthetic and mobile optimization.`);
             return;
         }
         // Edit menu selections
@@ -435,8 +416,7 @@ async function handleChatFlow(input) {
                 const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
                 await (0, whatsapp_1.sendCTAUrlMessage)(from, `Welcome back to *Gray Arc*! 🌟\n\nYour website is live. Tap below to view it:`, 'View Live Site', siteUrl);
                 await (0, whatsapp_1.sendButtonMessage)(from, `Need to make changes?`, [
-                    { id: 'btn_edit_details', title: 'Edit Details' },
-                    { id: 'btn_change_template', title: 'Change Template' }
+                    { id: 'btn_edit_details', title: 'Edit Details' }
                 ]);
                 return;
             }
@@ -516,17 +496,10 @@ async function handleChatFlow(input) {
             await sendTemplateSelector(from);
             break;
         case 'AWAITING_TEMPLATE':
-            // User typed template choice as text instead of using buttons
-            const templateChoice = text.toLowerCase();
-            if (templateChoice.includes('astro') || templateChoice.includes('modern')) {
-                session.answers.template = 'astro';
-            }
-            else {
-                session.answers.template = 'classic';
-            }
+            session.answers.template = 'portfolio';
             session.step = 'AWAITING_DOMAIN_CHOICE';
             await db_1.db.saveSession(session);
-            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected ✅\n\nHow would you like to host your website?`, [
+            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *Nature Portfolio* ✅\n\nHow would you like to host your website?`, [
                 { id: 'host_custom', title: 'Custom Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
             ], 'Hosting Option', 'Custom domain: ₹500 one-time');

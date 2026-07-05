@@ -1437,13 +1437,7 @@ function renderAstroAgencyTemplate(site) {
 </html>`;
 }
 function renderPremiumWebsite(site, templateName) {
-    if (templateName === 'namari' || templateName === 'agency' || templateName === 'astro') {
-        return renderAstroAgencyTemplate(site);
-    }
-    if (templateName === 'portfolio' || templateName === 'nature') {
-        return renderNaturePortfolioTemplate(site);
-    }
-    return renderPremiumClassicTemplate(site);
+    return renderNaturePortfolioTemplate(site);
 }
 function renderNaturePortfolioTemplate(site) {
     const images = getCategoryImages(site.category);
