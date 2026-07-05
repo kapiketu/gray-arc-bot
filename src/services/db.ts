@@ -14,13 +14,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export interface Session {
   phoneNumber: string;
-  step: 'WELCOME' | 'AWAITING_CATEGORY' | 'AWAITING_NAME' | 'AWAITING_ABOUT' | 'AWAITING_SERVICES' | 'AWAITING_CONTACT' | 'AWAITING_DOMAIN_CHOICE' | 'AWAITING_DOMAIN_NAME' | 'COMPLETED';
+  step: 'WELCOME' | 'AWAITING_CATEGORY' | 'AWAITING_NAME' | 'AWAITING_ABOUT' | 'AWAITING_SERVICES' | 'AWAITING_CONTACT' | 'AWAITING_TEMPLATE' | 'AWAITING_DOMAIN_CHOICE' | 'AWAITING_DOMAIN_NAME' | 'EDIT_NAME' | 'EDIT_ABOUT' | 'EDIT_SERVICES' | 'EDIT_CONTACT' | 'COMPLETED';
   answers: {
     category?: string;
     businessName?: string;
     about?: string;
     services?: string;
     contact?: string;
+    template?: string;
     customDomainRequested?: string;
   };
   lastActive: string;
@@ -82,6 +83,7 @@ export interface SiteConfig {
   features?: SiteFeature[];
   faqs?: SiteFAQ[];
   testimonials?: SiteTestimonial[];
+  template?: string;
 }
 
 export const db = {
