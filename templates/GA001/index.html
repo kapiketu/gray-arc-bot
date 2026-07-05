@@ -62,6 +62,25 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none opacity-0 transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div id="mobile-menu-backdrop" class="absolute inset-0 bg-dark-900/90 backdrop-blur-xl"></div>
+        <!-- Menu Content -->
+        <div class="relative z-10 flex flex-col items-center justify-center h-full">
+            <button id="mobile-menu-close" class="absolute top-6 right-6 text-white p-2">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+            <div class="flex flex-col items-center gap-8 text-2xl font-bold">
+                <a href="#about" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">About</a>
+                <a href="#services" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Services</a>
+                <a href="#portfolio" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Work</a>
+                <a href="#testimonials" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Reviews</a>
+                <a href="#contact" class="mobile-nav-link btn-primary px-8 py-3 rounded-full text-dark-900 text-lg mt-4 transition-transform hover:scale-105">Get a Quote</a>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <header class="relative min-h-screen flex items-center pt-24 pb-12 px-6 lg:px-12 overflow-hidden">
         <!-- Background Image with Overlay -->

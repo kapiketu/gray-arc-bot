@@ -21,11 +21,34 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Mobile Menu Toggle (Basic implementation for completeness)
+// Mobile Menu Toggle
 const menuBtn = document.getElementById('mobile-menu-btn');
-menuBtn.addEventListener('click', () => {
-    // In a full implementation, this would trigger a fullscreen glass menu
-    alert("Mobile menu opened! (Add custom overlay logic here based on final routing)");
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+function openMobileMenu() {
+    mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+    mobileMenu.classList.add('opacity-100', 'pointer-events-auto');
+    document.body.classList.add('overflow-hidden');
+    // Re-render icons inside menu
+    lucide.createIcons();
+}
+
+function closeMobileMenu() {
+    mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+    document.body.classList.remove('overflow-hidden');
+}
+
+menuBtn.addEventListener('click', openMobileMenu);
+mobileMenuClose.addEventListener('click', closeMobileMenu);
+mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+
+// Close menu when a nav link is clicked
+mobileNavLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
 });
 
 // Animated Counters Logic
