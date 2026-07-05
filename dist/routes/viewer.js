@@ -2602,7 +2602,7 @@ function renderTaxiTemplate(site) {
       <a href="#reviews" class="hover:text-yellow-400 transition-colors">Reviews</a>
       <a href="#contact" class="hover:text-yellow-400 transition-colors">Contact</a>
     </div>
-    <a href="#contact" class="bg-yellow-400 text-black px-5 py-2 rounded-full font-semibold hover:bg-yellow-300 transition-colors">Book Now</a>
+    <a href="#contact" class="bg-yellow-400 text-black px-5 py-2 rounded-full font-semibold hover:bg-yellow-300 transition-colors">${isTaxi ? 'Book Now' : 'Contact Us'}</a>
   </div>
 </nav>
 
@@ -2611,16 +2611,16 @@ function renderTaxiTemplate(site) {
   <div class="max-w-7xl mx-auto px-6 py-28 relative z-10 grid lg:grid-cols-2 gap-10 items-center">
     <div data-aos="fade-right">
       <span class="px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-300 font-medium">${site.category || 'Premium Service'}</span>
-      <h2 class="text-5xl md:text-6xl font-extrabold mt-6 leading-tight">${site.heroTitle || 'Premium Service You Can Trust'}</h2>
-      <p class="text-slate-300 mt-6 text-lg leading-relaxed">${site.heroSubtitle || 'Professional drivers, fixed rates, and premium vehicle class for a comfortable ride.'}</p>
+      <h2 class="text-5xl md:text-6xl font-extrabold mt-6 leading-tight">${site.heroTitle || (isTaxi ? 'Premium Taxi Service You Can Trust' : site.businessName)}</h2>
+      <p class="text-slate-300 mt-6 text-lg leading-relaxed">${site.heroSubtitle || (isTaxi ? 'Professional drivers, fixed rates, and premium vehicle class for a comfortable ride.' : 'High-quality products, premium service, and friendly support tailored to your requirements.')}</p>
       <div class="mt-8 flex flex-wrap gap-4">
-        <a href="#contact" class="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold hover:bg-yellow-300 transition-colors">Book Ride</a>
+        <a href="#contact" class="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold hover:bg-yellow-300 transition-colors">${isTaxi ? 'Book Ride' : 'Order Now'}</a>
         <a href="tel:${site.phoneNumber}" class="border border-yellow-400 text-yellow-400 px-8 py-4 rounded-full hover:bg-yellow-400 hover:text-black transition-all">Call Now</a>
       </div>
     </div>
     <div data-aos="zoom-in">
       <div class="glass p-8 rounded-3xl">
-        <h3 class="text-2xl font-bold mb-4">Quick Booking</h3>
+        <h3 class="text-2xl font-bold mb-4">${isTaxi ? 'Quick Booking' : 'Quick Inquiry'}</h3>
         ${isTaxi ? `
           <input id="pickup" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Pickup Location">
           <input id="destination" class="w-full p-3 mb-3 rounded bg-slate-800 text-white focus:outline-none focus:border-yellow-400" placeholder="Destination">
@@ -2706,19 +2706,19 @@ function renderTaxiTemplate(site) {
 
 <!-- HOW TO BOOK -->
 <section class="py-24 max-w-6xl mx-auto px-6">
-  <h2 class="text-4xl font-bold text-center mb-12">Book in 4 Easy Steps</h2>
+  <h2 class="text-4xl font-bold text-center mb-12">${isTaxi ? 'Book in 4 Easy Steps' : 'Order in 4 Easy Steps'}</h2>
   <div class="grid md:grid-cols-4 gap-6 text-center">
-    <div class="card" data-aos="fade-right">1. Submit Details</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="100">2. Confirm Booking</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="200">3. Fast Pickup</div>
-    <div class="card" data-aos="fade-right" data-aos-delay="300">4. Enjoy Service</div>
+    <div class="card" data-aos="fade-right">${isTaxi ? '1. Submit Details' : '1. Select Items'}</div>
+    <div class="card" data-aos="fade-right" data-aos-delay="100">${isTaxi ? '2. Confirm Booking' : '2. Confirm Order'}</div>
+    <div class="card" data-aos="fade-right" data-aos-delay="200">${isTaxi ? '3. Fast Pickup' : '3. Fresh Delivery'}</div>
+    <div class="card" data-aos="fade-right" data-aos-delay="300">${isTaxi ? '4. Enjoy Ride' : '4. Enjoy Order'}</div>
   </div>
 </section>
 
 <!-- CONTACT CTA -->
 <section class="py-24 bg-yellow-400 text-black" id="contact">
   <div class="max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
-    <h2 class="text-5xl font-extrabold">Need a Service?</h2>
+    <h2 class="text-5xl font-extrabold">${isTaxi ? 'Need a Ride?' : 'Ready to Order?'}</h2>
     <p class="mt-4 text-lg">Call or WhatsApp us anytime. We are online and ready to assist.</p>
     <div class="mt-8 flex justify-center gap-4">
       <a href="tel:${site.phoneNumber}" class="bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-slate-900 transition-colors">Call Now</a>
