@@ -823,7 +823,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       await sendCTAUrlMessage(
         from,
         `To link your custom domain (*${targetDomain}*), tap below to activate:\n\n💰 *Billing Summary (1-Time Auth):*\n• Today's Payment: *₹${399 + domainPrice}* (₹${domainPrice} domain + ₹399 subscription)\n• Future Months: *₹399/month* auto-debit.`,
-        'Activate Domain & Site',
+        'Pay & Activate',
         payment.paymentUrl
       );
     } else {
