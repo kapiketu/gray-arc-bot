@@ -22,17 +22,17 @@ export interface PaymentLinkResponse {
 }
 
 /**
- * Generates a link to pay for a custom domain upfront (₹500)
+ * Generates a link to pay for a custom domain upfront (dynamic price)
  */
-export async function createDomainPaymentLink(siteId: string, domain: string): Promise<PaymentLinkResponse> {
-  console.log(`[Billing Service] Creating Razorpay domain payment link for ${siteId} -> ${domain}`);
+export async function createDomainPaymentLink(siteId: string, domain: string, priceInINR: number): Promise<PaymentLinkResponse> {
+  console.log(`[Billing Service] Creating Razorpay domain payment link for ${siteId} -> ${domain} at ₹${priceInINR}`);
   
   try {
     const site = await db.getSite(siteId);
     const customerContact = site?.phoneNumber || "+919999999999";
     
     const paymentLink = await razorpay.paymentLink.create({
-      amount: 50000, // Amount in paise (₹500)
+      amount: priceInINR * 100, // Amount in paise
       currency: "INR",
       accept_partial: false,
       description: `Domain registration for ${domain} (Site: ${siteId})`,
@@ -63,7 +63,7 @@ export async function createDomainPaymentLink(siteId: string, domain: string): P
     // Fallback to mock if API keys are missing/invalid
     const mockPaymentId = `pay_dom_${Math.random().toString(36).substring(2, 9)}`;
     return {
-      paymentUrl: `${BASE_URL}/pay/domain?siteId=${siteId}&domain=${domain}&paymentId=${mockPaymentId}`,
+      paymentUrl: `${BASE_URL}/pay/domain?siteId=${siteId}&domain=${domain}&paymentId=${mockPaymentId}&price=${priceInINR}`,
       paymentId: mockPaymentId
     };
   }

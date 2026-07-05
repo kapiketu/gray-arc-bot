@@ -251,8 +251,9 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
 
   // 2. Mock Razorpay Domain Payment Page
   fastify.get('/pay/domain', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { siteId, domain, paymentId } = request.query as { siteId: string; domain: string; paymentId: string };
-    return reply.type('text/html').send(renderPaymentPage('domain', siteId, domain, paymentId));
+    const { siteId, domain, paymentId, price } = request.query as { siteId: string; domain: string; paymentId: string; price?: string };
+    const priceNum = price ? parseInt(price) : 500;
+    return reply.type('text/html').send(renderPaymentPage('domain', siteId, domain, paymentId, priceNum));
   });
 
   // 3. Mock Razorpay Subscription Page
@@ -1509,7 +1510,7 @@ function renderSubscriptionPendingPage(site: SiteConfig): string {
     </body></html>`;
 }
 
-function renderPaymentPage(type: string, siteId: string, domain?: string, paymentId?: string): string {
+function renderPaymentPage(type: string, siteId: string, domain?: string, paymentId?: string, price?: number): string {
   const isDomain = type === 'domain';
   return `<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
@@ -1525,7 +1526,7 @@ function renderPaymentPage(type: string, siteId: string, domain?: string, paymen
         </div>
         <div class="mb-8">
           <div class="text-zinc-500 text-sm">${isDomain ? 'Domain Registration' : 'Monthly Subscription'}</div>
-          <div class="text-4xl font-black text-white mt-1">${isDomain ? '₹500' : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
+          <div class="text-4xl font-black text-white mt-1">${isDomain ? `₹${price || 500}` : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
           ${isDomain ? `<p class="text-zinc-500 text-sm mt-3">Domain: <strong class="text-white">${domain}</strong></p>` : '<p class="text-zinc-500 text-xs mt-2">Recurring UPI AutoPay mandate</p>'}
         </div>
         <form action="/pay/confirm" method="POST">

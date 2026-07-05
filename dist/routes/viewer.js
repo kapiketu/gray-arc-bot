@@ -235,8 +235,9 @@ async function viewerRoutes(fastify) {
     });
     // 2. Mock Razorpay Domain Payment Page
     fastify.get('/pay/domain', async (request, reply) => {
-        const { siteId, domain, paymentId } = request.query;
-        return reply.type('text/html').send(renderPaymentPage('domain', siteId, domain, paymentId));
+        const { siteId, domain, paymentId, price } = request.query;
+        const priceNum = price ? parseInt(price) : 500;
+        return reply.type('text/html').send(renderPaymentPage('domain', siteId, domain, paymentId, priceNum));
     });
     // 3. Mock Razorpay Subscription Page
     fastify.get('/pay/subscribe', async (request, reply) => {
@@ -1448,7 +1449,7 @@ function renderSubscriptionPendingPage(site) {
       </div>
     </body></html>`;
 }
-function renderPaymentPage(type, siteId, domain, paymentId) {
+function renderPaymentPage(type, siteId, domain, paymentId, price) {
     const isDomain = type === 'domain';
     return `<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
@@ -1464,7 +1465,7 @@ function renderPaymentPage(type, siteId, domain, paymentId) {
         </div>
         <div class="mb-8">
           <div class="text-zinc-500 text-sm">${isDomain ? 'Domain Registration' : 'Monthly Subscription'}</div>
-          <div class="text-4xl font-black text-white mt-1">${isDomain ? '₹500' : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
+          <div class="text-4xl font-black text-white mt-1">${isDomain ? `₹${price || 500}` : '₹399'}<span class="text-sm font-normal text-zinc-500">${isDomain ? '' : ' /month'}</span></div>
           ${isDomain ? `<p class="text-zinc-500 text-sm mt-3">Domain: <strong class="text-white">${domain}</strong></p>` : '<p class="text-zinc-500 text-xs mt-2">Recurring UPI AutoPay mandate</p>'}
         </div>
         <form action="/pay/confirm" method="POST">

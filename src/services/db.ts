@@ -23,6 +23,7 @@ export interface Session {
     contact?: string;
     template?: string;
     customDomainRequested?: string;
+    domainPrice?: number;
   };
   lastActive: string;
 }

@@ -21,15 +21,15 @@ const razorpay = new razorpay_1.default({
     key_secret: process.env.RAZORPAY_KEY_SECRET || ''
 });
 /**
- * Generates a link to pay for a custom domain upfront (₹500)
+ * Generates a link to pay for a custom domain upfront (dynamic price)
  */
-async function createDomainPaymentLink(siteId, domain) {
-    console.log(`[Billing Service] Creating Razorpay domain payment link for ${siteId} -> ${domain}`);
+async function createDomainPaymentLink(siteId, domain, priceInINR) {
+    console.log(`[Billing Service] Creating Razorpay domain payment link for ${siteId} -> ${domain} at ₹${priceInINR}`);
     try {
         const site = await db_1.db.getSite(siteId);
         const customerContact = site?.phoneNumber || "+919999999999";
         const paymentLink = await razorpay.paymentLink.create({
-            amount: 50000, // Amount in paise (₹500)
+            amount: priceInINR * 100, // Amount in paise
             currency: "INR",
             accept_partial: false,
             description: `Domain registration for ${domain} (Site: ${siteId})`,
@@ -60,7 +60,7 @@ async function createDomainPaymentLink(siteId, domain) {
         // Fallback to mock if API keys are missing/invalid
         const mockPaymentId = `pay_dom_${Math.random().toString(36).substring(2, 9)}`;
         return {
-            paymentUrl: `${BASE_URL}/pay/domain?siteId=${siteId}&domain=${domain}&paymentId=${mockPaymentId}`,
+            paymentUrl: `${BASE_URL}/pay/domain?siteId=${siteId}&domain=${domain}&paymentId=${mockPaymentId}&price=${priceInINR}`,
             paymentId: mockPaymentId
         };
     }
