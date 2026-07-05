@@ -149,7 +149,7 @@ async function sendTemplateSelector(to: string) {
     `Almost done! Choose a design style for your website:`,
     [
       { id: 'tpl_portfolio', title: 'Nature Portfolio' },
-      { id: 'tpl_story', title: 'Story Board' }
+      { id: 'tpl_astroship', title: 'Astroship' }
     ],
     'Step 5 of 5',
     'Both designs are mobile-responsive'
@@ -370,13 +370,13 @@ async function handleChatFlow(input: UserInput) {
     }
 
     // Template selection
-    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story') {
+    if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship') {
       if (!session || session.step !== 'AWAITING_TEMPLATE') {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
       }
-      const selectedTemplateName = buttonId === 'tpl_story' ? 'Story Board' : 'Nature Portfolio';
-      session.answers.template = buttonId === 'tpl_story' ? 'story' : 'portfolio';
+      const selectedTemplateName = buttonId === 'tpl_astroship' ? 'Astroship' : 'Nature Portfolio';
+      session.answers.template = buttonId === 'tpl_astroship' ? 'astroship' : 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       session.lastActive = new Date().toISOString();
       await db.saveSession(session);
@@ -633,13 +633,13 @@ async function handleChatFlow(input: UserInput) {
 
     case 'AWAITING_TEMPLATE':
       const choice = text.toLowerCase();
-      const isStory = choice.includes('story') || choice.includes('board');
-      session.answers.template = isStory ? 'story' : 'portfolio';
+      const isAstroship = choice.includes('astro') || choice.includes('ship');
+      session.answers.template = isAstroship ? 'astroship' : 'portfolio';
       session.step = 'AWAITING_DOMAIN_CHOICE';
       await db.saveSession(session);
       await sendButtonMessage(
         from,
-        `Design selected: *${isStory ? 'Story Board' : 'Nature Portfolio'}* ✅\n\nHow would you like to host your website?`,
+        `Design selected: *${isAstroship ? 'Astroship' : 'Nature Portfolio'}* ✅\n\nHow would you like to host your website?`,
         [
           { id: 'host_custom', title: 'Custom Domain' },
           { id: 'host_free', title: 'Free Subdomain' }

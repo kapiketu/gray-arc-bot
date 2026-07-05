@@ -1504,6 +1504,9 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
 }
 
 function renderPremiumWebsite(site: SiteConfig, templateName?: string): string {
+  if (templateName === 'astroship') {
+    return renderAstroshipTemplate(site);
+  }
   if (templateName === 'story') {
     return renderStoryTemplate(site);
   }
@@ -2140,6 +2143,164 @@ function renderStoryTemplate(site: SiteConfig): string {
 
 	</body>
 </html>`;
+}
+
+
+function renderAstroshipTemplate(site: SiteConfig): string {
+  const images = getCategoryImages(site.category || '');
+  
+  let subtitle = site.heroSubtitle || '';
+  if (subtitle.length < 50) {
+    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
+  }
+
+  let story = site.storyContent || site.aboutText || '';
+  if (story.length < 100) {
+    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
+  }
+  
+  const currentYear = new Date().getFullYear();
+
+  return `<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/public/templates/astroship/favicon.svg"><title>${site.businessName} - Astroship</title><link rel="stylesheet" href="/public/templates/astroship/_astro/about.BzqdUs8y.css"></head> <body> <div class="max-w-(--breakpoint-xl) mx-auto px-5">  <header class="flex flex-col lg:flex-row justify-between items-center my-5">  <div class="flex w-full lg:w-auto items-center justify-between"> <a href="#" class="text-lg"><span class="font-bold text-slate-800">${site.businessName}</span> </a> <div class="block lg:hidden"> <button id="astronav-menu" aria-label="Toggle Menu">  <svg fill="currentColor" class="w-4 h-4 text-gray-800" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <title>Toggle Menu</title> <path class="astronav-close-icon astronav-toggle hidden" fill-rule="evenodd" clip-rule="evenodd" d="M18.278 16.864a1 1 0 01-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 01-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 011.414-1.414l4.829 4.828 4.828-4.828a1 1 0 111.414 1.414l-4.828 4.829 4.828 4.828z"></path> <path class="astronav-open-icon astronav-toggle" fill-rule="evenodd" d="M4 5h16a1 1 0 010 2H4a1 1 0 110-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2z"></path> </svg>  </button> </div> </div> <nav class="astronav-items astronav-toggle hidden w-full lg:w-auto mt-2 lg:flex lg:mt-0">  <ul class="flex flex-col lg:flex-row lg:gap-3"> <li> <a href="#about" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> About</span>  </a> </li><li> <a href="#services" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> Services</span>  </a> </li><li> <a href="#contact" class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900"> <span> Contact</span>  </a> </li> </ul>  </nav>  <script>(function(){const closeOnClick = false;
+
+["DOMContentLoaded", "astro:after-swap"].forEach((event) => {
+  document.addEventListener(event, addListeners);
+});
+
+function cloneAndReplace(element) {
+  const clone = element.cloneNode(true);
+  element.parentNode.replaceChild(clone, element);
+}
+
+function addListeners() {
+  const oldMenuButton = document.getElementById("astronav-menu");
+  if (oldMenuButton) {
+    cloneAndReplace(oldMenuButton);
+  }
+
+  const menuButton = document.getElementById("astronav-menu");
+  menuButton && menuButton.addEventListener("click", toggleMobileNav);
+}
+
+function toggleMobileNav() {
+  [...document.querySelectorAll(".astronav-toggle")].forEach((el) => {
+    el.classList.toggle("hidden");
+  });
+}
+})();</script> <div class="hidden lg:flex items-center gap-4"> <a href="tel:${site.phoneNumber}" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-4 py-2 bg-black text-white hover:bg-gray-800 border-2 border-transparent">Call Now</a> </div> </header>  </div>  
+
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5">  
+    <main class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24"> 
+      <div class="py-6 md:order-1 hidden md:block"> 
+        <img src="${images.hero || '/public/templates/astroship/_astro/hero.DlKDY3ml_ZQyPaD.png'}" alt="Hero Image" width="520" height="424" class="rounded-3xl shadow-2xl object-cover h-[350px] w-[500px]">
+      </div> 
+      <div> 
+        <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
+          ${site.heroTitle || site.businessName}
+        </h1> 
+        <p class="text-lg mt-4 text-slate-600 max-w-xl">
+          ${subtitle}
+        </p> 
+        <div class="mt-6 flex flex-col sm:flex-row gap-3"> 
+          <a href="#services" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-5 py-2.5 bg-black text-white hover:bg-gray-800 border-2 border-transparent flex gap-1 items-center justify-center">
+            Explore Services
+          </a> 
+          <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="rounded-sm text-center transition focus-visible:ring-2 ring-offset-2 ring-gray-200 px-5 py-2.5 bg-white border-2 border-black hover:bg-gray-100 text-black flex gap-1 items-center justify-center">
+            Order via WhatsApp
+          </a> 
+        </div> 
+      </div> 
+    </main> 
+
+    <!-- About Section -->
+    <div id="about" class="py-16 border-t border-slate-100">
+      <div class="max-w-3xl">
+        <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">${site.storyTitle || 'About Us'}</h2>
+        <p class="text-lg mt-4 text-slate-600 leading-relaxed">${story}</p>
+      </div>
+    </div>
+
+    <!-- Services Section -->
+    <div id="services" class="mt-16 md:mt-24 border-t border-slate-100 pt-16"> 
+      <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">
+        Professional Services & Catalog
+      </h2> 
+      <p class="text-lg mt-4 text-slate-600">
+        Choose from our core professional offerings. Tap any service to place an order via WhatsApp.
+      </p> 
+    </div> 
+
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16"> 
+      ${site.services.map((service, index) => {
+        const icons = ['briefcase', 'window-alt', 'data', 'bot', 'file-find', 'user'];
+        const icon = icons[index % icons.length];
+        return `
+          <div class="flex gap-4 items-start cursor-pointer group" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')"> 
+            <div class="mt-1 bg-black rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center"> 
+              <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+                <symbol id="ai:bx:bxs-briefcase" viewBox="0 0 24 24"><path d="M20 6h-3V4c0-1.103-.897-2-2-2H9c-1.103 0-2 .897-2 2v2H4c-1.103 0-2 .897-2 2v3h20V8c0-1.103-.897-2-2-2zM9 4h6v2H9V4zm5 10h-4v-2H2v7c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2v-7h-8v2z" fill="currentColor"/></symbol>
+                <symbol id="ai:bx:bxs-window-alt" viewBox="0 0 24 24"><path d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zm-3 3h2v2h-2V6zm-3 0h2v2h-2V6zM4 19v-9h16.001l.001 9H4z" fill="currentColor"/></symbol>
+                <symbol id="ai:bx:bxs-data" viewBox="0 0 24 24"><path d="M20 6c0-2.168-3.663-4-8-4S4 3.832 4 6v2c0 2.168 3.663 4 8 4s8-1.832 8-4V6zm-8 13c-4.337 0-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3c0 2.168-3.663 4-8 4z" fill="currentColor"/><path d="M20 10c0 2.168-3.663 4-8 4s-8-1.832-8-4v3c0 2.168 3.663 4 8 4s8-1.832 8-4v-3z" fill="currentColor"/></symbol>
+                <symbol id="ai:bx:bxs-bot" viewBox="0 0 24 24"><path d="M21 10.975V8a2 2 0 0 0-2-2h-6V4.688c.305-.274.5-.668.5-1.11a1.5 1.5 0 0 0-3 0c0 .442.195.836.5 1.11V6H5a2 2 0 0 0-2 2v2.998l-.072.005A.999.999 0 0 0 2 12v2a1 1 0 0 0 1 1v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a1 1 0 0 0 1-1v-1.938a1.004 1.004 0 0 0-.072-.455c-.202-.488-.635-.605-.928-.632zM7 12c0-1.104.672-2 1.5-2s1.5.896 1.5 2s-.672 2-1.5 2S7 13.104 7 12zm8.998 6c-1.001-.003-7.997 0-7.998 0v-2s7.001-.002 8.002 0l-.004 2zm-.498-4c-.828 0-1.5-.896-1.5-2s.672-2 1.5-2s1.5.896 1.5 2s-.672 2-1.5 2z" fill="currentColor"/></symbol>
+                <symbol id="ai:bx:bxs-file-find" viewBox="0 0 24 24"><path d="M6 22h12c.178 0 .348-.03.512-.074l-3.759-3.759A4.966 4.966 0 0 1 12 19c-2.757 0-5-2.243-5-5s2.243-5 5-5s5 2.243 5 5a4.964 4.964 0 0 1-.833 2.753l3.759 3.759c.044-.164.074-.334.074-.512V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z" fill="currentColor"/><circle cx="12" cy="14" r="3" fill="currentColor"/></symbol>
+                <symbol id="ai:bx:bxs-user" viewBox="0 0 24 24"><path d="M7.5 6.5C7.5 8.981 9.519 11 12 11s4.5-2.019 4.5-4.5S14.481 2 12 2S7.5 4.019 7.5 6.5zM20 21h1v-1c0-3.859-3.141-7-7-7h-4c-3.86 0-7 3.141-7 7v1h17z" fill="currentColor"/></symbol>
+                <use href="#ai:bx:bxs-${icon}"></use>
+              </svg> 
+            </div> 
+            <div> 
+              <h3 class="font-semibold text-lg group-hover:text-indigo-600 transition-colors">${service.name}</h3>  
+              <p class="text-slate-500 mt-2 leading-relaxed">${service.description || 'Professional service tailored to your requirements.'}</p> 
+            </div> 
+          </div>
+        `;
+      }).join('')}
+    </div> 
+
+    <!-- Contact Form Section -->
+    <div id="contact" class="bg-black p-8 md:px-20 md:py-16 mt-24 mx-auto max-w-5xl rounded-2xl text-center"> 
+      <h2 class="text-white text-4xl md:text-5xl tracking-tight font-bold">
+        Get in Touch Today
+      </h2> 
+      <p class="text-slate-400 mt-4 text-lg max-w-lg mx-auto">
+        Have questions? Fill out the fields below to send an instant message straight to our WhatsApp.
+      </p> 
+      <form class="mt-8 max-w-md mx-auto flex flex-col gap-4 text-left" onsubmit="event.preventDefault(); window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('name').value + '. ' + document.getElementById('message').value), '_blank')">
+        <div>
+          <label for="name" class="block text-slate-300 text-sm font-semibold mb-1">Your Name</label>
+          <input type="text" id="name" required class="w-full bg-slate-900 border border-slate-800 rounded px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+        </div>
+        <div>
+          <label for="message" class="block text-slate-300 text-sm font-semibold mb-1">Your Message</label>
+          <textarea id="message" required rows="4" class="w-full bg-slate-900 border border-slate-800 rounded px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+        </div>
+        <button type="submit" class="mt-2 rounded-md text-center transition px-5 py-3 bg-indigo-600 text-white hover:bg-indigo-500 font-semibold border-2 border-transparent w-full">
+          Send Message via WhatsApp
+        </button>
+      </form> 
+    </div>  
+
+  </div>  
+
+  <footer class="my-20 border-t border-slate-100 pt-10"> 
+    <p class="text-center text-sm text-slate-500">
+      Copyright &copy; ${currentYear} ${site.businessName}. All rights reserved.
+    </p> 
+    <p class="text-center text-xs text-slate-500 mt-1">
+      Powered by The Gray Arc. Design from Web3Templates.
+    </p> 
+  </footer>  
+
+  <!-- Floating Sticky Contact Buttons -->
+  <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
+    <a href="https://wa.me/${site.phoneNumber}" target="_blank" style="width: 56px; height: 56px; background-color: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(37,211,102,0.4); border: 2px solid white; text-decoration: none;">
+      <svg style="width: 32px; height: 32px; margin: auto;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" style="width: 56px; height: 56px; background-color: #4b7833; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(75,120,51,0.4); border: 2px solid white; text-decoration: none;">
+      <svg style="width: 28px; height: 28px; margin: auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+    </a>
+  </div>
+
+ </body> </html>`;
 }
 
 
