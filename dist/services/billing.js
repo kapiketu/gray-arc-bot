@@ -124,7 +124,10 @@ async function processPaymentWebhook(payload) {
                     console.warn(`[Billing Webhook] ⚠️ Failed to auto-purchase domain "${domain}". Manual registration required.`);
                 }
                 // Send confirmation and email verification instructions to the user
-                await (0, whatsapp_1.sendTextMessage)(site.phoneNumber, `🎉 *Domain Registration Successful!*\n\nYour custom domain *${domain}* has been registered under your ownership and pointed to your website automatically!\n\n📧 *Action Required:*\nGoDaddy has sent a verification email to your address (*${customerEmail}*). Please click the verification link in that email to confirm ownership and avoid domain suspension.\n\nNo technical setup is needed on your part. Your website will be live on your custom domain shortly!`);
+                await (0, whatsapp_1.sendTextMessage)(site.phoneNumber, `🎉 *Domain Registration Successful!*\n\nYour custom domain *${domain}* has been registered under your ownership and pointed to your website automatically!\n\n📧 *Action Required:*\nGoDaddy has sent a verification email to your address (*${customerEmail}*). Please click the verification link in that email to confirm ownership and avoid domain suspension.`);
+                // Generate subscription link for monthly recurring AutoPay
+                const subscription = await createSubscriptionLink(site.id);
+                await (0, whatsapp_1.sendCTAUrlMessage)(site.phoneNumber, `💳 *Final Step (Subscription Setup):*\n\nTo activate your live website on your custom domain, please tap below to authorize your monthly subscription of *₹399/month* (automatic deduction via UPI or Credit/Debit card):`, 'Authorize AutoPay', subscription.paymentUrl);
                 return true;
             }
         }

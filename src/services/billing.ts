@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import { db } from './db';
-import { sendTextMessage } from './whatsapp';
+import { sendTextMessage, sendCTAUrlMessage } from './whatsapp';
 import { purchaseDomain, setupDomainDNS } from './domains';
 
 dotenv.config();
@@ -140,7 +140,17 @@ export async function processPaymentWebhook(payload: any): Promise<boolean> {
         // Send confirmation and email verification instructions to the user
         await sendTextMessage(
           site.phoneNumber,
-          `🎉 *Domain Registration Successful!*\n\nYour custom domain *${domain}* has been registered under your ownership and pointed to your website automatically!\n\n📧 *Action Required:*\nGoDaddy has sent a verification email to your address (*${customerEmail}*). Please click the verification link in that email to confirm ownership and avoid domain suspension.\n\nNo technical setup is needed on your part. Your website will be live on your custom domain shortly!`
+          `🎉 *Domain Registration Successful!*\n\nYour custom domain *${domain}* has been registered under your ownership and pointed to your website automatically!\n\n📧 *Action Required:*\nGoDaddy has sent a verification email to your address (*${customerEmail}*). Please click the verification link in that email to confirm ownership and avoid domain suspension.`
+        );
+
+        // Generate subscription link for monthly recurring AutoPay
+        const subscription = await createSubscriptionLink(site.id);
+
+        await sendCTAUrlMessage(
+          site.phoneNumber,
+          `💳 *Final Step (Subscription Setup):*\n\nTo activate your live website on your custom domain, please tap below to authorize your monthly subscription of *₹399/month* (automatic deduction via UPI or Credit/Debit card):`,
+          'Authorize AutoPay',
+          subscription.paymentUrl
         );
 
         return true;
