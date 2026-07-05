@@ -210,6 +210,6 @@ async function sendFlowMessage(toPhoneNumber, bodyText, buttonLabel, flowId, flo
     }
     catch (error) {
         console.error('[WhatsApp Outbound] Error sending Flow:', error.response?.data || error.message);
-        throw new Error('Failed to send WhatsApp Flow message');
+        throw error;
     }
 }

@@ -384,14 +384,18 @@ async function handleChatFlow(input: UserInput) {
           'BUSINESS_DETAILS',
           'Website Builder'
         );
-      } catch (flowError) {
+      } catch (flowError: any) {
         console.error('[Flow Error] Failed to send Flow message, falling back to step-by-step chat flow:', flowError);
+        const errorData = flowError.response?.data || { message: flowError.message };
         
         // Update session back to category list step
         newSession.step = 'AWAITING_CATEGORY';
         await db.saveSession(newSession);
         
-        await sendTextMessage(from, `⚠️ WhatsApp Form is not active yet (missing/invalid WHATSAPP_FLOW_ID). \n\nNo worries! Let's set up your website step-by-step instead:`);
+        await sendTextMessage(
+          from, 
+          `⚠️ *WhatsApp Form error:*\n\n*Error details from Meta:* \`\`\`${JSON.stringify(errorData, null, 2)}\`\`\`\n\nNo worries! Let's set up your website step-by-step instead:`
+        );
         await sendCategoryList(from);
       }
       return;

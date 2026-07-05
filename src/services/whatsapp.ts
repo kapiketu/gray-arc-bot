@@ -277,6 +277,6 @@ export async function sendFlowMessage(
     console.log('[WhatsApp Outbound] Flow sent. ID:', response.data.messages?.[0]?.id);
   } catch (error: any) {
     console.error('[WhatsApp Outbound] Error sending Flow:', error.response?.data || error.message);
-    throw new Error('Failed to send WhatsApp Flow message');
+    throw error;
   }
 }
