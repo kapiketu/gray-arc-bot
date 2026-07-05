@@ -511,7 +511,15 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{feature_2_title}}': site.features?.[1]?.title || 'Execution',
     '{{feature_2_desc}}': site.features?.[1]?.description || 'Our certified crew executes the project utilizing high quality tools.',
     '{{feature_3_title}}': site.features?.[2]?.title || 'Walkthrough',
-    '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.'
+    '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.',
+    '{{gallery_img_1}}': imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_2}}': imageBase.products[1] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_3}}': imageBase.products[2] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_4}}': imageBase.products[3] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_label_1}}': site.services?.[0]?.name || site.category || 'Our Work',
+    '{{gallery_label_2}}': site.services?.[1]?.name || site.category || 'Quality Service',
+    '{{gallery_label_3}}': site.services?.[2]?.name || site.category || 'Premium Results',
+    '{{gallery_label_4}}': site.services?.[3]?.name || site.category || 'Expert Craft'
   };
 
   for (const [key, value] of Object.entries(replacements)) {
