@@ -1504,6 +1504,9 @@ function renderAstroAgencyTemplate(site: SiteConfig): string {
 }
 
 function renderPremiumWebsite(site: SiteConfig, templateName?: string): string {
+  if (templateName === 'nimbus') {
+    return renderNimbusTemplate(site);
+  }
   if (templateName === 'astroship') {
     return renderAstroshipTemplate(site);
   }
@@ -2301,6 +2304,364 @@ function toggleMobileNav() {
   </div>
 
  </body> </html>`;
+}
+
+
+function renderNimbusTemplate(site: SiteConfig): string {
+  const images = getCategoryImages(site.category || '');
+  
+  let subtitle = site.heroSubtitle || '';
+  if (subtitle.length < 50) {
+    subtitle = `${subtitle} Delivering excellence and quality in everything we do.`;
+  }
+
+  let story = site.storyContent || site.aboutText || '';
+  if (story.length < 100) {
+    story = `${story} We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Our team works tirelessly to ensure your expectations are not just met, but exceeded.`;
+  }
+  
+  const currentYear = new Date().getFullYear();
+
+  // Setup services data
+  const services = site.services || [];
+  const service1 = services[0] || { name: 'Premium Service', description: 'Tailored solutions designed for your exact business requirements.' };
+  const service2 = services[1] || { name: 'Quality Delivery', description: 'Exceptional craftsmanship and attention to detail in every project.' };
+  const service3 = services[2] || { name: '24/7 Support', description: 'Dedicated consultation and support round the clock.' };
+
+  // Scrolling marquee services list
+  const marqueeItems = services.length > 0 ? services.map(s => s.name) : [service1.name, service2.name, service3.name, 'Quality Guaranteed', 'WhatsApp Support'];
+  const marqueeText = marqueeItems.map(item => `<span>${item}</span>`).join('<span class="mx-8 opacity-30">•</span>');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${site.businessName} — Live Site</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.1/tailwind.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: '#0A0C10',
+          panel: '#12151C',
+          panel2: '#171B24',
+          line: '#232833',
+          mist: '#8A8F98',
+          bone: '#E9EAEE',
+          violet: '#7C6CF6',
+          cyan: '#4FD1C5',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+      },
+    },
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #0A0C10; }
+  .mesh {
+    background:
+      radial-gradient(600px circle at 15% 20%, rgba(124,108,246,0.20), transparent 60%),
+      radial-gradient(500px circle at 85% 10%, rgba(79,209,197,0.15), transparent 55%),
+      radial-gradient(700px circle at 50% 100%, rgba(124,108,246,0.10), transparent 60%);
+  }
+  .glass {
+    background: rgba(23,27,36,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .grad-text {
+    background: linear-gradient(90deg, #7C6CF6, #4FD1C5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    #pulse-path { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+  }
+  #pulse-path {
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    animation: draw 2.4s ease-out forwards 0.5s;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .marquee-track { animation: scroll 26s linear infinite; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  a:focus-visible, button:focus-visible { outline: 2px solid #4FD1C5; outline-offset: 3px; }
+</style>
+</head>
+<body class="bg-ink text-bone font-body antialiased">
+
+<!-- NAV -->
+<header class="fixed top-0 inset-x-0 z-50 glass">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2 font-display font-semibold text-lg">
+      <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-violet to-cyan"></span>
+      ${site.businessName}
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm text-mist">
+      <a href="#about" class="hover:text-bone transition">About</a>
+      <a href="#services" class="hover:text-bone transition">Services</a>
+      <a href="#contact" class="hover:text-bone transition">Contact</a>
+    </nav>
+    <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="text-sm font-medium px-4 py-2 rounded-full bg-bone text-ink hover:bg-white transition">
+      Chat Now
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="relative mesh pt-40 pb-28 px-6 overflow-hidden">
+  <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div>
+      <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-5">${site.category || 'Professional Services'}</p>
+      <h1 class="font-display text-5xl md:text-6xl leading-[1.05] font-semibold">
+        ${site.heroTitle || site.businessName}
+      </h1>
+      <p class="mt-6 text-mist text-lg max-w-md">
+        ${subtitle}
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-4">
+        <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="px-6 py-3 rounded-full bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 transition">
+          Contact on WhatsApp
+        </a>
+        <a href="#services" class="px-6 py-3 rounded-full border border-line text-bone hover:border-mist transition">
+          Explore Catalog
+        </a>
+      </div>
+    </div>
+
+    <!-- Signature elements: Stats and Unsplash visual in a glass card -->
+    <div class="glass rounded-2xl p-6 shadow-2xl shadow-black/40 relative group overflow-hidden">
+      <div class="absolute inset-0 bg-cover bg-center opacity-20 filter blur-xs group-hover:scale-105 transition-transform duration-[10s]" style="background-image: url('${images.hero}');"></div>
+      <div class="relative z-10">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <p class="text-xs text-mist font-mono">BUSINESS STATUS</p>
+            <p class="font-display text-2xl font-semibold mt-1">Active & Online</p>
+          </div>
+          <span class="text-xs font-mono px-2 py-1 rounded-full bg-cyan/10 text-cyan">Live</span>
+        </div>
+        <div class="w-full h-36 rounded-xl overflow-hidden mb-4 relative border border-line">
+           <img src="${images.about || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80'}" alt="Workspace" class="w-full h-full object-cover">
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-lg bg-panel2 py-3 border border-line">
+            <p class="text-xs text-mist">Experience</p>
+            <p class="font-mono text-sm mt-1 text-bone">10+ Years</p>
+          </div>
+          <div class="rounded-lg bg-panel2 py-3 border border-line">
+            <p class="text-xs text-mist">Satisfaction</p>
+            <p class="font-mono text-sm mt-1 text-bone">100%</p>
+          </div>
+          <div class="rounded-lg bg-panel2 py-3 border border-line">
+            <p class="text-xs text-mist">Support</p>
+            <p class="font-mono text-sm mt-1 text-bone">24/7</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE MARQUEE -->
+<section class="border-y border-line py-8 overflow-hidden bg-panel/30">
+  <div class="flex whitespace-nowrap marquee-track text-mist font-display text-lg tracking-wide uppercase font-semibold">
+    <div class="flex gap-8 items-center">
+      ${marqueeText}
+    </div>
+    <div class="flex gap-8 items-center ml-16" aria-hidden="true">
+      ${marqueeText}
+    </div>
+  </div>
+</section>
+
+<!-- BENTO FEATURES (SERVICES & STORY) -->
+<section id="services" class="max-w-6xl mx-auto px-6 py-28">
+  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">What we offer</p>
+  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Our Premium Offerings & Catalog</h2>
+
+  <div class="grid md:grid-cols-3 gap-5 mt-14">
+    <!-- Large Bento Slot (Primary Service) -->
+    <div class="reveal md:col-span-2 md:row-span-2 glass rounded-2xl p-8 flex flex-col justify-between min-h-[340px] relative overflow-hidden group cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service1.name)}', '_blank')">
+      <div class="absolute inset-0 bg-cover bg-center opacity-10 group-hover:scale-105 transition-transform duration-[10s]" style="background-image: url('${getSemanticServiceImage(service1.name, site.category || '', 0)}');"></div>
+      <div class="relative z-10 flex flex-col h-full justify-between">
+        <div>
+          <span class="px-3 py-1 text-xs font-mono rounded-full bg-violet/20 text-violet border border-violet/40">Featured Service</span>
+          <h3 class="font-display text-3xl font-semibold mb-3 mt-4">${service1.name}</h3>
+          <p class="text-mist max-w-md">${service1.description}</p>
+        </div>
+        <div class="mt-8 flex justify-between items-center">
+          <span class="text-cyan font-mono font-semibold text-lg">Order via WhatsApp →</span>
+          <div class="w-12 h-12 rounded-full bg-bone text-ink flex items-center justify-center font-bold">01</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medium Bento Slot 2 -->
+    <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between min-h-[170px] cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service2.name)}', '_blank')">
+      <div>
+        <h3 class="font-display text-xl font-semibold mb-2">${service2.name}</h3>
+        <p class="text-mist text-sm">${service2.description}</p>
+      </div>
+      <span class="text-xs font-mono text-cyan mt-4 block">Order Now →</span>
+    </div>
+
+    <!-- Medium Bento Slot 3 -->
+    <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between min-h-[170px] cursor-pointer border border-line hover:border-violet/40 transition-colors" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service3.name)}', '_blank')">
+      <div>
+        <h3 class="font-display text-xl font-semibold mb-2">${service3.name}</h3>
+        <p class="text-mist text-sm">${service3.description}</p>
+      </div>
+      <span class="text-xs font-mono text-cyan mt-4 block">Order Now →</span>
+    </div>
+
+    <!-- Full Width Bento Slot (Story & About Us) -->
+    <div id="about" class="reveal md:col-span-3 glass rounded-2xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-10 border border-line relative overflow-hidden group">
+      <div class="absolute inset-0 bg-cover bg-center opacity-5 pointer-events-none" style="background-image: url('${images.about}');"></div>
+      <div class="relative z-10 max-w-2xl">
+        <span class="font-mono text-xs tracking-widest text-cyan uppercase">Our Story</span>
+        <h3 class="font-display text-2xl font-semibold mb-3 mt-2">${site.storyTitle || 'About Us'}</h3>
+        <p class="text-mist text-sm leading-relaxed">${story}</p>
+      </div>
+      <a href="https://wa.me/${site.phoneNumber}" target="_blank" class="shrink-0 px-6 py-3 rounded-full bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 transition text-sm relative z-10">Chat with us →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOG GRID (Additional services if any) -->
+${services.length > 3 ? `
+<section class="max-w-6xl mx-auto px-6 py-12 border-t border-line">
+  <div class="grid md:grid-cols-3 gap-6">
+    ${services.slice(3).map((service, index) => `
+      <div class="reveal glass rounded-2xl p-6 border border-line hover:border-violet/40 transition-colors flex flex-col justify-between min-h-[160px] cursor-pointer" onclick="window.open('https://wa.me/${site.phoneNumber}?text=Hi! I am interested in ${encodeURIComponent(service.name)}', '_blank')">
+        <div>
+          <h3 class="font-display text-lg font-semibold mb-2">${service.name}</h3>
+          <p class="text-mist text-xs">${service.description || 'Premium quality service.'}</p>
+        </div>
+        <span class="text-xs font-mono text-cyan mt-4 block">Order via WhatsApp →</span>
+      </div>
+    `).join('')}
+  </div>
+</section>
+` : ''}
+
+<!-- TIMELINE/PROCESS -->
+<section class="max-w-6xl mx-auto px-6 py-28 border-t border-line">
+  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">Setup Workflow</p>
+  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Seamless process to get started.</h2>
+
+  <div class="grid md:grid-cols-3 gap-8 mt-14">
+    <div class="reveal">
+      <p class="font-display text-4xl text-violet mb-4">1</p>
+      <h3 class="font-semibold mb-2">Connect via WhatsApp</h3>
+      <p class="text-mist text-sm">Send us a message detailing your requirements. Our automated system handles routing instantly.</p>
+    </div>
+    <div class="reveal">
+      <p class="font-display text-4xl text-violet mb-4">2</p>
+      <h3 class="font-semibold mb-2">Confirm Details</h3>
+      <p class="text-mist text-sm">We clarify the specifications, catalog item details, and establish pricing transparency.</p>
+    </div>
+    <div class="reveal">
+      <p class="font-display text-4xl text-violet mb-4">3</p>
+      <h3 class="font-semibold mb-2">Meticulous Delivery</h3>
+      <p class="text-mist text-sm">Our team executes with maximum precision and delivers directly according to the agreed terms.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (GROWTH/Starter Layout) -->
+<section class="max-w-6xl mx-auto px-6 py-28 border-t border-line">
+  <p class="font-mono text-xs tracking-widest text-cyan uppercase mb-3 reveal">Client Reviews</p>
+  <h2 class="font-display text-4xl font-semibold max-w-xl reveal">Straightforward reviews from satisfied clients.</h2>
+
+  <div class="grid md:grid-cols-2 gap-6 mt-14">
+    ${(site.testimonials || [
+      { name: 'Sarah M.', role: 'Verified Client', content: 'The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined.' },
+      { name: 'David R.', role: 'Business Owner', content: 'I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. Five stars!' }
+    ]).slice(0, 2).map((review, index) => `
+      <div class="reveal glass rounded-2xl p-8 flex flex-col justify-between border border-line">
+        <p class="text-bone/90 italic leading-relaxed">"${review.content}"</p>
+        <div class="mt-6 flex items-center gap-4 border-t border-line pt-4">
+          <div class="w-10 h-10 rounded-full bg-violet/20 text-violet flex items-center justify-center font-bold font-display">${review.name.charAt(0)}</div>
+          <div>
+            <h4 class="font-semibold text-sm">${review.name}</h4>
+            <span class="text-xs text-mist">${review.role || 'Client'}</span>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+</section>
+
+<!-- CONTACT CTA -->
+<section id="contact" class="relative mesh px-6 py-28 border-t border-line">
+  <div class="max-w-3xl mx-auto text-center reveal">
+    <h2 class="font-display text-4xl md:text-5xl font-semibold leading-tight">
+      Ready to get started?
+    </h2>
+    <p class="text-mist mt-5">Fill in your message below to start a conversation directly on WhatsApp.</p>
+    
+    <form class="mt-10 max-w-md mx-auto flex flex-col gap-4 text-left glass p-6 rounded-2xl border border-line" onsubmit="event.preventDefault(); window.open('https://wa.me/${site.phoneNumber}?text=' + encodeURIComponent('Hi! My name is ' + document.getElementById('name').value + '. ' + document.getElementById('message').value), '_blank')">
+      <div>
+        <label for="name" class="block text-slate-300 text-sm font-semibold mb-1">Your Name</label>
+        <input type="text" id="name" required class="w-full bg-panel border border-line rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan transition-colors" />
+      </div>
+      <div>
+        <label for="message" class="block text-slate-300 text-sm font-semibold mb-1">Your Message</label>
+        <textarea id="message" required rows="4" class="w-full bg-panel border border-line rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan transition-colors"></textarea>
+      </div>
+      <button type="submit" class="mt-2 rounded-full text-center transition px-5 py-3 bg-gradient-to-r from-violet to-cyan text-ink font-semibold hover:opacity-90 w-full">
+        Send Message via WhatsApp
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-line px-6 py-10">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-mist">
+    <div class="flex items-center gap-2 font-display font-semibold text-bone">
+      <span class="w-2 h-2 rounded-full bg-gradient-to-br from-violet to-cyan"></span>
+      ${site.businessName}
+    </div>
+    <p>© ${currentYear} ${site.businessName}. All rights reserved.</p>
+    <p class="text-xs opacity-50">Design inspired by Web3Templates.</p>
+  </div>
+</footer>
+
+<!-- Floating Sticky Contact Buttons -->
+<div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
+  <a href="https://wa.me/${site.phoneNumber}" target="_blank" style="width: 56px; height: 56px; background-color: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(37,211,102,0.4); border: 2px solid white; text-decoration: none;">
+    <svg style="width: 32px; height: 32px; margin: auto;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <a href="tel:${site.contactDetails?.phone || site.phoneNumber}" style="width: 56px; height: 56px; background-color: #4b7833; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(75,120,51,0.4); border: 2px solid white; text-decoration: none;">
+    <svg style="width: 28px; height: 28px; margin: auto;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+  </a>
+</div>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.15 });
+  els.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>`;
 }
 
 

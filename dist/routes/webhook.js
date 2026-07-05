@@ -115,8 +115,9 @@ async function sendCategoryList(to) {
 async function sendTemplateSelector(to) {
     await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Choose a design style for your website:`, [
         { id: 'tpl_portfolio', title: 'Nature Portfolio' },
-        { id: 'tpl_astroship', title: 'Astroship' }
-    ], 'Step 5 of 5', 'Both designs are mobile-responsive');
+        { id: 'tpl_astroship', title: 'Astroship' },
+        { id: 'tpl_nimbus', title: 'Nimbus (Dark)' }
+    ], 'Step 5 of 5', 'All designs are mobile-responsive');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
     await (0, whatsapp_1.sendCTAUrlMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`, 'View Live Site', siteUrl);
@@ -291,13 +292,22 @@ async function handleChatFlow(input) {
             return;
         }
         // Template selection
-        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship') {
+        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship' || buttonId === 'tpl_nimbus') {
             if (!session || session.step !== 'AWAITING_TEMPLATE') {
                 await (0, whatsapp_1.sendTextMessage)(from, `Something went wrong. Type *'reset'* to start over.`);
                 return;
             }
-            const selectedTemplateName = buttonId === 'tpl_astroship' ? 'Astroship' : 'Nature Portfolio';
-            session.answers.template = buttonId === 'tpl_astroship' ? 'astroship' : 'portfolio';
+            let selectedTemplateName = 'Nature Portfolio';
+            let templateKey = 'portfolio';
+            if (buttonId === 'tpl_astroship') {
+                selectedTemplateName = 'Astroship';
+                templateKey = 'astroship';
+            }
+            else if (buttonId === 'tpl_nimbus') {
+                selectedTemplateName = 'Nimbus (Dark)';
+                templateKey = 'nimbus';
+            }
+            session.answers.template = templateKey;
             session.step = 'AWAITING_DOMAIN_CHOICE';
             session.lastActive = new Date().toISOString();
             await db_1.db.saveSession(session);
@@ -499,11 +509,20 @@ async function handleChatFlow(input) {
             break;
         case 'AWAITING_TEMPLATE':
             const choice = text.toLowerCase();
-            const isAstroship = choice.includes('astro') || choice.includes('ship');
-            session.answers.template = isAstroship ? 'astroship' : 'portfolio';
+            let templateKey = 'portfolio';
+            let selectedTemplateName = 'Nature Portfolio';
+            if (choice.includes('astro') || choice.includes('ship')) {
+                templateKey = 'astroship';
+                selectedTemplateName = 'Astroship';
+            }
+            else if (choice.includes('nimbus') || choice.includes('dark')) {
+                templateKey = 'nimbus';
+                selectedTemplateName = 'Nimbus (Dark)';
+            }
+            session.answers.template = templateKey;
             session.step = 'AWAITING_DOMAIN_CHOICE';
             await db_1.db.saveSession(session);
-            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${isAstroship ? 'Astroship' : 'Nature Portfolio'}* ✅\n\nHow would you like to host your website?`, [
+            await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`, [
                 { id: 'host_custom', title: 'Custom Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
             ], 'Hosting Option', 'Custom domain: ₹500 one-time');
