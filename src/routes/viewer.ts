@@ -484,7 +484,8 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
 
   const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
   const testimonialsHtml = renderTestimonialsSlider(site.testimonials || []);
-  const logoHtml = `<img src="https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(site.businessName)}?width=200&height=200&nologo=true" class="w-12 h-12 rounded-xl object-contain bg-white/5 border border-white/10" alt="${site.businessName} Logo">`;
+  const logoPrompt = `minimalist professional logo icon for ${site.businessName} ${site.category || ''} business, clean vector style, transparent background, no text, single icon`;
+  const logoHtml = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true" class="h-14 w-auto object-contain" alt="${site.businessName} Logo">`;
   const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
 
   const imageBase = getCategoryImages(site.category || '');

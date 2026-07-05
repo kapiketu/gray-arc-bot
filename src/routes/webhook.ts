@@ -970,7 +970,8 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
     );
     
     // Pre-generate and cache the logo image using Pollinations AI so it loads instantly for the user
-    const logoUrl = `https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(session.answers.businessName || 'Business')}?width=200&height=200&nologo=true`;
+    const logoPrompt = `minimalist professional logo icon for ${session.answers.businessName || 'Business'} ${session.answers.category || ''} business, clean vector style, transparent background, no text, single icon`;
+    const logoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true`;
     console.log(`[Logo Generator] Generating logo at: ${logoUrl}`);
     try {
       await axios.get(logoUrl, { timeout: 15000 });
