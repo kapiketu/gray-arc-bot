@@ -252,6 +252,7 @@ export async function sendFlowMessage(
       action: {
         name: 'flow',
         parameters: {
+          flow_message_version: '3',
           flow_token: flowToken,
           flow_id: flowId,
           flow_cta: buttonLabel,
