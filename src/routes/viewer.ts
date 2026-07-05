@@ -336,7 +336,8 @@ fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply
       const site = await db.getSite(body.siteId);
       if (site) {
         const hasCustomDomain = !!site.customDomain;
-        const previewLink = `https://gray-arc-bot-production.up.railway.app/site/${site.id}`;
+        const BASE_URL = process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`;
+        const previewLink = `${BASE_URL}/site/${site.id}`;
         
         if (hasCustomDomain) {
           // 1. Send immediate payment confirmation message mentioning 30 minutes activation time
