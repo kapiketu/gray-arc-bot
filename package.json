@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts"
+    "dev": "ts-node src/server.ts",
+    "test:chat": "ts-node src/test-chat.ts"
   },
   "dependencies": {
     "@fastify/formbody": "^7.4.0",
