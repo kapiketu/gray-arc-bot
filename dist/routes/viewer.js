@@ -1511,12 +1511,13 @@ function renderPaymentPage(type, siteId, domain, paymentId, price) {
     const showWhoisForm = isDomain || hasAddon;
     return `<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pageTitle}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>body{font-family:'Inter',sans-serif}</style></head>
-    <body class="bg-zinc-950 flex items-center justify-center min-h-screen py-10">
-      <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md animate-fade-in">
+    <body class="bg-zinc-950 flex items-center justify-center min-h-screen py-6 px-4">
+      <div class="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-3xl w-full max-w-md animate-fade-in">
         <div class="flex justify-between items-center mb-8">
           <span class="text-blue-400 font-bold text-lg">Razorpay</span>
           <span class="bg-blue-500/10 text-blue-400 text-xs px-3 py-1 rounded-full font-semibold border border-blue-500/20">Test Mode</span>
