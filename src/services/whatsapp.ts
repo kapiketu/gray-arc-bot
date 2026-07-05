@@ -168,3 +168,55 @@ export async function sendListMessage(
     throw new Error('Failed to send WhatsApp list message');
   }
 }
+
+// ────────────────────────────────────────────────────────
+// 4. SEND CTA URL BUTTON (opens link directly in browser)
+// ────────────────────────────────────────────────────────
+export async function sendCTAUrlMessage(
+  toPhoneNumber: string,
+  bodyText: string,
+  buttonLabel: string,
+  url: string,
+  headerText?: string,
+  footerText?: string
+): Promise<void> {
+  console.log(`[WhatsApp Outbound] Sending CTA URL to ${toPhoneNumber}: "${buttonLabel}" -> ${url}`);
+
+  if (isMock()) {
+    console.warn('[WhatsApp Outbound] Mock mode — logging only.');
+    return;
+  }
+
+  const payload: any = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: toPhoneNumber,
+    type: 'interactive',
+    interactive: {
+      type: 'cta_url',
+      body: { text: bodyText },
+      action: {
+        name: 'cta_url',
+        parameters: {
+          display_text: buttonLabel,
+          url: url
+        }
+      }
+    }
+  };
+
+  if (headerText) {
+    payload.interactive.header = { type: 'text', text: headerText };
+  }
+  if (footerText) {
+    payload.interactive.footer = { text: footerText };
+  }
+
+  try {
+    const response = await axios.post(API_URL, payload, { headers: getHeaders() });
+    console.log('[WhatsApp Outbound] CTA URL sent. ID:', response.data.messages?.[0]?.id);
+  } catch (error: any) {
+    console.error('[WhatsApp Outbound] Error sending CTA URL:', error.response?.data || error.message);
+    throw new Error('Failed to send WhatsApp CTA URL message');
+  }
+}

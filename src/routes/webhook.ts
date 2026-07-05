@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import dotenv from 'dotenv';
 import { db, Session } from '../services/db';
-import { sendTextMessage, sendButtonMessage, sendListMessage } from '../services/whatsapp';
+import { sendTextMessage, sendButtonMessage, sendListMessage, sendCTAUrlMessage } from '../services/whatsapp';
 import { generateWebsiteConfig, modifyWebsiteConfig } from '../services/ai';
 import { createDomainPaymentLink, createSubscriptionLink, processPaymentWebhook } from '../services/billing';
 import crypto from 'crypto';
@@ -156,11 +156,16 @@ async function sendTemplateSelector(to: string) {
 }
 
 async function sendSiteReadyMenu(to: string, siteUrl: string) {
+  await sendCTAUrlMessage(
+    to,
+    `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`,
+    'View Live Site',
+    siteUrl
+  );
   await sendButtonMessage(
     to,
-    `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`,
+    `Need to make changes?`,
     [
-      { id: 'btn_view_site', title: 'View Live Site' },
       { id: 'btn_edit_details', title: 'Edit Details' },
       { id: 'btn_change_template', title: 'Change Template' }
     ]
@@ -391,7 +396,7 @@ async function handleChatFlow(input: UserInput) {
     if (buttonId === 'btn_view_site') {
       if (existingSite) {
         const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-        await sendTextMessage(from, `🔗 Your website: ${siteUrl}`);
+        await sendCTAUrlMessage(from, `Tap below to open your website:`, 'View Live Site', siteUrl);
       }
       return;
     }
@@ -497,12 +502,16 @@ async function handleChatFlow(input: UserInput) {
       const greetings = ['hi', 'hello', 'hey', 'help', 'menu'];
       if (greetings.includes(text.toLowerCase().trim())) {
         const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-        await sendTextMessage(from, `Welcome back to *Gray Arc*! 🌟\n\nYour website is live at:\n🔗 ${siteUrl}`);
+        await sendCTAUrlMessage(
+          from,
+          `Welcome back to *Gray Arc*! 🌟\n\nYour website is live. Tap below to view it:`,
+          'View Live Site',
+          siteUrl
+        );
         await sendButtonMessage(
           from,
-          `What would you like to do?`,
+          `Need to make changes?`,
           [
-            { id: 'btn_view_site', title: 'View Live Site' },
             { id: 'btn_edit_details', title: 'Edit Details' },
             { id: 'btn_change_template', title: 'Change Template' }
           ]

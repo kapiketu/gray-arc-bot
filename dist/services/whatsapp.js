@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendTextMessage = sendTextMessage;
 exports.sendButtonMessage = sendButtonMessage;
 exports.sendListMessage = sendListMessage;
+exports.sendCTAUrlMessage = sendCTAUrlMessage;
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -121,5 +122,46 @@ async function sendListMessage(toPhoneNumber, bodyText, buttonLabel, sections, h
     catch (error) {
         console.error('[WhatsApp Outbound] Error sending list:', error.response?.data || error.message);
         throw new Error('Failed to send WhatsApp list message');
+    }
+}
+// ────────────────────────────────────────────────────────
+// 4. SEND CTA URL BUTTON (opens link directly in browser)
+// ────────────────────────────────────────────────────────
+async function sendCTAUrlMessage(toPhoneNumber, bodyText, buttonLabel, url, headerText, footerText) {
+    console.log(`[WhatsApp Outbound] Sending CTA URL to ${toPhoneNumber}: "${buttonLabel}" -> ${url}`);
+    if (isMock()) {
+        console.warn('[WhatsApp Outbound] Mock mode — logging only.');
+        return;
+    }
+    const payload = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: toPhoneNumber,
+        type: 'interactive',
+        interactive: {
+            type: 'cta_url',
+            body: { text: bodyText },
+            action: {
+                name: 'cta_url',
+                parameters: {
+                    display_text: buttonLabel,
+                    url: url
+                }
+            }
+        }
+    };
+    if (headerText) {
+        payload.interactive.header = { type: 'text', text: headerText };
+    }
+    if (footerText) {
+        payload.interactive.footer = { text: footerText };
+    }
+    try {
+        const response = await axios_1.default.post(API_URL, payload, { headers: getHeaders() });
+        console.log('[WhatsApp Outbound] CTA URL sent. ID:', response.data.messages?.[0]?.id);
+    }
+    catch (error) {
+        console.error('[WhatsApp Outbound] Error sending CTA URL:', error.response?.data || error.message);
+        throw new Error('Failed to send WhatsApp CTA URL message');
     }
 }

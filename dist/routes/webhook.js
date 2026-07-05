@@ -118,8 +118,8 @@ async function sendTemplateSelector(to) {
     ], 'Step 5 of 5', 'You can change this anytime later');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
-    await (0, whatsapp_1.sendButtonMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nWhat would you like to do next?`, [
-        { id: 'btn_view_site', title: 'View Live Site' },
+    await (0, whatsapp_1.sendCTAUrlMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`, 'View Live Site', siteUrl);
+    await (0, whatsapp_1.sendButtonMessage)(to, `Need to make changes?`, [
         { id: 'btn_edit_details', title: 'Edit Details' },
         { id: 'btn_change_template', title: 'Change Template' }
     ]);
@@ -309,7 +309,7 @@ async function handleChatFlow(input) {
         if (buttonId === 'btn_view_site') {
             if (existingSite) {
                 const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-                await (0, whatsapp_1.sendTextMessage)(from, `🔗 Your website: ${siteUrl}`);
+                await (0, whatsapp_1.sendCTAUrlMessage)(from, `Tap below to open your website:`, 'View Live Site', siteUrl);
             }
             return;
         }
@@ -401,9 +401,8 @@ async function handleChatFlow(input) {
             const greetings = ['hi', 'hello', 'hey', 'help', 'menu'];
             if (greetings.includes(text.toLowerCase().trim())) {
                 const siteUrl = `${BASE_URL}/site/${existingSite.id}`;
-                await (0, whatsapp_1.sendTextMessage)(from, `Welcome back to *Gray Arc*! 🌟\n\nYour website is live at:\n🔗 ${siteUrl}`);
-                await (0, whatsapp_1.sendButtonMessage)(from, `What would you like to do?`, [
-                    { id: 'btn_view_site', title: 'View Live Site' },
+                await (0, whatsapp_1.sendCTAUrlMessage)(from, `Welcome back to *Gray Arc*! 🌟\n\nYour website is live. Tap below to view it:`, 'View Live Site', siteUrl);
+                await (0, whatsapp_1.sendButtonMessage)(from, `Need to make changes?`, [
                     { id: 'btn_edit_details', title: 'Edit Details' },
                     { id: 'btn_change_template', title: 'Change Template' }
                 ]);
