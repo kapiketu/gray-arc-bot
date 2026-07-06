@@ -494,6 +494,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   const replacements: Record<string, string> = {
     '{{business_name}}': site.businessName,
     '{{category}}': site.category || 'Professional Services',
+    '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
     '{{logo}}': logoHtml,
     '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
     '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
