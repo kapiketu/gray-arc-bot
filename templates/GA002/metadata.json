@@ -1,0 +1,22 @@
+{
+  "template_id": "GA002",
+  "template_name": "Travel Elite",
+  "version": "1.0.0",
+  "suitable_business_categories": [
+    "Travel Agency",
+    "Tour Operator",
+    "Holiday Packages",
+    "Adventure Tours",
+    "Trekking Company",
+    "Visa Consultant",
+    "Taxi Service",
+    "Cab Service",
+    "Airport Transfer",
+    "Car Rental",
+    "Chauffeur Service",
+    "Hotel",
+    "Resort",
+    "Homestay"
+  ],
+  "short_description": "A high-end, immersive single-page template designed for luxury travel and tourism businesses. Features cinematic imagery, glassmorphism, masonry galleries, and smooth scroll animations to create an unforgettable booking experience."
+}
