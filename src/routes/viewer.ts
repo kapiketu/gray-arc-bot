@@ -540,7 +540,10 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
     
     // Sanitize service name to avoid commas/slashes that break the AI endpoint
     const cleanName = s.name.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
-    const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+    let cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+    if (idx === 1) {
+      cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
+    }
     const icon = icons[idx % icons.length];
     const delay = idx * 100;
 
