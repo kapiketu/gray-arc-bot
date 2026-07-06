@@ -1,0 +1,17 @@
+{
+  "template_id": "GA003",
+  "template_name": "Business Edge",
+  "version": "1.0.0",
+  "suitable_business_categories": [
+    "IT Company",
+    "Software Company",
+    "AI Company",
+    "Startup",
+    "Digital Marketing Agency",
+    "Business Consultant",
+    "Manufacturing Company",
+    "Technology Company",
+    "Corporate Business"
+  ],
+  "short_description": "A premium corporate website template designed for modern businesses, technology companies and professional service providers."
+}

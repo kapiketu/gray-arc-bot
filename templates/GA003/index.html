@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{business_name}} | Professional Business Solutions</title>
+    <meta name="description" content="{{hero_subtitle}}">
+    <!-- Open Graph & Twitter -->
+    <meta property="og:title" content="{{business_name}}">
+    <meta property="og:description" content="{{hero_subtitle}}">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .gradient-text { background: linear-gradient(135deg, #1e293b 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b border-slate-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold tracking-tighter">{{logo}}</div>
+            <div class="hidden md:flex gap-8 font-medium text-sm">
+                <a href="#services" class="hover:text-blue-600">Services</a>
+                <a href="#portfolio" class="hover:text-blue-600">Portfolio</a>
+                <a href="#contact" class="bg-slate-900 text-white px-5 py-2 rounded-full">Get Started</a>
+            </div>
+            <button id="menu-btn" class="md:hidden"><i data-lucide="menu"></i></button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="fixed right-0 top-0 bottom-0 w-64 bg-white p-6 shadow-2xl flex flex-col gap-6">
+            <div class="flex justify-end">
+                <button id="close-btn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex flex-col gap-6 font-medium text-lg">
+                <a href="#services" class="hover:text-blue-600 mobile-link">Services</a>
+                <a href="#portfolio" class="hover:text-blue-600 mobile-link">Portfolio</a>
+                <a href="#contact" class="bg-slate-900 text-white px-5 py-3 rounded-xl text-center mobile-link">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight gradient-text">{{hero_title}}</h1>
+                <p class="text-xl text-slate-600 mb-8">{{hero_subtitle}}</p>
+                <a href="#contact" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition">Explore Solutions</a>
+            </div>
+            <img src="{{hero_image}}" alt="Hero" class="rounded-2xl shadow-2xl">
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+            <img src="{{about_image}}" alt="About" class="rounded-xl">
+            <div>
+                <h2 class="text-3xl font-bold mb-6">{{about_title}}</h2>
+                <p class="text-slate-600 leading-relaxed">{{about_content}}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16">Our Core Services</h2>
+            {{services_grid}}
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12">
+            <div><h3 class="text-xl font-bold mb-3">{{feature_1_title}}</h3><p class="text-slate-400">{{feature_1_desc}}</p></div>
+            <div><h3 class="text-xl font-bold mb-3">{{feature_2_title}}</h3><p class="text-slate-400">{{feature_2_desc}}</p></div>
+            <div><h3 class="text-xl font-bold mb-3">{{feature_3_title}}</h3><p class="text-slate-400">{{feature_3_desc}}</p></div>
+        </div>
+    </section>
+
+    <!-- Portfolio Gallery -->
+    <section id="portfolio" class="py-20">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="group relative overflow-hidden rounded-xl h-64"><img src="{{gallery_img_1}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"><div class="absolute bottom-4 left-4 text-white font-bold">{{gallery_label_1}}</div></div>
+            <div class="group relative overflow-hidden rounded-xl h-64"><img src="{{gallery_img_2}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"><div class="absolute bottom-4 left-4 text-white font-bold">{{gallery_label_2}}</div></div>
+            <div class="group relative overflow-hidden rounded-xl h-64"><img src="{{gallery_img_3}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"><div class="absolute bottom-4 left-4 text-white font-bold">{{gallery_label_3}}</div></div>
+            <div class="group relative overflow-hidden rounded-xl h-64"><img src="{{gallery_img_4}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"><div class="absolute bottom-4 left-4 text-white font-bold">{{gallery_label_4}}</div></div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 bg-slate-100">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            {{testimonials_slider}}
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20">
+        <div class="max-w-3xl mx-auto px-6 bg-white p-12 rounded-2xl shadow-xl">
+            <h2 class="text-3xl font-bold mb-8">Let's Connect</h2>
+            <form id="contactForm" class="grid gap-4">
+                <input type="text" id="name" placeholder="Your Name" class="w-full p-4 border rounded-lg" required>
+                <input type="tel" id="phone" placeholder="Your Phone Number" class="w-full p-4 border rounded-lg" required>
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700">Send via WhatsApp</button>
+            </form>
+            <div class="mt-8 pt-8 border-t text-sm text-slate-500">
+                <p>{{address}} | {{email}} | {{phone}}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center text-slate-500 text-sm">
+        &copy; <span id="year"></span> {{business_name}}. All rights reserved.
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', toggleMenu);
+            if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
+            mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = "{{phone_clean}}";
+            const message = `Hello, my name is ${name}. I am interested in your services.`;
+            window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        });
+    </script>
+</body>
+</html>
