@@ -559,27 +559,45 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
     const defaultIcons = getDefaultCategoryIcons(category);
     let gridItems = '';
     services.forEach((s, idx) => {
-      if (idx >= 6) return;
+      if (idx >= 5) return; // grid-cols-5 row limit
       const icon = s.icon || defaultIcons[idx % defaultIcons.length];
-      let colSpan = 'md:col-span-2';
-      if (idx === 0 || idx === 3) colSpan = 'md:col-span-4';
-      if (idx === 4 || idx === 5) colSpan = 'md:col-span-3';
-
-      gridItems += `
-        <div class="reveal card-lift ${colSpan} rounded-2xl border border-white/10 bg-white/[0.03] p-8 lg:p-10 flex flex-col justify-between" style="transition-delay: ${idx * 100}ms;">
-          <div>
-            <div class="w-12 h-12 rounded-xl bg-white/[0.07] border border-white/10 flex items-center justify-center mb-6">
-              <i data-lucide="${icon}" class="w-6 h-6 text-indigo"></i>
+      const delay = idx * 100;
+      
+      const isHighlighted = (idx === 2); // 3rd card Web Development is dark highlighted in reference image
+      
+      if (isHighlighted) {
+        gridItems += `
+          <div class="reveal card-lift bg-slate-950 text-white border border-slate-900 rounded-[2rem] p-8 flex flex-col justify-between h-full shadow-lg" style="transition-delay: ${delay}ms;">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mb-6">
+                <i data-lucide="${icon}" class="w-6 h-6 text-blue-400"></i>
+              </div>
+              <h3 class="font-display font-semibold text-xl text-white mb-3">${s.name}</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">${s.description}</p>
             </div>
-            <h3 class="font-display font-semibold text-xl text-white mb-3">${s.name}</h3>
-            <p class="text-fog text-sm leading-relaxed">${s.description}</p>
+            <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-900">
+              <span class="text-blue-400 font-bold text-sm">${s.price || 'Contact Us'}</span>
+              <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-all flex items-center gap-1">Read More <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
           </div>
-          <div class="flex justify-between items-center mt-8 pt-4 border-t border-white/5">
-            <span class="text-indigo font-bold text-sm">${s.price || 'Contact Us'}</span>
-            <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-ink bg-white hover:bg-indigo hover:text-white px-4 py-2 rounded-full font-semibold transition-all">Enquire</a>
+        `;
+      } else {
+        gridItems += `
+          <div class="reveal card-lift bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex flex-col justify-between h-full" style="transition-delay: ${delay}ms;">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6">
+                <i data-lucide="${icon}" class="w-6 h-6 text-blue-600"></i>
+              </div>
+              <h3 class="font-display font-semibold text-xl text-slate-900 mb-3">${s.name}</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">${s.description}</p>
+            </div>
+            <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-100">
+              <span class="text-blue-600 font-bold text-sm">${s.price || 'Contact Us'}</span>
+              <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-all flex items-center gap-1">Read More <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
     });
     return gridItems;
   }

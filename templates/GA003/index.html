@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{business_name}} | Premium Business Solutions</title>
+    <title>{{business_name}} | Premium Corporate Solutions</title>
     <meta name="description" content="{{about}}">
 
     <!-- Open Graph / Twitter -->
@@ -14,167 +14,670 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        },
+                        darknavy: '#050B14',
+                        cardnavy: '#0C1322'
+                    },
+                    fontFamily: {
+                        display: ['Sora', 'Inter', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
-        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .font-display { font-family: 'Sora', sans-serif; }
+        .glass { background: rgba(5, 11, 20, 0.75); backdrop-filter: blur(16px); }
+        .blueprint {
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 56px 56px;
+        }
+        .card-lift { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease; }
+        .card-lift:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); }
+        .mobile-menu-active { max-height: 400px; opacity: 1; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-50 text-slate-900 antialiased overflow-x-hidden">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 transition-all duration-300 glass border-b border-slate-200/50">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="text-2xl font-bold tracking-tighter">{{logo}}</div>
-            <div class="hidden md:flex space-x-8 font-medium text-sm">
-                <a href="#services" class="hover:text-blue-600">Services</a>
-                <a href="#portfolio" class="hover:text-blue-600">Work</a>
-                <a href="#contact" class="px-5 py-2 bg-slate-900 text-white rounded-full text-xs">Get Started</a>
+    <!-- ==========================================
+         NAVIGATION BAR
+         ========================================== -->
+    <nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    {{logo}}
+                    <div class="flex flex-col">
+                        <span class="font-display font-bold text-lg text-white tracking-tight leading-none">{{business_name}}</span>
+                        <span class="text-[10px] text-blue-400 mt-1 uppercase tracking-wider font-semibold font-display">Innovate. Build. Elevate.</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center gap-9">
+                    <a href="#about" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">About Us</a>
+                    <a href="#services" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Services</a>
+                    <a href="#industries" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Industries</a>
+                    <a href="#portfolio" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Portfolio</a>
+                    <a href="#contact" class="px-5 py-2.5 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">Get a Free Quote</a>
+                </div>
+
+                <!-- Hamburger -->
+                <button id="menu-btn" class="lg:hidden p-2 text-white hover:text-blue-400 transition-colors" aria-label="Toggle Menu">
+                    <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+                </button>
             </div>
-            <button class="md:hidden p-2" id="mobile-menu-toggle" aria-label="Toggle Menu">
-                <i data-lucide="menu" id="menu-icon"></i>
-            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="lg:hidden max-h-0 opacity-0 overflow-hidden bg-darknavy/98 backdrop-blur-xl border-t border-slate-800 transition-all duration-300">
+            <div class="px-6 py-6 flex flex-col gap-5">
+                <a href="#about" class="mobile-link text-slate-200 text-base font-semibold">About Us</a>
+                <a href="#services" class="mobile-link text-slate-200 text-base font-semibold">Services</a>
+                <a href="#industries" class="mobile-link text-slate-200 text-base font-semibold">Industries</a>
+                <a href="#portfolio" class="mobile-link text-slate-200 text-base font-semibold">Portfolio</a>
+                <a href="#contact" class="mobile-link text-center px-5 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-lg">Get a Free Quote</a>
+            </div>
         </div>
     </nav>
 
-    <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden">
-        <div class="fixed right-0 top-0 bottom-0 w-64 bg-white p-6 shadow-2xl flex flex-col gap-6">
-            <div class="flex justify-end">
-                <button id="close-btn" class="p-2"><i data-lucide="x"></i></button>
-            </div>
-            <div class="flex flex-col gap-6 font-medium text-lg">
-                <a href="#services" class="hover:text-blue-600 mobile-link">Services</a>
-                <a href="#portfolio" class="hover:text-blue-600 mobile-link">Work</a>
-                <a href="#contact" class="bg-slate-900 text-white px-5 py-3 rounded-xl text-center mobile-link">Get Started</a>
-            </div>
-        </div>
-    </div>
+    <!-- ==========================================
+         HERO SECTION
+         ========================================== -->
+    <header class="relative bg-darknavy text-white overflow-hidden min-h-screen flex items-center pt-24">
+        <div class="absolute inset-0 blueprint"></div>
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-blue-500/10 blur-[130px]"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-6 lg:px-10 w-full py-16 lg:py-24">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                <!-- Left Content -->
+                <div class="lg:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/5 text-xs text-blue-400 font-medium tracking-wide">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        Your Partner in Digital Transformation
+                    </div>
+                    <h1 class="font-display font-extrabold text-[2.75rem] leading-[1.08] lg:text-7xl lg:leading-[1.05] tracking-tight">
+                        We Build Digital Solutions That <span class="text-blue-500">Drive Real Growth</span>
+                    </h1>
+                    <p class="text-lg text-slate-400 max-w-xl leading-relaxed">
+                        {{hero_subtitle}}
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <a href="#services" class="px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 transition font-semibold text-sm shadow-lg shadow-blue-600/30 inline-flex items-center gap-2">
+                            Explore Our Services <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#contact" class="px-7 py-3.5 rounded-xl border border-slate-700 hover:border-slate-500 transition font-semibold text-sm">
+                            Watch Our Story
+                        </a>
+                    </div>
+                </div>
 
-    <!-- Hero Header -->
-    <header class="relative min-h-screen flex items-center pt-20">
-        <div class="absolute inset-0 overflow-hidden">
-            <img src="{{hero_image}}" class="w-full h-full object-cover opacity-20" alt="Hero Background">
-        </div>
-        <div class="relative max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center py-16">
-            <div>
-                <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter leading-[0.9] mb-8">{{hero_title}}</h1>
-                <p class="text-xl text-slate-600 mb-10">{{hero_subtitle}}</p>
-                <div class="flex gap-4">
-                    <a href="#portfolio" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition">View Case Studies</a>
+                <!-- Right Visual -->
+                <div class="lg:col-span-5 relative mt-6 lg:mt-0">
+                    <div class="relative rounded-3xl border border-slate-800 bg-cardnavy/50 p-3 shadow-2xl backdrop-blur">
+                        <img src="{{hero_image}}" class="rounded-2xl w-full h-[400px] object-cover shadow-2xl" alt="Corporate Solution Hero">
+                        
+                        <!-- Floating metrics panel -->
+                        <div class="absolute -bottom-8 -left-8 bg-cardnavy border border-slate-800 rounded-2xl p-5 shadow-2xl max-w-xs hidden sm:block">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                    <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <div class="font-display font-bold text-lg text-white">500+</div>
+                                    <div class="text-[10px] text-slate-400 uppercase tracking-wide mono">Businesses Trusted</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white/50 p-6 rounded-3xl border border-white backdrop-blur shadow-2xl">
-                <img src="{{gallery_img_1}}" class="rounded-2xl w-full h-64 object-cover" alt="Featured Image">
+
+            <!-- Stats Bar at bottom of Hero -->
+            <div class="mt-20 border-t border-slate-800/80 pt-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="flex items-center gap-3.5">
+                    <i data-lucide="rocket" class="w-6 h-6 text-blue-500 shrink-0"></i>
+                    <div>
+                        <div class="font-display font-bold text-2xl text-white">10+</div>
+                        <div class="text-xs text-slate-400">Years of Experience</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-blue-500 shrink-0"></i>
+                    <div>
+                        <div class="font-display font-bold text-2xl text-white">350+</div>
+                        <div class="text-xs text-slate-400">Projects Completed</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <i data-lucide="users" class="w-6 h-6 text-blue-500 shrink-0"></i>
+                    <div>
+                        <div class="font-display font-bold text-2xl text-white">200+</div>
+                        <div class="text-xs text-slate-400">Expert Professionals</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <i data-lucide="award" class="w-6 h-6 text-blue-500 shrink-0"></i>
+                    <div>
+                        <div class="font-display font-bold text-2xl text-white">98%</div>
+                        <div class="text-xs text-slate-400">Client Satisfaction</div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- Services Section (Dynamic Grid) -->
-    <section id="services" class="py-24 bg-white border-t border-b">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-5xl font-bold mb-16 tracking-tight">Our Services</h2>
-            <div class="grid md:grid-cols-6 gap-6">
+    <!-- ==========================================
+         ABOUT US SECTION
+         ========================================== -->
+    <section id="about" class="py-24 lg:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="grid lg:grid-cols-12 gap-16 lg:gap-20 items-center">
+                <!-- Asymmetric Image Layout Left -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative">
+                        <img src="{{about_image}}" class="rounded-3xl w-full h-[450px] object-cover shadow-2xl border" alt="Corporate Meeting About">
+                        <div class="absolute -bottom-8 -right-8 w-60 rounded-2xl bg-white border border-slate-100 shadow-2xl p-5 hidden sm:block">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                    <i data-lucide="target" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <span class="font-display font-bold text-sm text-slate-900">Our Mission</span>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">Empowering businesses through technology and innovation to create a better tomorrow.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Right -->
+                <div class="lg:col-span-7 space-y-8">
+                    <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">About Us</span>
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-slate-900">
+                        Building The Future With Innovation And <span class="text-blue-600">Expertise</span>
+                    </h2>
+                    <div class="text-slate-600 leading-relaxed text-base space-y-4">
+                        {{about_content}}
+                    </div>
+                    
+                    <div class="grid sm:grid-cols-2 gap-4 pt-2">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 shrink-0"></i>
+                            <span class="text-sm font-semibold text-slate-800">Scalable & future-ready solutions</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 shrink-0"></i>
+                            <span class="text-sm font-semibold text-slate-800">Creativity & strategy integration</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 shrink-0"></i>
+                            <span class="text-sm font-semibold text-slate-800">Commitment to long-term success</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-blue-600 shrink-0"></i>
+                            <span class="text-sm font-semibold text-slate-800">Rigorous quality benchmarks</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <a href="#contact" class="px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition font-semibold text-sm shadow-md inline-flex items-center gap-2">
+                            Learn More About Us <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         SERVICES SECTION (DYNAMIC BENTO GRID)
+         ========================================== -->
+    <section id="services" class="py-24 lg:py-32 bg-slate-50 border-t border-b">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div class="max-w-xl space-y-4">
+                    <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">Services</span>
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-slate-900">
+                        Powerful Solutions For <span class="text-blue-600">Modern Businesses</span>
+                    </h2>
+                </div>
+                <a href="#contact" class="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 transition">
+                    View All Services <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <!-- Injected service cards -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                 {{services_grid}}
             </div>
         </div>
     </section>
 
-    <!-- Expertise Section (Bento Grid) -->
-    <section class="py-24 max-w-7xl mx-auto px-6">
-        <h2 class="text-5xl font-bold mb-16 tracking-tight">Why Choose Us</h2>
-        <div class="bento-grid">
-            <div class="md:col-span-2 bg-blue-900 text-white p-10 rounded-[2rem]">
-                <h3 class="text-3xl font-bold mb-4">{{feature_1_title}}</h3>
-                <p class="text-blue-200">{{feature_1_desc}}</p>
-            </div>
-            <div class="bg-white p-10 rounded-[2rem] border shadow-sm">
-                <h3 class="text-xl font-bold mb-2">{{feature_2_title}}</h3>
-                <p class="text-slate-500">{{feature_2_desc}}</p>
-            </div>
-            <div class="bg-white p-10 rounded-[2rem] border shadow-sm">
-                <h3 class="text-xl font-bold mb-2">{{feature_3_title}}</h3>
-                <p class="text-slate-500">{{feature_3_desc}}</p>
+    <!-- ==========================================
+         WHY CHOOSE US SECTION (DARK PANEL)
+         ========================================== -->
+    <section class="py-24 lg:py-32 bg-darknavy text-white relative overflow-hidden">
+        <div class="absolute inset-0 blueprint opacity-50"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[120px]"></div>
+
+        <div class="relative max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                <!-- Left Title -->
+                <div class="lg:col-span-4 space-y-4">
+                    <span class="text-xs uppercase font-display font-bold text-blue-400 tracking-wider">Why Choose Us</span>
+                    <h2 class="font-display font-extrabold text-4xl leading-tight tracking-tight text-white">
+                        We Deliver More Than Just <span class="text-blue-500">Solutions</span>
+                    </h2>
+                </div>
+
+                <!-- Right 4-column Features Deck -->
+                <div class="lg:col-span-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Feature 1 -->
+                    <div class="reveal bg-cardnavy border border-slate-800/80 rounded-[2rem] p-7 shadow-xl card-lift">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-6">
+                            <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                        <h3 class="font-display font-semibold text-lg text-white mb-2">{{feature_1_title}}</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">{{feature_1_desc}}</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="reveal bg-cardnavy border border-slate-800/80 rounded-[2rem] p-7 shadow-xl card-lift">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-6">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                        <h3 class="font-display font-semibold text-lg text-white mb-2">{{feature_2_title}}</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">{{feature_2_desc}}</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="reveal bg-cardnavy border border-slate-800/80 rounded-[2rem] p-7 shadow-xl card-lift">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-6">
+                            <i data-lucide="clock" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                        <h3 class="font-display font-semibold text-lg text-white mb-2">{{feature_3_title}}</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">{{feature_3_desc}}</p>
+                    </div>
+
+                    <!-- Feature 4 (Static support representation) -->
+                    <div class="reveal bg-cardnavy border border-slate-800/80 rounded-[2rem] p-7 shadow-xl card-lift">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-6">
+                            <i data-lucide="headset" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                        <h3 class="font-display font-semibold text-lg text-white mb-2">24/7 Support</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">Round-the-clock proactive system monitoring and operations backup, always standard.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Portfolio Gallery Section -->
-    <section id="portfolio" class="py-24 bg-white border-t border-b">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-5xl font-bold mb-16 tracking-tight">Our Work</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="group relative overflow-hidden rounded-[2rem] h-64 border shadow-sm">
-                    <img src="{{gallery_img_1}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="{{gallery_label_1}}">
-                    <div class="absolute bottom-6 left-6 text-white font-bold bg-slate-900/80 px-4 py-2 rounded-full text-xs">{{gallery_label_1}}</div>
+    <!-- ==========================================
+         INDUSTRIES WE SERVE
+         ========================================== -->
+    <section id="industries" class="py-24 lg:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div class="max-w-xl space-y-4">
+                    <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">Industries</span>
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-slate-900">
+                        Solutions Tailored For <span class="text-blue-600">Every Industry</span>
+                    </h2>
                 </div>
-                <div class="group relative overflow-hidden rounded-[2rem] h-64 border shadow-sm">
-                    <img src="{{gallery_img_2}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="{{gallery_label_2}}">
-                    <div class="absolute bottom-6 left-6 text-white font-bold bg-slate-900/80 px-4 py-2 rounded-full text-xs">{{gallery_label_2}}</div>
+                <a href="#contact" class="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 transition">
+                    Explore All Industries <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <!-- Industries Grid (6 Dark overlay cards matching references) -->
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-6">
+                <!-- Ind 1 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="heart-pulse" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Healthcare</span>
                 </div>
-                <div class="group relative overflow-hidden rounded-[2rem] h-64 border shadow-sm">
-                    <img src="{{gallery_img_3}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="{{gallery_label_3}}">
-                    <div class="absolute bottom-6 left-6 text-white font-bold bg-slate-900/80 px-4 py-2 rounded-full text-xs">{{gallery_label_3}}</div>
+                <!-- Ind 2 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="landmark" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Finance</span>
                 </div>
-                <div class="group relative overflow-hidden rounded-[2rem] h-64 border shadow-sm">
-                    <img src="{{gallery_img_4}}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="{{gallery_label_4}}">
-                    <div class="absolute bottom-6 left-6 text-white font-bold bg-slate-900/80 px-4 py-2 rounded-full text-xs">{{gallery_label_4}}</div>
+                <!-- Ind 3 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="factory" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Manufacturing</span>
+                </div>
+                <!-- Ind 4 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="graduation-cap" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Education</span>
+                </div>
+                <!-- Ind 5 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="shopping-cart" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Retail</span>
+                </div>
+                <!-- Ind 6 -->
+                <div class="reveal bg-slate-950 text-white rounded-2xl p-6 border border-slate-900 flex flex-col items-center text-center justify-center aspect-[5/4] card-lift">
+                    <i data-lucide="truck" class="w-8 h-8 text-blue-500 mb-4 shrink-0"></i>
+                    <span class="font-display font-semibold text-xs tracking-wide">Logistics</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Slider Section -->
-    <section class="py-24 bg-slate-100">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-5xl font-bold mb-16 tracking-tight text-center">What Clients Say</h2>
+    <!-- ==========================================
+         PORTFOLIO SECTION
+         ========================================== -->
+    <section id="portfolio" class="py-24 lg:py-32 bg-slate-50 border-t border-b">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div class="max-w-xl space-y-4">
+                    <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">Our Portfolio</span>
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-slate-900">
+                        Work That Speaks For <span class="text-blue-600">Itself</span>
+                    </h2>
+                </div>
+                <a href="#contact" class="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 transition">
+                    View All Projects <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <!-- Grid of 4 Case studies/Gallery images -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Project 1 -->
+                <div class="reveal bg-white border border-slate-100 rounded-3xl overflow-hidden card-lift shadow-sm">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="{{gallery_img_1}}" class="w-full h-full object-cover" alt="{{gallery_label_1}}">
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] uppercase font-bold text-blue-600 tracking-wider font-display">{{category}}</span>
+                        <h3 class="font-display font-semibold text-lg text-slate-900 mt-2 mb-2">{{gallery_label_1}}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Premium quality system engineered to client benchmarks.</p>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="reveal bg-white border border-slate-100 rounded-3xl overflow-hidden card-lift shadow-sm">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="{{gallery_img_2}}" class="w-full h-full object-cover" alt="{{gallery_label_2}}">
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] uppercase font-bold text-blue-600 tracking-wider font-display">{{category}}</span>
+                        <h3 class="font-display font-semibold text-lg text-slate-900 mt-2 mb-2">{{gallery_label_2}}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">High performance operational architecture.</p>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="reveal bg-white border border-slate-100 rounded-3xl overflow-hidden card-lift shadow-sm">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="{{gallery_img_3}}" class="w-full h-full object-cover" alt="{{gallery_label_3}}">
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] uppercase font-bold text-blue-600 tracking-wider font-display">{{category}}</span>
+                        <h3 class="font-display font-semibold text-lg text-slate-900 mt-2 mb-2">{{gallery_label_3}}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Enterprise compliance and systems review.</p>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="reveal bg-white border border-slate-100 rounded-3xl overflow-hidden card-lift shadow-sm">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="{{gallery_img_4}}" class="w-full h-full object-cover" alt="{{gallery_label_4}}">
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] uppercase font-bold text-blue-600 tracking-wider font-display">{{category}}</span>
+                        <h3 class="font-display font-semibold text-lg text-slate-900 mt-2 mb-2">{{gallery_label_4}}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">Applied artificial intelligence integration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         OUR PROCESS SECTION (TIMELINE)
+         ========================================== -->
+    <section class="py-24 lg:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="max-w-xl space-y-4 mb-20">
+                <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">Our Process</span>
+                <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-slate-900">
+                    A Simple, Transparent Process That <span class="text-blue-600">Delivers</span>
+                </h2>
+            </div>
+
+            <!-- Timeline flow line -->
+            <div class="relative">
+                <div class="hidden lg:block absolute top-7 left-10 right-10 h-px bg-slate-200"></div>
+                <div class="grid lg:grid-cols-5 gap-10">
+                    <!-- Step 1 -->
+                    <div class="reveal relative flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-display font-bold text-lg mb-6 relative z-10 shadow-lg shadow-blue-600/20">01</div>
+                        <h3 class="font-display font-semibold text-xl text-slate-950 mb-2">Discover</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">We understand your business model, scale points, and core metrics.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="reveal relative flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-display font-bold text-lg mb-6 relative z-10 shadow-lg shadow-blue-600/20">02</div>
+                        <h3 class="font-display font-semibold text-xl text-slate-950 mb-2">Plan</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">We create a strategic tech stack roadmap for development.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="reveal relative flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-display font-bold text-lg mb-6 relative z-10 shadow-lg shadow-blue-600/20">03</div>
+                        <h3 class="font-display font-semibold text-xl text-slate-950 mb-2">Design</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">We architect clean solutions that engage, optimize and scale.</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="reveal relative flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-display font-bold text-lg mb-6 relative z-10 shadow-lg shadow-blue-600/20">04</div>
+                        <h3 class="font-display font-semibold text-xl text-slate-950 mb-2">Develop</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">We build with premium quality, performance, and unit-tested specs.</p>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="reveal relative flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-display font-bold text-lg mb-6 relative z-10 shadow-lg shadow-blue-600/20">05</div>
+                        <h3 class="font-display font-semibold text-xl text-slate-950 mb-2">Deliver</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">We deliver, host monitor, and stay online to back you up.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         TESTIMONIALS SECTION (DARK GRAPHIC)
+         ========================================== -->
+    <section class="py-24 lg:py-32 bg-darknavy text-white border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div class="max-w-xl space-y-4">
+                    <span class="text-xs uppercase font-display font-bold text-blue-400 tracking-wider">Testimonials</span>
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight tracking-tight text-white">
+                        What Our Clients <span class="text-blue-500">Say About Us</span>
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Injected reviews -->
             {{testimonials_slider}}
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-24 bg-slate-900 text-white">
-        <div class="max-w-3xl mx-auto px-6 text-center">
-            <h2 class="text-5xl font-bold mb-12">Let's build the future.</h2>
-            <form id="contactForm" class="grid grid-cols-1 gap-6 text-left">
-                <input type="text" id="name" placeholder="Name" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none text-white focus:ring-2 focus:ring-blue-500" required>
-                <input type="tel" id="phone" placeholder="Phone Number" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none text-white focus:ring-2 focus:ring-blue-500" required>
-                <button type="submit" class="bg-white text-slate-900 py-4 rounded-xl font-bold text-lg hover:bg-slate-200 transition">Send Message</button>
-            </form>
-            <div class="mt-12 pt-8 border-t border-slate-800 text-sm text-slate-400">
-                <p>{{address}} | {{email}} | {{phone}}</p>
+    <!-- ==========================================
+         LEAD COLLECTION FORM / INTERACTIVE BANNER
+         ========================================== -->
+    <section id="contact" class="py-20 bg-slate-50 border-t border-b">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="bg-white border rounded-[3rem] p-2 lg:p-4 shadow-2xl flex flex-col md:flex-row items-center gap-12 overflow-hidden">
+                <!-- Left Banner Image -->
+                <div class="w-full md:w-5/12 h-96 overflow-hidden rounded-[2.5rem]">
+                    <img src="{{about_image}}" class="w-full h-full object-cover" alt="Let's Work Together">
+                </div>
+
+                <!-- Right Lead Form -->
+                <div class="w-full md:w-7/12 py-8 pr-6 lg:pr-10 pl-6 md:pl-0 space-y-6">
+                    <span class="text-xs uppercase font-display font-bold text-blue-600 tracking-wider">Let's Work Together</span>
+                    <h2 class="font-display font-extrabold text-3xl lg:text-4xl text-slate-950 leading-tight">Ready To Take Your Business To The <span class="text-blue-600">Next Level</span>?</h2>
+                    <p class="text-sm text-slate-500">Let's build something great together. Get in touch with us today.</p>
+
+                    <form id="contactForm" class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div class="relative flex-1">
+                            <input type="text" id="name" placeholder="Your Name" class="w-full pl-5 pr-10 py-4 border border-slate-200 rounded-xl outline-none text-slate-900 focus:ring-2 focus:ring-blue-600" required>
+                            <i data-lucide="user" class="absolute right-4 top-4.5 w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <div class="relative flex-1">
+                            <input type="tel" id="phone" placeholder="Phone Number" class="w-full pl-5 pr-10 py-4 border border-slate-200 rounded-xl outline-none text-slate-900 focus:ring-2 focus:ring-blue-600" required>
+                            <i data-lucide="phone" class="absolute right-4 top-4.5 w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white hover:bg-blue-700 transition font-bold px-8 py-4 rounded-xl inline-flex items-center gap-2 shadow-lg shadow-blue-500/20 shrink-0">
+                            Start a Conversation <i data-lucide="arrow-right-circle" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-12 text-center text-slate-400 text-sm border-t">
-        &copy; <span id="year"></span> {{business_name}}. All rights reserved.
+    <!-- ==========================================
+         FOOTER SECTION
+         ========================================== -->
+    <footer class="bg-darknavy text-white pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10">
+            <div class="grid md:grid-cols-5 gap-12 pb-14 border-b border-slate-900">
+                <!-- Col 1 -->
+                <div class="md:col-span-2 space-y-6">
+                    <div class="flex items-center gap-3">
+                        {{logo}}
+                        <span class="font-display font-bold text-lg text-white">{{business_name}}</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed max-w-sm">We help businesses leverage technology and innovation to stay ahead of the competition and achieve sustainable growth.</p>
+                    <div class="flex items-center gap-4 pt-2">
+                        <a href="#" aria-label="Facebook" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 text-slate-400 hover:text-white transition-all"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                        <a href="#" aria-label="LinkedIn" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 text-slate-400 hover:text-white transition-all"><i data-lucide="linkedin" class="w-4 h-4"></i></a>
+                        <a href="#" aria-label="Twitter" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 text-slate-400 hover:text-white transition-all"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                        <a href="#" aria-label="Instagram" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-blue-600 text-slate-400 hover:text-white transition-all"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div>
+                    <h4 class="font-display font-bold text-sm text-white mb-6 uppercase tracking-wider">Quick Links</h4>
+                    <ul class="space-y-3.5 text-sm text-slate-400">
+                        <li><a href="#about" class="hover:text-blue-500 transition-colors">About Us</a></li>
+                        <li><a href="#services" class="hover:text-blue-500 transition-colors">Services</a></li>
+                        <li><a href="#industries" class="hover:text-blue-500 transition-colors">Industries</a></li>
+                        <li><a href="#portfolio" class="hover:text-blue-500 transition-colors">Portfolio</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3 -->
+                <div>
+                    <h4 class="font-display font-bold text-sm text-white mb-6 uppercase tracking-wider">Contact Info</h4>
+                    <ul class="space-y-3.5 text-sm text-slate-400">
+                        <li class="flex items-start gap-2.5"><i data-lucide="map-pin" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0"></i> <span>{{address}}</span></li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="phone" class="w-4 h-4 text-blue-500 shrink-0"></i> <span>{{phone}}</span></li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="mail" class="w-4 h-4 text-blue-500 shrink-0"></i> <span>{{email}}</span></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4 -->
+                <div class="space-y-6">
+                    <h4 class="font-display font-bold text-sm text-white uppercase tracking-wider">Newsletter</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Stay updated with our latest news and corporate insights.</p>
+                    <div class="relative">
+                        <input type="email" placeholder="Your email address" class="w-full pl-4 pr-12 py-3 bg-slate-900 border border-slate-800 rounded-lg outline-none text-xs text-white focus:ring-1 focus:ring-blue-600">
+                        <button class="absolute right-1 top-1 bottom-1 w-10 bg-blue-600 rounded-md flex items-center justify-center hover:bg-blue-700 transition" aria-label="Send"><i data-lucide="arrow-right" class="w-4 h-4 text-white"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom legal copyrights -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
+                <p class="text-xs text-slate-500">© <span id="year"></span> {{business_name}}. All rights reserved.</p>
+                <div class="flex gap-6 text-xs text-slate-500">
+                    <a href="#" class="hover:text-slate-400">Privacy Policy</a>
+                    <a href="#" class="hover:text-slate-400">Terms of Service</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <!-- ==========================================
+         SCRIPT INTEGRATIONS
+         ========================================== -->
     <script>
         lucide.createIcons();
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('mobile-menu-toggle');
-        const closeBtn = document.getElementById('close-btn');
+        // Sticky glass navbar
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 40) {
+                navbar.classList.add('glass');
+                navbar.classList.remove('border-transparent');
+                navbar.classList.add('border-slate-800/40');
+            } else {
+                navbar.classList.remove('glass');
+                navbar.classList.add('border-transparent');
+                navbar.classList.remove('border-slate-800/40');
+            }
+        });
+
+        // Responsive Hamburger Drawer
+        const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
         const menuIcon = document.getElementById('menu-icon');
+        let isMenuOpen = false;
 
         function toggleMenu() {
-            mobileMenu.classList.toggle('hidden');
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+                mobileMenu.style.opacity = '1';
+                menuIcon.setAttribute('data-lucide', 'x');
+            } else {
+                mobileMenu.style.maxHeight = '0px';
+                mobileMenu.style.opacity = '0';
+                menuIcon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
         }
 
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', toggleMenu);
-            if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
-            mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', toggleMenu);
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    isMenuOpen = true;
+                    toggleMenu();
+                });
+            });
         }
 
-        // WhatsApp redirect logic
+        // WhatsApp redirect action
         document.getElementById('contactForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('name').value;
