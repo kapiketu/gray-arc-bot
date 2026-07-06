@@ -1,8 +1,8 @@
 {
-  "templateId": "GA003",
-  "templateName": "Business Edge",
+  "template_id": "GA003",
+  "template_name": "Business Edge",
   "version": "1.0.0",
-  "suitableBusinessCategories": [
+  "suitable_business_categories": [
     "IT Company",
     "Software Company",
     "SaaS Company",
@@ -22,23 +22,8 @@
     "B2B Company",
     "Business Consultant",
     "Industrial Company",
-    "Technology Company"
+    "Technology Company",
+    "Digital marketing"
   ],
-  "shortDescription": "Premium single-page corporate template for IT, software, and B2B businesses. Dark navy hero with a live-status dashboard signature panel, bento-grid services, industries grid, portfolio, process timeline, testimonials, and a two-field (name + phone) contact form. Sora/Manrope/IBM Plex Mono typography, Lucide icons, built with Tailwind CSS and vanilla JS. Fully responsive with glass-effect sticky nav and scroll-reveal animations.",
-  "requiredBusinessInputs": [
-    "businessName",
-    "businessCategory",
-    "aboutBusiness",
-    "services",
-    "phoneNumber",
-    "email",
-    "businessAddress"
-  ],
-  "techStack": {
-    "markup": "HTML5",
-    "styling": "Tailwind CSS (CDN)",
-    "scripting": "Vanilla JavaScript",
-    "icons": "Lucide",
-    "fonts": ["Sora", "Manrope", "IBM Plex Mono"]
-  }
+  "short_description": "A high-end, editorial-focused corporate template featuring Bento-grid services and layered, glassmorphism-inspired UI components."
 }
