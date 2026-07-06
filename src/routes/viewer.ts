@@ -497,10 +497,10 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{logo}}': logoHtml,
     '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
     '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
-    '{{hero_image}}': imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
+    '{{hero_image}}': site.heroImage || imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
     '{{about_title}}': site.storyTitle || 'About Our Company',
     '{{about_content}}': formatParagraphs(site.storyContent || 'We operate at the intersection of traditional craftsmanship and modern technology, ensuring absolute perfection.'),
-    '{{about_image}}': imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
+    '{{about_image}}': site.aboutImage || imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
     '{{phone}}': site.phoneNumber || '',
     '{{phone_clean}}': cleanPhone,
     '{{email}}': site.contactDetails?.email || 'contact@mybusiness.com',
@@ -513,10 +513,10 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{feature_2_desc}}': site.features?.[1]?.description || 'Our certified crew executes the project utilizing high quality tools.',
     '{{feature_3_title}}': site.features?.[2]?.title || 'Walkthrough',
     '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.',
-    '{{gallery_img_1}}': imageBase.products[0] || imageBase.hero,
-    '{{gallery_img_2}}': imageBase.products[1] || imageBase.products[0] || imageBase.hero,
-    '{{gallery_img_3}}': imageBase.products[2] || imageBase.products[0] || imageBase.hero,
-    '{{gallery_img_4}}': imageBase.products[3] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_1}}': site.galleryImages?.[0] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_2}}': site.galleryImages?.[1] || imageBase.products[1] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_3}}': site.galleryImages?.[2] || imageBase.products[2] || imageBase.products[0] || imageBase.hero,
+    '{{gallery_img_4}}': site.galleryImages?.[3] || imageBase.products[3] || imageBase.products[0] || imageBase.hero,
     '{{gallery_label_1}}': site.services?.[0]?.name || site.category || 'Our Work',
     '{{gallery_label_2}}': site.services?.[1]?.name || site.category || 'Quality Service',
     '{{gallery_label_3}}': site.services?.[2]?.name || site.category || 'Premium Results',
@@ -530,7 +530,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   return html;
 }
 
-function renderServicesGrid(services: Array<{ name: string; description: string; price?: string }>, category: string, phone: string, site: SiteConfig): string {
+function renderServicesGrid(services: Array<{ name: string; description: string; price?: string; image?: string }>, category: string, phone: string, site: SiteConfig): string {
   if (services.length === 0) return '';
 
   const icons = ['zap', 'droplets', 'thermometer-sun', 'shield', 'sparkles', 'star'];
@@ -540,9 +540,12 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
     
     // Sanitize service name to avoid commas/slashes that break the AI endpoint
     const cleanName = s.name.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
-    let cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
-    if (idx === 1) {
-      cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
+    let cardImg = s.image;
+    if (!cardImg) {
+      cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+      if (idx === 1) {
+        cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
+      }
     }
     const icon = icons[idx % icons.length];
     const delay = idx * 100;
@@ -626,13 +629,13 @@ function formatParagraphs(content: string): string {
   return content.split('\n').filter(p => p.trim()).map(p => `<p class="text-gray-400 text-lg leading-relaxed">${p}</p>`).join('\n');
 }
 
-interface CategoryImages {
+export interface CategoryImages {
   hero: string;
   about: string;
   products: string[];
 }
 
-function getCategoryImages(category: string): CategoryImages {
+export function getCategoryImages(category: string): CategoryImages {
   const cat = category.toLowerCase();
   
   if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry')) {

@@ -957,7 +957,7 @@ async function handleChatFlow(input: UserInput) {
 // ────────────────────────────────────────────────────────
 
 async function buildAndPublishSite(from: string, session: Session, isCustomDomain: boolean) {
-  await sendTextMessage(from, `🛠️ *AI is now designing your website...*\nThis takes about 10-15 seconds. Please wait.`);
+  await sendTextMessage(from, `🛠️ *AI is now designing your website...*\nThis takes about 45-60 seconds to ensure a verified, flawless build. Please wait.`);
 
   try {
     const siteConfig = await generateWebsiteConfig(

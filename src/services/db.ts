@@ -35,6 +35,7 @@ export interface SiteProduct {
   name: string;
   price: string;
   description: string;
+  image?: string;
 }
 
 export interface SiteFeature {
@@ -78,11 +79,13 @@ export interface SiteConfig {
   trialEndsAt: string; // ISO date string (30 days from creation)
   customDomain: string | null;
   domainStatus: 'none' | 'pending_payment' | 'paid' | 'active';
-  // Generated Website Content (AI Copywriting)
   heroTitle: string;
   heroSubtitle: string;
   storyTitle: string;
   storyContent: string;
+  heroImage?: string;
+  aboutImage?: string;
+  galleryImages?: string[];
   // Dynamic extended sections
   features?: SiteFeature[];
   faqs?: SiteFAQ[];

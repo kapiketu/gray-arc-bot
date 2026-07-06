@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
-    "test:chat": "ts-node src/test-chat.ts"
+    "test:chat": "ts-node src/test-chat.ts",
+    "test:verification": "ts-node src/test-verification.ts"
   },
   "dependencies": {
     "@fastify/formbody": "^7.4.0",
