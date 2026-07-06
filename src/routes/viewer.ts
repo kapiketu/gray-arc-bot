@@ -538,7 +538,9 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
   services.forEach((s, idx) => {
     if (idx >= 6) return;
     
-    const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(s.name)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+    // Sanitize service name to avoid commas/slashes that break the AI endpoint
+    const cleanName = s.name.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
+    const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
     const icon = icons[idx % icons.length];
     const delay = idx * 100;
 
@@ -546,7 +548,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
       // Featured card — larger span
       gridItems += `
         <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
             <div class="absolute inset-0 p-8 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
@@ -565,7 +567,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
       // All other cards — same background image treatment
       gridItems += `
         <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
             <div class="absolute inset-0 p-6 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">
