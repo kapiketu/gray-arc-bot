@@ -36,6 +36,7 @@ export interface SiteProduct {
   price: string;
   description: string;
   image?: string;
+  icon?: string;
 }
 
 export interface SiteFeature {

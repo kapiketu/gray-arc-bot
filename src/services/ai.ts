@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import { SiteConfig, SiteProduct } from './db';
-import { getCategoryImages } from '../routes/viewer';
+import { getCategoryImages, getDefaultCategoryIcons } from '../routes/viewer';
 
 dotenv.config();
 
@@ -52,6 +52,7 @@ function getMockWebsiteContent(
   }
   
   const fallbacks = getCategoryImages(category);
+  const fallbackIcons = getDefaultCategoryIcons(category);
 
   for (const [idx, item] of rawItems.entries()) {
     if (!item) continue;
@@ -59,11 +60,13 @@ function getMockWebsiteContent(
     const name = parts[0]?.trim() || 'Service / Product';
     const price = parts.length > 1 ? parts[1]?.trim() : 'Contact Us';
     const fallbackProd = fallbacks.products[idx] || fallbacks.products[0] || fallbacks.hero;
+    const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
     services.push({
       name: name.charAt(0).toUpperCase() + name.slice(1),
       price: price || 'Contact Us',
       description: `Premium quality ${name.toLowerCase()} customized to your needs.`,
-      image: fallbackProd
+      image: fallbackProd,
+      icon: fallbackIcon
     });
   }
 
@@ -72,7 +75,8 @@ function getMockWebsiteContent(
       name: 'Standard Product',
       price: '₹499',
       description: 'Our signature offering.',
-      image: fallbacks.products[0] || fallbacks.hero
+      image: fallbacks.products[0] || fallbacks.hero,
+      icon: fallbackIcons[0]
     });
   }
 
@@ -214,7 +218,8 @@ export async function generateWebsiteConfig(
        - You MUST split them into SEPARATE individual service objects. NEVER combine multiple services into one.
        - Each service must have a professional name, a price in Rupees (e.g. "₹499" or "₹1,200"). If the user did not provide a price, set price to "Contact Us" (without any currency symbol).
        - Each service must have a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
-       - Each service must also have a specific "imagePrompt" string that is clean, descriptive, vector/photographic style, with no special characters, quotes, or slashes, suitable for generating a background image (e.g., "premium yoga studio class interior with wooden floor").
+       - Each service must have a specific "imagePrompt" string that is clean, descriptive, vector/photographic style, with no special characters, quotes, or slashes, suitable for generating a background image (e.g., "premium yoga studio class interior with wooden floor").
+       - Each service must have a valid lowercase, hyphenated "icon" name from Lucide library that relates specifically to the service (e.g. 'code', 'laptop', 'plane', 'dumbbell', 'utensils', 'scissors', 'stethoscope', 'briefcase', 'shield').
     5. WHY CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
     6. FAQs: Generate exactly 3 frequently asked questions and detailed answers (at least 35-50 words or 2-3 complete sentences per answer) providing helpful, concrete information about operating schedules, booking procedures, and locations.
     7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be at least 45-60 words (3-4 complete sentences) explaining the client's problem, how the business solved it, and their specific satisfaction.
@@ -235,7 +240,7 @@ export async function generateWebsiteConfig(
         "textColor": "hex string"
       },
       "services": [
-        { "name": "service name", "price": "price with currency", "description": "rich description paragraph of at least 45-60 words", "imagePrompt": "clean photographic prompt" }
+        { "name": "service name", "price": "price with currency", "description": "rich description paragraph of at least 45-60 words", "imagePrompt": "clean photographic prompt", "icon": "lowercase hyphenated Lucide icon name" }
       ],
       "contactDetails": {
         "phone": "phone number",
@@ -294,17 +299,19 @@ export async function generateWebsiteConfig(
     const aboutOk = await verifyImageUrl(rawAboutUrl);
     const verifiedAboutImage = aboutOk ? rawAboutUrl : (fallbacks.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80');
 
-    // Services cards images
+    const fallbackIcons = getDefaultCategoryIcons(category);
     const verifiedServices = await Promise.all(
       (generatedConfig.services || []).map(async (s: any, idx: number) => {
         const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
         const ok = await verifyImageUrl(rawUrl);
         const fallbackProd = fallbacks.products[idx] || fallbacks.products[0] || fallbacks.hero;
+        const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
         return {
           name: s.name,
           price: s.price,
           description: s.description,
-          image: ok ? rawUrl : fallbackProd
+          image: ok ? rawUrl : fallbackProd,
+          icon: s.icon || fallbackIcon
         };
       })
     );

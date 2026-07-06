@@ -49,6 +49,7 @@ async function runVerificationTest() {
       console.log(`\n[Service ${i+1}] ${s.name} (${s.price})`);
       console.log(`  - Description: "${s.description}"`);
       console.log(`  - Image:       ${s.image}`);
+      console.log(`  - Icon:        ${s.icon}`);
     });
 
   } catch (error: any) {

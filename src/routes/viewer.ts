@@ -531,10 +531,33 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   return html;
 }
 
-function renderServicesGrid(services: Array<{ name: string; description: string; price?: string; image?: string }>, category: string, phone: string, site: SiteConfig): string {
+export function getDefaultCategoryIcons(category: string): string[] {
+  const cat = category.toLowerCase();
+  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('food') || cat.includes('restaurant') || cat.includes('cafe')) {
+    return ['utensils', 'coffee', 'cake', 'cookie', 'glass-water', 'shopping-bag'];
+  }
+  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+    return ['sparkles', 'scissors', 'gem', 'flower', 'heart', 'smile'];
+  }
+  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+    return ['dumbbell', 'flame', 'trophy', 'target', 'heart', 'activity'];
+  }
+  if (cat.includes('travel') || cat.includes('tour') || cat.includes('holiday') || cat.includes('adventure') || cat.includes('trip') || cat.includes('taxi') || cat.includes('cab')) {
+    return ['compass', 'map', 'plane', 'globe', 'luggage', 'camera'];
+  }
+  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical')) {
+    return ['stethoscope', 'activity', 'heart', 'shield', 'award', 'sparkles'];
+  }
+  if (cat.includes('tech') || cat.includes('software') || cat.includes('it') || cat.includes('digital') || cat.includes('web') || cat.includes('app') || cat.includes('development') || cat.includes('coding') || cat.includes('programmer')) {
+    return ['code', 'laptop', 'smartphone', 'database', 'cpu', 'terminal'];
+  }
+  return ['zap', 'shield', 'sparkles', 'star', 'award', 'activity'];
+}
+
+function renderServicesGrid(services: Array<{ name: string; description: string; price?: string; image?: string; icon?: string }>, category: string, phone: string, site: SiteConfig): string {
   if (services.length === 0) return '';
 
-  const icons = ['zap', 'droplets', 'thermometer-sun', 'shield', 'sparkles', 'star'];
+  const defaultIcons = getDefaultCategoryIcons(category);
   let gridItems = '';
   services.forEach((s, idx) => {
     if (idx >= 6) return;
@@ -548,7 +571,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
         cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
       }
     }
-    const icon = icons[idx % icons.length];
+    const icon = s.icon || defaultIcons[idx % defaultIcons.length];
     const delay = idx * 100;
 
     if (idx === 0) {
