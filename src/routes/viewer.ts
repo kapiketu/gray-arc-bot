@@ -483,7 +483,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   }
 
   const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
-  const testimonialsHtml = renderTestimonialsSlider(site.testimonials || []);
+  const testimonialsHtml = renderTestimonialsSlider(site.testimonials || [], site);
   const logoPrompt = `minimalist professional logo icon for ${site.businessName} ${site.category || ''} business, clean vector style, transparent background, no text, single icon`;
   const logoHtml = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="${site.businessName} Logo">`;
   const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
@@ -555,6 +555,35 @@ export function getDefaultCategoryIcons(category: string): string[] {
 }
 
 function renderServicesGrid(services: Array<{ name: string; description: string; price?: string; image?: string; icon?: string }>, category: string, phone: string, site: SiteConfig): string {
+  if (site && site.template === 'GA003') {
+    const defaultIcons = getDefaultCategoryIcons(category);
+    let gridItems = '';
+    services.forEach((s, idx) => {
+      if (idx >= 6) return;
+      const icon = s.icon || defaultIcons[idx % defaultIcons.length];
+      let colSpan = 'md:col-span-2';
+      if (idx === 0 || idx === 3) colSpan = 'md:col-span-4';
+      if (idx === 4 || idx === 5) colSpan = 'md:col-span-3';
+
+      gridItems += `
+        <div class="reveal card-lift ${colSpan} rounded-2xl border border-white/10 bg-white/[0.03] p-8 lg:p-10 flex flex-col justify-between" style="transition-delay: ${idx * 100}ms;">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-white/[0.07] border border-white/10 flex items-center justify-center mb-6">
+              <i data-lucide="${icon}" class="w-6 h-6 text-indigo"></i>
+            </div>
+            <h3 class="font-display font-semibold text-xl text-white mb-3">${s.name}</h3>
+            <p class="text-fog text-sm leading-relaxed">${s.description}</p>
+          </div>
+          <div class="flex justify-between items-center mt-8 pt-4 border-t border-white/5">
+            <span class="text-indigo font-bold text-sm">${s.price || 'Contact Us'}</span>
+            <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-ink bg-white hover:bg-indigo hover:text-white px-4 py-2 rounded-full font-semibold transition-all">Enquire</a>
+          </div>
+        </div>
+      `;
+    });
+    return gridItems;
+  }
+
   if (services.length === 0) return '';
 
   const defaultIcons = getDefaultCategoryIcons(category);
@@ -618,8 +647,30 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
   return `<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">\n${gridItems}\n</div>`;
 }
 
-function renderTestimonialsSlider(testimonials: SiteTestimonial[]): string {
+function renderTestimonialsSlider(testimonials: SiteTestimonial[], site?: SiteConfig): string {
   if (testimonials.length === 0) return '';
+
+  if (site && site.template === 'GA003') {
+    let items = '';
+    testimonials.forEach((t) => {
+      const initials = (t.name || 'C').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      items += `
+        <div class="reveal bg-white border border-line rounded-2xl p-8 text-left shadow-sm">
+          <i data-lucide="quote" class="w-6 h-6 text-indigo mb-5"></i>
+          <p class="text-sm leading-relaxed text-ink/90 mb-6">"${t.content}"</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center font-display font-semibold text-indigo text-sm">${initials}</div>
+            <div>
+              <div class="font-display font-semibold text-sm text-ink">${t.name}</div>
+              <div class="text-xs text-slate">${t.role || 'Verified Client'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    return `<div class="grid md:grid-cols-3 gap-6">\n${items}\n</div>`;
+  }
+
   let items = '';
   testimonials.forEach((t) => {
     const initials = (t.name || 'C').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();

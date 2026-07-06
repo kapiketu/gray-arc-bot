@@ -1,17 +1,44 @@
 {
-  "template_id": "GA003",
-  "template_name": "Business Edge",
+  "templateId": "GA003",
+  "templateName": "Business Edge",
   "version": "1.0.0",
-  "suitable_business_categories": [
+  "suitableBusinessCategories": [
     "IT Company",
     "Software Company",
+    "SaaS Company",
     "AI Company",
-    "Startup",
     "Digital Marketing Agency",
+    "Web Development Company",
+    "Mobile App Development Company",
+    "Startup",
+    "Corporate Company",
+    "Consulting Firm",
+    "Financial Company",
+    "Chartered Accountant",
+    "Manufacturer",
+    "Factory",
+    "Import Export Company",
+    "Logistics Company",
+    "B2B Company",
     "Business Consultant",
-    "Manufacturing Company",
-    "Technology Company",
-    "Corporate Business"
+    "Industrial Company",
+    "Technology Company"
   ],
-  "short_description": "A premium corporate website template designed for modern businesses, technology companies and professional service providers."
+  "shortDescription": "Premium single-page corporate template for IT, software, and B2B businesses. Dark navy hero with a live-status dashboard signature panel, bento-grid services, industries grid, portfolio, process timeline, testimonials, and a two-field (name + phone) contact form. Sora/Manrope/IBM Plex Mono typography, Lucide icons, built with Tailwind CSS and vanilla JS. Fully responsive with glass-effect sticky nav and scroll-reveal animations.",
+  "requiredBusinessInputs": [
+    "businessName",
+    "businessCategory",
+    "aboutBusiness",
+    "services",
+    "phoneNumber",
+    "email",
+    "businessAddress"
+  ],
+  "techStack": {
+    "markup": "HTML5",
+    "styling": "Tailwind CSS (CDN)",
+    "scripting": "Vanilla JavaScript",
+    "icons": "Lucide",
+    "fonts": ["Sora", "Manrope", "IBM Plex Mono"]
+  }
 }
