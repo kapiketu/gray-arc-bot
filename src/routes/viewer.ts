@@ -355,7 +355,9 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
   fastify.get('/catalog', async (request: FastifyRequest, reply: FastifyReply) => {
     const phone = ((request.query as any).phone || '').trim();
     const nameParam = ((request.query as any).name || '').trim();
+    const botPhoneParam = ((request.query as any).botPhone || '').trim();
     const businessName = nameParam || 'Your Business';
+    const botPhone = botPhoneParam.replace(/[^\d]/g, '') || '919693186322';
 
     const fallbackScreenshots: Record<string, string> = {
       'GA001': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=600&q=80&auto=format&fit=crop',
@@ -489,7 +491,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
 
         function closeTab() {
           window.close();
-          window.location.href = 'https://wa.me/919693186322';
+          window.location.href = 'https://wa.me/${botPhone}';
         }
       </script>
     </body>

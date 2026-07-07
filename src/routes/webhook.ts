@@ -66,6 +66,7 @@ interface UserInput {
   type: 'text' | 'button_reply' | 'list_reply' | 'flow_reply';
   buttonId?: string;  // e.g. "btn_create_website"
   flowData?: any;     // Decoded form submission payload
+  recipientPhone?: string;
 }
 
 function extractUserInput(value: any): UserInput | null {
@@ -75,12 +76,15 @@ function extractUserInput(value: any): UserInput | null {
   const from = message.from;
   if (!from) return null;
 
+  const recipientPhone = value?.metadata?.display_phone_number || '';
+
   // 1. Plain text message
   if (message.type === 'text' && message.text?.body?.trim()) {
     return {
       from,
       text: message.text.body.trim(),
-      type: 'text'
+      type: 'text',
+      recipientPhone
     };
   }
 
@@ -90,7 +94,8 @@ function extractUserInput(value: any): UserInput | null {
       from,
       text: message.interactive.button_reply.title,
       type: 'button_reply',
-      buttonId: message.interactive.button_reply.id
+      buttonId: message.interactive.button_reply.id,
+      recipientPhone
     };
   }
 
@@ -100,7 +105,8 @@ function extractUserInput(value: any): UserInput | null {
       from,
       text: message.interactive.list_reply.title,
       type: 'list_reply',
-      buttonId: message.interactive.list_reply.id
+      buttonId: message.interactive.list_reply.id,
+      recipientPhone
     };
   }
 
@@ -119,7 +125,8 @@ function extractUserInput(value: any): UserInput | null {
       from,
       text: 'Flow submitted',
       type: 'flow_reply',
-      flowData
+      flowData,
+      recipientPhone
     };
   }
 
@@ -170,7 +177,8 @@ async function sendCategoryList(to: string) {
 async function sendTemplateSelector(to: string, session?: any) {
   const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
   const businessName = session?.answers?.businessName || 'Your Business';
-  const catalogUrl = `${baseUrl}/catalog?phone=${to}&name=${encodeURIComponent(businessName)}`;
+  const botPhone = session?.answers?.botPhone || '919693186322';
+  const catalogUrl = `${baseUrl}/catalog?phone=${to}&name=${encodeURIComponent(businessName)}&botPhone=${botPhone}`;
 
   await sendCTAUrlMessage(
     to,
@@ -342,6 +350,8 @@ async function handleChatFlow(input: UserInput) {
     session.answers.email = flowData.email || '';
     session.answers.phone = flowData.phone || from;
     session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${flowData.phone || from}\n📧 Email: ${flowData.email || ''}`;
+    
+    session.answers.botPhone = input.recipientPhone || '919693186322';
     
     // Transition directly to template selection!
     session.step = 'AWAITING_TEMPLATE';
