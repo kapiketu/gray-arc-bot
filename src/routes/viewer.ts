@@ -349,7 +349,49 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
     };
 
     const rendered = renderPremiumWebsite(mockSiteConfig, templateId);
-    return reply.type('text/html').send(rendered);
+    
+    let finalHtml = rendered;
+    const phoneParam = ((request.query as any).phone || '').trim();
+    if (phoneParam) {
+      const botPhoneParam = ((request.query as any).botPhone || '919693186322').trim().replace(/[^\d]/g, '');
+      const bannerHtml = `
+        <!-- Floating Apply Design Action Bar -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-zinc-950/85 backdrop-blur-md border border-zinc-800 p-4 rounded-2xl flex items-center justify-between shadow-2xl" style="font-family: system-ui, -apple-system, sans-serif;">
+          <div class="flex flex-col text-left">
+            <span class="text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Custom Preview</span>
+            <span class="text-xs font-bold text-white mt-0.5">${businessName}</span>
+          </div>
+          <button onclick="applyDesignDirectly()" class="px-5 py-2.5 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl text-xs transition shadow-lg">
+            Apply this Design
+          </button>
+        </div>
+        
+        <script>
+          async function applyDesignDirectly() {
+            try {
+              const response = await fetch('/api/select-template', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: "${phoneParam}", templateId: "${templateId}" })
+              });
+              const data = await response.json();
+              if (data.success) {
+                window.location.href = 'https://wa.me/${botPhoneParam}';
+              } else {
+                alert(data.error || 'Failed to apply design.');
+              }
+            } catch (err) {
+              console.error('Error selecting template:', err);
+              alert('A connection error occurred. Please try again.');
+            }
+          }
+        </script>
+      `;
+      // Inject before body close tag
+      finalHtml = finalHtml.replace('</body>', `${bannerHtml}</body>`);
+    }
+
+    return reply.type('text/html').send(finalHtml);
   });
 
   fastify.get('/catalog', async (request: FastifyRequest, reply: FastifyReply) => {
@@ -392,7 +434,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
             name,
             description,
             imageUrl,
-            previewUrl: `/preview/${folder}?name=${encodeURIComponent(businessName)}`
+            previewUrl: `/preview/${folder}?name=${encodeURIComponent(businessName)}&phone=${phone}&botPhone=${botPhone}`
           });
         }
       }
