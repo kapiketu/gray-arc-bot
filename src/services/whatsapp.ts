@@ -280,3 +280,69 @@ export async function sendFlowMessage(
     throw error;
   }
 }
+
+// ────────────────────────────────────────────────────────
+// 7. SEND CAROUSEL MESSAGE (horizontally scrollable cards)
+// ────────────────────────────────────────────────────────
+export interface CarouselCard {
+  title: string;
+  description: string;
+  imageUrl: string;
+  buttonId: string;
+  buttonTitle: string;
+}
+
+export async function sendCarouselMessage(
+  toPhoneNumber: string,
+  bodyText: string,
+  cards: CarouselCard[]
+): Promise<void> {
+  console.log(`[WhatsApp Outbound] Sending Carousel to ${toPhoneNumber} with ${cards.length} cards: [${cards.map(c => c.title).join(', ')}]`);
+
+  if (isMock()) {
+    console.warn('[WhatsApp Outbound] Mock mode — logging only.');
+    return;
+  }
+
+  const payload: any = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: toPhoneNumber,
+    type: 'interactive',
+    interactive: {
+      type: 'carousel',
+      body: { text: bodyText },
+      action: {
+        cards: cards.map((card, idx) => ({
+          card_index: idx,
+          type: 'reply',
+          header: {
+            type: 'image',
+            image: {
+              link: card.imageUrl
+            }
+          },
+          body: {
+            text: card.description
+          },
+          action: {
+            name: 'reply',
+            parameters: {
+              id: card.buttonId,
+              title: card.buttonTitle
+            }
+          }
+        }))
+      }
+    }
+  };
+
+  try {
+    const response = await axios.post(API_URL, payload, { headers: getHeaders() });
+    console.log('[WhatsApp Outbound] Carousel sent. ID:', response.data.messages?.[0]?.id);
+  } catch (error: any) {
+    console.error('[WhatsApp Outbound] Error sending Carousel:', error.response?.data || error.message);
+    throw new Error('Failed to send WhatsApp Carousel message');
+  }
+}
+
