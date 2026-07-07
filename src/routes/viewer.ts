@@ -230,6 +230,128 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
     `);
   });
 
+  fastify.get('/preview/:templateId', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { templateId } = request.params as { templateId: string };
+    const templatesDir = path.join(__dirname, '../../templates');
+    const templatePath = path.join(templatesDir, templateId);
+    if (!fs.existsSync(templatePath)) {
+      return reply.status(404).send(`Template ${templateId} not found.`);
+    }
+
+    const nameParam = (request.query as any).name || '';
+    const businessName = nameParam.trim() || 'Elite Business Solutions';
+    const category = 'Corporate Solutions';
+
+    const mockSiteConfig: SiteConfig = {
+      id: `preview-${templateId}`,
+      businessName: businessName,
+      category: category,
+      aboutText: 'Leading provider of innovative solutions. Experience industry-defining quality and professional excellence.',
+      phoneNumber: '+91 99999 99999',
+      aboutImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80',
+      heroImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80',
+      heroTitle: `Welcome to ${businessName}`,
+      heroSubtitle: `We design and ship high-converting solutions tailored to expand your market footprint. Driven by innovation, built to scale.`,
+      storyTitle: 'Our Story',
+      storyContent: 'Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship.',
+      billingStatus: 'active',
+      trialEndsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+      template: templateId,
+      customDomain: null,
+      domainStatus: 'none',
+      theme: {
+        bgColor: '#ffffff',
+        textColor: '#0B0E14',
+        fontFamily: 'Inter, sans-serif',
+        primaryColor: '#3b82f6',
+        secondaryColor: '#1e3a8a'
+      },
+      services: [
+        {
+          name: 'IT Strategy & Consulting',
+          description: 'Leverage our decades of domain experience to audit, plan, and guide your technological roadmaps.',
+          price: 'Contact Us',
+          image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80',
+          icon: 'briefcase'
+        },
+        {
+          name: 'Custom Software Development',
+          description: 'Enterprise-grade systems engineered with modern frameworks, built to perform and outlast its first release.',
+          price: 'Contact Us',
+          image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80',
+          icon: 'code'
+        },
+        {
+          name: 'Applied AI Integrations',
+          description: 'Integrate deep learning, LLMs, and computer vision models directly into real-world business pipelines.',
+          price: 'Contact Us',
+          image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&q=80',
+          icon: 'cpu'
+        },
+        {
+          name: 'Cloud Operations & Scaling',
+          description: 'Provisioning, monitoring, and horizontal autoscaling built for high availability and zero downtime.',
+          price: 'Contact Us',
+          image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80',
+          icon: 'cloud'
+        },
+        {
+          name: 'Compliance & Digital Transformation',
+          description: 'Technical due diligence, system migrations, and audit compliance groundwork for modern businesses.',
+          price: 'Contact Us',
+          image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80',
+          icon: 'shield'
+        }
+      ],
+      features: [
+        {
+          title: 'Premium Quality Assurance',
+          description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks.'
+        },
+        {
+          title: 'Experienced Specialists',
+          description: 'Our crew consists of highly trained, certified, and passionate professionals with years of experience.'
+        },
+        {
+          title: 'Client Centric Partnership',
+          description: 'Your goals are our priorities. We provide transparent updates and custom, flexible solutions.'
+        }
+      ],
+      testimonials: [
+        {
+          name: 'Sarah Johnson',
+          role: 'CEO, Tech Corporation',
+          content: 'They delivered exactly what was in the technical plan. No surprises, no scope creep. Professionalism was stellar.'
+        },
+        {
+          name: 'Aarav Mehta',
+          role: 'VP Engineering, Retail Group',
+          content: 'Rebuilt our core platform during our highest-traffic quarter without a single hour of downtime.'
+        },
+        {
+          name: 'David Okafor',
+          role: 'Director of IT, Healthcare',
+          content: 'Post-launch support was the real difference. They stayed embedded for three months standard.'
+        }
+      ],
+      galleryImages: [
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80'
+      ],
+      contactDetails: {
+        phone: '+91 99999 99999',
+        email: 'hello@corporate.com',
+        address: '12 Parliament St, London, UK',
+        hours: 'Monday - Saturday: 10:00 AM - 8:00 PM'
+      }
+    };
+
+    const rendered = renderPremiumWebsite(mockSiteConfig, templateId);
+    return reply.type('text/html').send(rendered);
+  });
+
   fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply) => {
     const { siteId } = request.params as { siteId: string };
     const site = await db.getSite(siteId);
