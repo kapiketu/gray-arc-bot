@@ -489,7 +489,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
 
         function closeTab() {
           window.close();
-          alert('You can now close this tab and return to WhatsApp!');
+          window.location.href = 'https://wa.me/919693186322';
         }
       </script>
     </body>
@@ -504,7 +504,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ error: 'Missing phone or templateId' });
     }
 
-    const cleanPhone = phone.replace(/[^\\d]/g, '');
+    const cleanPhone = phone.replace(/[^\d]/g, '');
     const session = await db.getSession(cleanPhone);
     if (!session || session.step !== 'AWAITING_TEMPLATE') {
       return reply.code(400).send({ error: 'No active session or not in template selection step' });
