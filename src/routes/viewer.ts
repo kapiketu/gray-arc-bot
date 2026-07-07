@@ -239,8 +239,58 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
     }
 
     const nameParam = (request.query as any).name || '';
-    const businessName = nameParam.trim() || 'Elite Business Solutions';
-    const category = 'Corporate Solutions';
+    let businessName = nameParam.trim() || 'Elite Business Solutions';
+    let category = 'Corporate Solutions';
+
+    const phoneParam = ((request.query as any).phone || '').trim().replace(/[^\d]/g, '');
+    let siteConfig: SiteConfig | null = null;
+
+    if (phoneParam) {
+      // 1. Try to load an already generated site from database
+      siteConfig = await db.getSiteByPhone(phoneParam);
+
+      // 2. If no generated site exists yet, generate one on the fly using the onboarding session details
+      if (!siteConfig) {
+        const session = await db.getSession(phoneParam);
+        if (session) {
+          try {
+            console.log(`[Preview Engine] Generating dynamic Gemini preview for phone: ${phoneParam}`);
+            const { generateWebsiteConfig } = require('../services/ai');
+            
+            businessName = session.answers.businessName || businessName;
+            category = session.answers.category || 'Professional Services';
+            
+            siteConfig = await generateWebsiteConfig(
+              session.answers.phone || phoneParam,
+              businessName,
+              category,
+              session.answers.about || 'A premium local business.',
+              session.answers.services || '',
+              session.answers.contact || ''
+            );
+
+            if (siteConfig) {
+              const { slugify } = require('../services/ai');
+              const siteId = slugify(businessName);
+              siteConfig.id = siteId;
+              siteConfig.template = templateId;
+              await db.saveSite(siteConfig);
+              console.log(`[Preview Engine] Cached site preview in DB: ${siteId}`);
+            }
+          } catch (err: any) {
+            console.error('[Preview Engine] Failed to generate dynamic AI site config:', err);
+          }
+        }
+      } else {
+        // Update template on existing site config if different
+        if (siteConfig.template !== templateId) {
+          siteConfig.template = templateId;
+          await db.saveSite(siteConfig);
+        }
+        businessName = siteConfig.businessName;
+        category = siteConfig.category;
+      }
+    }
 
     const mockSiteConfig: SiteConfig = {
       id: `preview-${templateId}`,
@@ -348,10 +398,9 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
       }
     };
 
-    const rendered = renderPremiumWebsite(mockSiteConfig, templateId);
+    const rendered = renderPremiumWebsite(siteConfig || mockSiteConfig, templateId);
     
     let finalHtml = rendered;
-    const phoneParam = ((request.query as any).phone || '').trim();
     if (phoneParam) {
       const botPhoneParam = ((request.query as any).botPhone || '919693186322').trim().replace(/[^\d]/g, '');
       const bannerHtml = `
