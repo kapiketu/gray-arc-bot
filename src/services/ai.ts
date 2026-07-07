@@ -188,9 +188,9 @@ export async function generateWebsiteConfig(
   try {
     const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
     
-    // Using gemini-1.5-flash for speed and structured outputs
+    // Using gemini-2.5-flash for speed and structured outputs
     const model = ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json'
       }
@@ -465,7 +465,7 @@ export async function modifyWebsiteConfig(
   try {
     const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json'
       }
