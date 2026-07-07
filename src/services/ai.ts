@@ -229,6 +229,7 @@ export async function generateWebsiteConfig(
          - "aboutImagePrompt": team, storefront, or workspace showcase image.
          - "galleryImagePrompts": exactly 4 distinct prompts highlighting services or products.
     9. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
+    10. STATISTICS (STATS): Generate exactly 4 stat items. Each item needs a value (e.g. "5000+" or "100%"), a short label (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
     
     Output the result EXACTLY matching this JSON structure:
     {
@@ -268,6 +269,9 @@ export async function generateWebsiteConfig(
       ],
       "testimonials": [
         { "name": "client name", "role": "client role", "content": "review testimonial paragraph of at least 45-60 words" }
+      ],
+      "stats": [
+        { "value": "value", "label": "label", "icon": "lowercase hyphenated Lucide icon name" }
       ]
     }
     `;
@@ -354,7 +358,8 @@ export async function generateWebsiteConfig(
       galleryImages: verifiedGallery,
       features: generatedConfig.features,
       faqs: generatedConfig.faqs,
-      testimonials: generatedConfig.testimonials
+      testimonials: generatedConfig.testimonials,
+      stats: generatedConfig.stats
     };
 
     // ──────────────────────────────────────────────────

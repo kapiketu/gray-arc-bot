@@ -93,6 +93,7 @@ export interface SiteConfig {
   faqs?: SiteFAQ[];
   testimonials?: SiteTestimonial[];
   template?: string;
+  stats?: Array<{ value: string; label: string; icon: string }>;
 }
 
 export const db = {

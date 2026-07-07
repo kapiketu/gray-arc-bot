@@ -894,7 +894,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
 
   const imageBase = getCategoryImages(site.category || '');
-  const stats = getCategoryStats(site.category || '');
+  const stats = (site.stats && site.stats.length === 4) ? site.stats : getCategoryStats(site.category || '');
 
   // Perform substitutions
   const replacements: Record<string, string> = {
