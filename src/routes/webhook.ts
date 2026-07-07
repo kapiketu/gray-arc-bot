@@ -236,10 +236,61 @@ async function sendTemplateSelector(to: string, session?: any) {
     });
   }
 
-  await sendCarouselMessage(
+  try {
+    await sendCarouselMessage(
+      to,
+      `Swipe through all available designs custom-branded for *${businessName}* and tap Apply Design directly inside WhatsApp!`,
+      cards
+    );
+  } catch (err: any) {
+    console.warn('[Webhook] Carousel sending failed, falling back to buttons list:', err.message);
+    await sendButtonTemplateSelector(to, session);
+  }
+}
+
+async function sendButtonTemplateSelector(to: string, session?: any) {
+  const buttons: Array<{ id: string; title: string }> = [];
+  const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
+  const businessName = session?.answers?.businessName || 'Your Business';
+  let previewText = `Almost done! Click the links below to preview each template design custom-branded for *${businessName}*:\n\n`;
+  
+  try {
+    const templatesDir = path.join(__dirname, '../../templates');
+    if (fs.existsSync(templatesDir)) {
+      const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+      for (const folder of folders) {
+        if (buttons.length >= 3) break;
+        
+        let title = folder;
+        const metaPath = path.join(templatesDir, folder, 'metadata.json');
+        if (fs.existsSync(metaPath)) {
+          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+          title = meta.template_name || meta.name || folder;
+        }
+        
+        const previewUrl = `${baseUrl}/preview/${folder}?name=${encodeURIComponent(businessName)}`;
+        previewText += `✨ *${title}*:\n🔗 ${previewUrl}\n\n`;
+
+        if (title.length > 20) title = title.substring(0, 17) + '...';
+        buttons.push({ id: `tpl_${folder}`, title });
+      }
+    }
+  } catch (err: any) {
+    console.error(`[Webhook] Failed reading templates for fallback:`, err.message);
+  }
+
+  if (buttons.length === 0) {
+    buttons.push({ id: 'tpl_GA001', title: 'Service Pro' });
+  }
+
+  previewText += `Tap a button below to apply your design and initiate the AI build!`;
+
+  await sendButtonMessage(
     to,
-    `Swipe through all available designs custom-branded for *${businessName}* and tap Apply Design directly inside WhatsApp!`,
-    cards
+    previewText,
+    buttons,
+    'Step 5 of 5',
+    'All designs are mobile-responsive'
   );
 }
 
