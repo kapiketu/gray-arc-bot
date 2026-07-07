@@ -168,129 +168,17 @@ async function sendCategoryList(to: string) {
 }
 
 async function sendTemplateSelector(to: string, session?: any) {
-  const cards: Array<{ title: string; description: string; imageUrl: string; buttonId: string; buttonTitle: string }> = [];
-  const businessName = session?.answers?.businessName || 'Your Business';
-  
-  const fallbackScreenshots: Record<string, string> = {
-    'GA001': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=600&q=80&auto=format&fit=crop',
-    'GA002': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80&auto=format&fit=crop',
-    'GA003': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop',
-  };
-
-  try {
-    const templatesDir = path.join(__dirname, '../../templates');
-    if (fs.existsSync(templatesDir)) {
-      const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
-      
-      for (const folder of folders) {
-        if (cards.length >= 10) break;
-        
-        let title = folder;
-        let description = 'Premium mobile-responsive design style.';
-        let imageUrl = fallbackScreenshots[folder] || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80&auto=format&fit=crop';
-        
-        const metaPath = path.join(templatesDir, folder, 'metadata.json');
-        if (fs.existsSync(metaPath)) {
-          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-          title = meta.template_name || meta.name || folder;
-          description = meta.short_description || meta.purpose || description;
-          if (meta.preview_image) {
-            imageUrl = meta.preview_image;
-          }
-        }
-        
-        if (description.length > 100) {
-          description = description.substring(0, 97) + '...';
-        }
-        if (title.length > 60) {
-          title = title.substring(0, 57) + '...';
-        }
-
-        cards.push({
-          title: title,
-          description: description,
-          imageUrl: imageUrl,
-          buttonId: `tpl_${folder}`,
-          buttonTitle: 'Apply Design'
-        });
-      }
-    }
-  } catch (err: any) {
-    console.error(`[Webhook] Failed reading templates for selector:`, err.message);
-  }
-
-  if (cards.length < 2) {
-    cards.push({
-      title: 'Service Pro (GA001)',
-      description: 'Sleek luxury layout with bento grid highlights.',
-      imageUrl: 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=600&q=80&auto=format&fit=crop',
-      buttonId: 'tpl_GA001',
-      buttonTitle: 'Apply Design'
-    });
-    cards.push({
-      title: 'Business Edge (GA003)',
-      description: 'Sophisticated dark navy corporate layout.',
-      imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop',
-      buttonId: 'tpl_GA003',
-      buttonTitle: 'Apply Design'
-    });
-  }
-
-  try {
-    await sendCarouselMessage(
-      to,
-      `Swipe through all available designs custom-branded for *${businessName}* and tap Apply Design directly inside WhatsApp!`,
-      cards
-    );
-  } catch (err: any) {
-    console.warn('[Webhook] Carousel sending failed, falling back to buttons list:', err.message);
-    await sendButtonTemplateSelector(to, session);
-  }
-}
-
-async function sendButtonTemplateSelector(to: string, session?: any) {
-  const buttons: Array<{ id: string; title: string }> = [];
   const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
   const businessName = session?.answers?.businessName || 'Your Business';
-  let previewText = `Almost done! Click the links below to preview each template design custom-branded for *${businessName}*:\n\n`;
-  
-  try {
-    const templatesDir = path.join(__dirname, '../../templates');
-    if (fs.existsSync(templatesDir)) {
-      const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
-      for (const folder of folders) {
-        if (buttons.length >= 3) break;
-        
-        let title = folder;
-        const metaPath = path.join(templatesDir, folder, 'metadata.json');
-        if (fs.existsSync(metaPath)) {
-          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-          title = meta.template_name || meta.name || folder;
-        }
-        
-        const previewUrl = `${baseUrl}/preview/${folder}?name=${encodeURIComponent(businessName)}`;
-        previewText += `✨ *${title}*:\n🔗 ${previewUrl}\n\n`;
+  const catalogUrl = `${baseUrl}/catalog?phone=${to}&name=${encodeURIComponent(businessName)}`;
 
-        if (title.length > 20) title = title.substring(0, 17) + '...';
-        buttons.push({ id: `tpl_${folder}`, title });
-      }
-    }
-  } catch (err: any) {
-    console.error(`[Webhook] Failed reading templates for fallback:`, err.message);
-  }
-
-  if (buttons.length === 0) {
-    buttons.push({ id: 'tpl_GA001', title: 'Service Pro' });
-  }
-
-  previewText += `Tap a button below to apply your design and initiate the AI build!`;
-
-  await sendButtonMessage(
+  await sendCTAUrlMessage(
     to,
-    previewText,
-    buttons,
-    'Step 5 of 5',
-    'All designs are mobile-responsive'
+    `Almost done! Tap the button below to browse our template catalog, custom-branded for *${businessName}*. Select your favorite design to initiate the AI build:`,
+    'Browse Designs',
+    catalogUrl,
+    'Choose Website Design',
+    'Catalog includes 10+ layouts'
   );
 }
 

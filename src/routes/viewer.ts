@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { db, SiteConfig, SiteTestimonial } from '../services/db';
 import { processPaymentWebhook } from '../services/billing';
 import { purchaseDomain, setupDomainDNS } from '../services/domains';
-import { sendCTAUrlMessage, sendTextMessage } from '../services/whatsapp';
+import { sendCTAUrlMessage, sendTextMessage, sendButtonMessage } from '../services/whatsapp';
 import fs from 'fs';
 import path from 'path';
 
@@ -350,6 +350,196 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
 
     const rendered = renderPremiumWebsite(mockSiteConfig, templateId);
     return reply.type('text/html').send(rendered);
+  });
+
+  fastify.get('/catalog', async (request: FastifyRequest, reply: FastifyReply) => {
+    const phone = ((request.query as any).phone || '').trim();
+    const nameParam = ((request.query as any).name || '').trim();
+    const businessName = nameParam || 'Your Business';
+
+    const fallbackScreenshots: Record<string, string> = {
+      'GA001': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=600&q=80&auto=format&fit=crop',
+      'GA002': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80&auto=format&fit=crop',
+      'GA003': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop',
+    };
+
+    const templates: Array<{ id: string; name: string; description: string; imageUrl: string; previewUrl: string }> = [];
+    const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
+
+    try {
+      const templatesDir = path.join(__dirname, '../../templates');
+      if (fs.existsSync(templatesDir)) {
+        const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
+        for (const folder of folders) {
+          let name = folder;
+          let description = 'Premium mobile-responsive template layout.';
+          let imageUrl = fallbackScreenshots[folder] || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80&auto=format&fit=crop';
+
+          const metaPath = path.join(templatesDir, folder, 'metadata.json');
+          if (fs.existsSync(metaPath)) {
+            const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+            name = meta.template_name || meta.name || folder;
+            description = meta.short_description || meta.purpose || description;
+            if (meta.preview_image) {
+              imageUrl = meta.preview_image;
+            }
+          }
+
+          templates.push({
+            id: folder,
+            name,
+            description,
+            imageUrl,
+            previewUrl: `/preview/${folder}?name=${encodeURIComponent(businessName)}`
+          });
+        }
+      }
+    } catch (err: any) {
+      console.error('[Catalog] Error reading templates:', err);
+    }
+
+    const html = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Select Your Design Style</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+      <style>body { font-family: 'Outfit', sans-serif; }</style>
+    </head>
+    <body class="bg-zinc-950 text-white min-h-screen py-12 px-6">
+      <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-16">
+          <span class="text-xs uppercase tracking-widest text-indigo-400 font-bold bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20">Template Catalog</span>
+          <h1 class="text-4xl font-extrabold mt-6 mb-4 bg-gradient-to-r from-white via-zinc-200 to-zinc-400 text-transparent bg-clip-text">Choose a Design Layout</h1>
+          <p class="text-zinc-400 text-base max-w-lg mx-auto">
+            Select a design to apply to <span class="text-white font-semibold">${businessName}</span>. Your AI assistant will write custom copy and verify images immediately.
+          </p>
+        </header>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${templates.map(tpl => `
+            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-zinc-700 transition duration-300 flex flex-col group">
+              <div class="relative overflow-hidden aspect-video">
+                <img src="${tpl.imageUrl}" alt="${tpl.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+              </div>
+              
+              <div class="p-6 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">${tpl.name}</h3>
+                  <p class="text-zinc-400 text-sm leading-relaxed mb-6">${tpl.description}</p>
+                </div>
+                
+                <div class="space-y-3">
+                  <a href="${tpl.previewUrl}" target="_blank" class="block w-full text-center py-3 bg-zinc-800 hover:bg-zinc-700/80 text-zinc-200 font-semibold rounded-xl text-sm transition">
+                    View Live Preview
+                  </a>
+                  <button onclick="applyTemplate('${tpl.id}')" class="block w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl text-sm transition shadow-lg">
+                    Apply this Design
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Success Screen Modal -->
+      <div id="success-modal" class="fixed inset-0 bg-zinc-950/90 flex items-center justify-center hidden z-50 p-6">
+        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl max-w-sm text-center shadow-2xl">
+          <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">✓</div>
+          <h2 class="text-2xl font-bold mb-3">Design Applied!</h2>
+          <p class="text-zinc-400 text-sm mb-8 leading-relaxed">
+            Layout successfully selected. Please return to your WhatsApp chat to complete your hosting configuration.
+          </p>
+          <button onclick="closeTab()" class="px-8 py-3 bg-white text-zinc-950 font-bold rounded-xl text-sm hover:bg-zinc-200 transition w-full">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <script>
+        const phone = '${phone}';
+
+        async function applyTemplate(templateId) {
+          if (!phone) {
+            alert('Phone number missing in URL context. Please access this page from the link sent to your WhatsApp.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/select-template', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ phone, templateId })
+            });
+            const data = await response.json();
+            if (data.success) {
+              document.getElementById('success-modal').classList.remove('hidden');
+            } else {
+              alert(data.error || 'Failed to apply design.');
+            }
+          } catch (err) {
+            console.error('Error selecting template:', err);
+            alert('A connection error occurred. Please try again.');
+          }
+        }
+
+        function closeTab() {
+          window.close();
+          alert('You can now close this tab and return to WhatsApp!');
+        }
+      </script>
+    </body>
+    </html>`;
+
+    return reply.type('text/html').send(html);
+  });
+
+  fastify.post('/api/select-template', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { phone, templateId } = request.body as { phone: string; templateId: string };
+    if (!phone || !templateId) {
+      return reply.code(400).send({ error: 'Missing phone or templateId' });
+    }
+
+    const cleanPhone = phone.replace(/[^\\d]/g, '');
+    const session = await db.getSession(cleanPhone);
+    if (!session || session.step !== 'AWAITING_TEMPLATE') {
+      return reply.code(400).send({ error: 'No active session or not in template selection step' });
+    }
+
+    let selectedTemplateName = templateId;
+    try {
+      const templatesDir = path.join(__dirname, '../../templates');
+      const metaPath = path.join(templatesDir, templateId, 'metadata.json');
+      if (fs.existsSync(metaPath)) {
+        const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+        selectedTemplateName = meta.template_name || meta.name || templateId;
+      }
+    } catch (e) {
+      console.warn(`[API] Failed to read template metadata:`, e);
+    }
+
+    session.answers.template = templateId;
+    session.step = 'AWAITING_DOMAIN_CHOICE';
+    session.lastActive = new Date().toISOString();
+    await db.saveSession(session);
+
+    await sendButtonMessage(
+      cleanPhone,
+      `Design selected: *${selectedTemplateName}* ✅\\n\\nHow would you like to host your website?`,
+      [
+        { id: 'host_buy_custom', title: 'Buy New Domain' },
+        { id: 'host_point_custom', title: 'Connect My Domain' },
+        { id: 'host_free', title: 'Free Subdomain' }
+      ],
+      'Hosting Option',
+      'Buy new domain: ₹500 one-time'
+    );
+
+    return reply.send({ success: true });
   });
 
   fastify.get('/site/:siteId', async (request: FastifyRequest, reply: FastifyReply) => {
