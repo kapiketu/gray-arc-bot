@@ -894,6 +894,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
 
   const imageBase = getCategoryImages(site.category || '');
+  const stats = getCategoryStats(site.category || '');
 
   // Perform substitutions
   const replacements: Record<string, string> = {
@@ -926,7 +927,19 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{gallery_label_1}}': site.services?.[0]?.name || site.category || 'Our Work',
     '{{gallery_label_2}}': site.services?.[1]?.name || site.category || 'Quality Service',
     '{{gallery_label_3}}': site.services?.[2]?.name || site.category || 'Premium Results',
-    '{{gallery_label_4}}': site.services?.[3]?.name || site.category || 'Expert Craft'
+    '{{gallery_label_4}}': site.services?.[3]?.name || site.category || 'Expert Craft',
+    '{{stat_1_icon}}': stats[0].icon,
+    '{{stat_1_value}}': stats[0].value,
+    '{{stat_1_label}}': stats[0].label,
+    '{{stat_2_icon}}': stats[1].icon,
+    '{{stat_2_value}}': stats[1].value,
+    '{{stat_2_label}}': stats[1].label,
+    '{{stat_3_icon}}': stats[2].icon,
+    '{{stat_3_value}}': stats[2].value,
+    '{{stat_3_label}}': stats[2].label,
+    '{{stat_4_icon}}': stats[3].icon,
+    '{{stat_4_value}}': stats[3].value,
+    '{{stat_4_label}}': stats[3].label
   };
 
   for (const [key, value] of Object.entries(replacements)) {
@@ -1360,4 +1373,62 @@ function renderPaymentPage(type: string, siteId: string, domain?: string, paymen
         <p class="text-center text-xs text-zinc-600 mt-6">🔒 Secured by Razorpay</p>
       </div>
     </body></html>`;
+}
+
+interface CategoryStats {
+  icon: string;
+  value: string;
+  label: string;
+}
+
+export function getCategoryStats(category: string): CategoryStats[] {
+  const cat = category.toLowerCase();
+  
+  if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('restaurant') || cat.includes('food') || cat.includes('cafe') || cat.includes('kitchen') || cat.includes('coffee') || cat.includes('biryani')) {
+    return [
+      { icon: 'heart', value: '5000+', label: 'Happy Foodies' },
+      { icon: 'flame', value: '15+', label: 'Secret Spices' },
+      { icon: 'leaf', value: '100%', label: 'Fresh & Clean' },
+      { icon: 'star', value: '4.9★', label: 'Top Rated' }
+    ];
+  }
+  if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+    return [
+      { icon: 'scissors', value: '8+', label: 'Expert Stylists' },
+      { icon: 'sparkles', value: '1200+', label: 'Makeovers Done' },
+      { icon: 'shield-check', value: '100%', label: 'Organic Products' },
+      { icon: 'smile', value: '4.8★', label: 'Client Reviews' }
+    ];
+  }
+  if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+    return [
+      { icon: 'users', value: '12+', label: 'Expert Trainers' },
+      { icon: 'dumbbell', value: '30+', label: 'Modern Workouts' },
+      { icon: 'award', value: '500+', label: 'Active Members' },
+      { icon: 'flame', value: '99%', label: 'Goal Success' }
+    ];
+  }
+  if (cat.includes('travel') || cat.includes('tour') || cat.includes('holiday') || cat.includes('adventure') || cat.includes('trip') || cat.includes('taxi') || cat.includes('cab')) {
+    return [
+      { icon: 'compass', value: '50+', label: 'Guided Packages' },
+      { icon: 'globe', value: '2000+', label: 'Happy Travelers' },
+      { icon: 'shield-check', value: '100%', label: 'Safe Journeys' },
+      { icon: 'star', value: '4.9★', label: 'Travel Rating' }
+    ];
+  }
+  if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical')) {
+    return [
+      { icon: 'stethoscope', value: '15+', label: 'Years of Care' },
+      { icon: 'users', value: '10k+', label: 'Patients Healed' },
+      { icon: 'shield-check', value: '100%', label: 'Certified Clinic' },
+      { icon: 'activity', value: '24/7', label: 'Emergency Support' }
+    ];
+  }
+  
+  return [
+    { icon: 'rocket', value: '10+', label: 'Years of Experience' },
+    { icon: 'shield-check', value: '350+', label: 'Projects Completed' },
+    { icon: 'users', value: '200+', label: 'Expert Professionals' },
+    { icon: 'award', value: '98%', label: 'Client Satisfaction' }
+  ];
 }
