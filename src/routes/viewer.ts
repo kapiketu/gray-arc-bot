@@ -7,6 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { compileDynamicLayout } from '../services/templateEngine';
 import { generateThemePalette } from '../services/colorEngine';
+import { exportToReact, exportToNextJS } from '../services/publishingEngine';
+import { injectAOSAnimations } from '../services/animationEngine';
 
 export default async function viewerRoutes(fastify: FastifyInstance) {
   
@@ -659,6 +661,38 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
     return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
   });
 
+  // 1b. Export generated websites to React source code
+  fastify.get('/site/:siteId/export/react', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { siteId } = request.params as { siteId: string };
+    const site = await db.getSite(siteId);
+    
+    if (!site) {
+      return reply.code(404).send({ error: 'Site not found' });
+    }
+
+    const { template } = request.query as { template?: string };
+    const code = exportToReact(site, template || site.template);
+    
+    reply.header('Content-Disposition', `attachment; filename="${site.id}-component.jsx"`);
+    return reply.type('text/plain').send(code);
+  });
+
+  // 1c. Export generated websites to Next.js source code
+  fastify.get('/site/:siteId/export/nextjs', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { siteId } = request.params as { siteId: string };
+    const site = await db.getSite(siteId);
+    
+    if (!site) {
+      return reply.code(404).send({ error: 'Site not found' });
+    }
+
+    const { template } = request.query as { template?: string };
+    const code = exportToNextJS(site, template || site.template);
+    
+    reply.header('Content-Disposition', `attachment; filename="${site.id}-page.tsx"`);
+    return reply.type('text/plain').send(code);
+  });
+
   // 2. Mock Razorpay Domain Payment Page
   fastify.get('/pay/domain', async (request: FastifyRequest, reply: FastifyReply) => {
     const { siteId, domain, paymentId, price } = request.query as { siteId: string; domain: string; paymentId: string; price?: string };
@@ -978,6 +1012,22 @@ export function renderPremiumWebsite(site: SiteConfig, templateId?: string): str
   for (const [key, value] of Object.entries(replacements)) {
     html = html.split(key).join(value);
   }
+
+  // Apply animation engine rules
+  html = injectAOSAnimations(html, 'dynamic');
+
+  // Inject analytics tracker pixel
+  const analyticsSnippet = `
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MOCK-TAG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MOCK-TAG');
+  </script>
+  `;
+  html = html.replace('</head>', `${analyticsSnippet}\n</head>`);
 
   // ────────────────────────────────────────────────────────
   // STAGE 12: AUTOMATED QA GATE & AUTO-HEALING
