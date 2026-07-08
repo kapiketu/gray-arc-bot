@@ -1,0 +1,45 @@
+{
+  "template_id": "GA004",
+  "components": {
+    "hero": {
+      "required_fields": ["heroTitle", "heroSubtitle", "heroImage"],
+      "word_limits": {
+        "heroSubtitle": { "min": 15, "max": 30 }
+      }
+    },
+    "about": {
+      "required_fields": ["storyTitle", "storyContent", "aboutImage"],
+      "word_limits": {
+        "storyContent": { "min": 60, "max": 90 }
+      }
+    },
+    "services": {
+      "required_fields": ["name", "description", "price", "image", "icon"],
+      "word_limits": {
+        "description": { "min": 15, "max": 25 }
+      },
+      "max_items": 6
+    },
+    "features": {
+      "required_fields": ["title", "description"],
+      "word_limits": {
+        "description": { "min": 20, "max": 35 }
+      },
+      "exact_items": 3
+    },
+    "faqs": {
+      "required_fields": ["question", "answer"],
+      "word_limits": {
+        "answer": { "min": 25, "max": 40 }
+      },
+      "exact_items": 3
+    },
+    "testimonials": {
+      "required_fields": ["name", "role", "content"],
+      "word_limits": {
+        "content": { "min": 25, "max": 40 }
+      },
+      "exact_items": 3
+    }
+  }
+}

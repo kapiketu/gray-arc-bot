@@ -1,0 +1,34 @@
+{
+  "design_system": {
+    "color_tokens": {
+      "primary": "var(--primary-color, #3b82f6)",
+      "secondary": "var(--secondary-color, #1d4ed8)",
+      "background": "var(--bg-color, #030712)",
+      "text": "var(--text-color, #f3f4f6)",
+      "glass_border": "rgba(255, 255, 255, 0.05)"
+    },
+    "typography": {
+      "headings": "var(--font-family, Outfit), sans-serif",
+      "body": "var(--font-family, Inter), sans-serif",
+      "scale": {
+        "h1": "text-4xl sm:text-5xl lg:text-6xl",
+        "h2": "text-3xl sm:text-4xl",
+        "body": "text-sm sm:text-base"
+      }
+    },
+    "spacing": {
+      "section_padding": "py-24 px-6",
+      "container_width": "max-w-7xl mx-auto"
+    },
+    "border_radius": {
+      "cards": "rounded-[2rem]",
+      "images": "rounded-3xl"
+    },
+    "animations": {
+      "library": "AOS",
+      "default_duration": 800,
+      "effect_cards": "fade-up",
+      "effect_headers": "zoom-in"
+    }
+  }
+}

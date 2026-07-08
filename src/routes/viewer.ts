@@ -849,7 +849,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
 // PREMIUM WEBSITE TEMPLATE ENGINE (DYNAMIC LOADER)
 // ────────────────────────────────────────────────────────
 
-function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
+export function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   const templatesDir = path.join(__dirname, '../../templates');
   let finalId = templateId || 'GA001';
 
@@ -923,6 +923,7 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{bg_color}}': site.theme?.bgColor || '#030712',
     '{{text_color}}': site.theme?.textColor || '#f3f4f6',
     '{{font_family}}': site.theme?.fontFamily || 'Outfit, sans-serif',
+    '{{hours}}': site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM',
     '{{logo}}': logoHtml,
     '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
     '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
@@ -1501,7 +1502,7 @@ const VALID_LUCIDE_ICONS = new Set([
   'cloud', 'activity', 'chef-hat', 'smile-plus', 'store', 'phone', 'mail',
   'map-pin', 'clock', 'check-circle-2', 'check', 'arrow-right', 'instagram',
   'facebook', 'twitter', 'youtube', 'linkedin', 'chevron-right', 'chevron-left',
-  'quote'
+  'quote', 'message-circle', 'chevron-down', 'shield-check'
 ]);
 
 export function validateLucideIcon(icon: string, fallback: string): string {
