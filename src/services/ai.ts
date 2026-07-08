@@ -178,11 +178,18 @@ export async function generateWebsiteConfig(
   servicesRaw: string,
   contactRaw: string
 ): Promise<SiteConfig> {
-  console.log(`[AI Engine] Generating site config for "${businessName}" (${category})`);
+  // 1. Data Normalization: Clean formatting, capitalize and trim duplicate spaces
+  const cleanName = (businessName || '').trim().replace(/\s+/g, ' ');
+  const cleanCategory = (category || '').trim().replace(/\s+/g, ' ');
+  const cleanAbout = (about || '').trim().replace(/\s+/g, ' ');
+  const cleanServices = (servicesRaw || '').trim().split(/[,\n]+/).map(s => s.trim()).filter(Boolean).join(', ');
+  const cleanContact = (contactRaw || '').trim().replace(/\s+/g, ' ');
+
+  console.log(`[AI Engine] Generating site config for normalized "${cleanName}" (${cleanCategory})`);
 
   if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('YOUR_GEMINI')) {
     console.warn('[AI Engine] Gemini API Key is missing. Using local Mock generator.');
-    return getMockWebsiteContent(phoneNumber, businessName, category, about, servicesRaw, contactRaw);
+    return getMockWebsiteContent(phoneNumber, cleanName, cleanCategory, cleanAbout, cleanServices, cleanContact);
   }
 
   try {
@@ -203,11 +210,11 @@ export async function generateWebsiteConfig(
     You are an expert copywriter and premium website landing page architect. Generate a complete, highly professional, and informative website configuration based on the user's inputs.
     
     USER INPUTS:
-    - Business Name: ${businessName}
-    - Business Category: ${category}
-    - Business Description: ${about}
-    - Services/Products (raw input): ${servicesRaw}
-    - Contact Details / Address (raw input): ${contactRaw}
+    - Business Name: ${cleanName}
+    - Business Category: ${cleanCategory}
+    - Business Description: ${cleanAbout}
+    - Services/Products (raw input): ${cleanServices}
+    - Contact Details / Address (raw input): ${cleanContact}
     
     CRITICAL COPYWRITING DIRECTIVES FOR LENGTH AND DEPTH (VERY IMPORTANT):
     1. CONCISE MARKETING COPY: Even if the user provided sparse input, expand it into professional, engaging marketing copy. However, you MUST follow the strict word counts specified below to ensure text fits within the styled template sections without overflowing or overlapping.
@@ -230,6 +237,9 @@ export async function generateWebsiteConfig(
          - "galleryImagePrompts": exactly 4 distinct prompts highlighting services or products.
     9. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
     10. STATISTICS (STATS): Generate exactly 4 stat items. Value must be short (e.g. "5000+" or "100%"), label must be a short phrase of 1-2 words (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
+    11. TYPOS AND GRAMMAR CORRECTION: Correct all spelling mistakes, grammatical issues, and lowercase names in user inputs (e.g. correct 'chickn' to 'chicken', 'jodhour' to 'Jodhpur', and capitalize business names) across all generated titles, descriptions, and feature blocks.
+    12. BRAND STRATEGY: Define a brand style strategy. Generate 'styleKeywords' (3-4 comma-separated visual style keywords like rustic, elegant, modern) and 'colorAesthetic' (image color scheme description matching theme colors like warm golden, clean neon green).
+    13. LOCAL SEO SCHEMA: Determine the correct 'businessType' (e.g., Restaurant, HairSalon, Gym, Dentist, LocalBusiness) and 'priceRange' (e.g., ₹₹).
     
     Output the result EXACTLY matching this JSON structure:
     {
@@ -241,7 +251,7 @@ export async function generateWebsiteConfig(
         "textColor": "hex string"
       },
       "services": [
-        { "name": "service name", "price": "price with currency", "description": "rich description paragraph of at least 45-60 words", "imagePrompt": "clean photographic prompt", "icon": "lowercase hyphenated Lucide icon name" }
+        { "name": "service name", "price": "price with currency", "description": "concise description paragraph of exactly 15-20 words", "imagePrompt": "clean photographic prompt", "icon": "lowercase hyphenated Lucide icon name" }
       ],
       "contactDetails": {
         "phone": "phone number",
@@ -250,9 +260,9 @@ export async function generateWebsiteConfig(
         "hours": "business hours"
       },
       "heroTitle": "highly engaging main headline",
-      "heroSubtitle": "sub-headline of at least 35-50 words",
+      "heroSubtitle": "sub-headline of exactly 15-25 words",
       "storyTitle": "engaging subtitle for our story section",
-      "storyContent": "richly expanded story narrative of at least 150-200 words",
+      "storyContent": "compelling story narrative of exactly 60-80 words",
       "heroImagePrompt": "clean photographic prompt",
       "aboutImagePrompt": "clean photographic prompt",
       "galleryImagePrompts": [
@@ -262,17 +272,25 @@ export async function generateWebsiteConfig(
         "prompt 4"
       ],
       "features": [
-        { "title": "feature title", "description": "feature description paragraph of at least 35-50 words" }
+        { "title": "feature title", "description": "feature description paragraph of exactly 20-30 words" }
       ],
       "faqs": [
-        { "question": "faq question", "answer": "faq answer of at least 35-50 words" }
+        { "question": "faq question", "answer": "faq answer of exactly 25-35 words" }
       ],
       "testimonials": [
-        { "name": "client name", "role": "client role", "content": "review testimonial paragraph of at least 45-60 words" }
+        { "name": "client name", "role": "client role", "content": "testimonial paragraph of exactly 25-35 words" }
       ],
       "stats": [
         { "value": "value", "label": "label", "icon": "lowercase hyphenated Lucide icon name" }
-      ]
+      ],
+      "brandPersonality": {
+        "styleKeywords": "comma-separated design style keywords (e.g. elegant, modern, rustic)",
+        "colorAesthetic": "descriptive image color tone matching theme colors (e.g. warm golden, cool neon blue)"
+      },
+      "schemaOrg": {
+        "businessType": "LocalBusiness, Restaurant, HairSalon, Gym, Dentist, etc.",
+        "priceRange": "price tier (e.g. ₹₹)"
+      }
     }
     `;
 
@@ -290,7 +308,15 @@ export async function generateWebsiteConfig(
     console.log('[AI Engine] Auditing generated image prompts...');
     const buildImgUrl = (promptStr: string, width = 1200, height = 800) => {
       const clean = promptStr.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
-      return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(category)}%20business?width=${width}&height=${height}&nologo=true`;
+      const style = (generatedConfig.brandPersonality?.styleKeywords || '').trim();
+      const color = (generatedConfig.brandPersonality?.colorAesthetic || '').trim();
+      const modifiers = [
+        style ? `styled in ${style} design style` : '',
+        color ? `matching a ${color} color scheme` : ''
+      ].filter(Boolean).join(', ');
+      
+      const suffix = modifiers ? ` - ${modifiers}` : '';
+      return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(cleanCategory)}%20business${encodeURIComponent(suffix)}?width=${width}&height=${height}&nologo=true`;
     };
 
     // Hero image
@@ -349,7 +375,9 @@ export async function generateWebsiteConfig(
       features: generatedConfig.features,
       faqs: generatedConfig.faqs,
       testimonials: generatedConfig.testimonials,
-      stats: generatedConfig.stats
+      stats: generatedConfig.stats,
+      brandPersonality: generatedConfig.brandPersonality,
+      schemaOrg: generatedConfig.schemaOrg
     };
 
     // ──────────────────────────────────────────────────

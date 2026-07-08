@@ -94,6 +94,14 @@ export interface SiteConfig {
   testimonials?: SiteTestimonial[];
   template?: string;
   stats?: Array<{ value: string; label: string; icon: string }>;
+  brandPersonality?: {
+    styleKeywords?: string;
+    colorAesthetic?: string;
+  };
+  schemaOrg?: {
+    businessType?: string;
+    priceRange?: string;
+  };
 }
 
 export const db = {
