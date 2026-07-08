@@ -656,9 +656,26 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
     }
 
     const { template } = request.query as { template?: string };
-    
     reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
+  });
+
+  // Temporary Diagnostic Route to test Gemini API Key directly on the server
+  fastify.get('/test-gemini-key', async (request: FastifyRequest, reply: FastifyReply) => {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      return { success: false, error: 'GEMINI_API_KEY is not defined in process.env!' };
+    }
+    try {
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const ai = new GoogleGenerativeAI(key);
+      const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const res = await model.generateContent("Respond with 'OK'");
+      const text = res.response.text();
+      return { success: true, keySnippet: key.substring(0, 8) + '...', response: text.trim() };
+    } catch (err: any) {
+      return { success: false, keySnippet: key.substring(0, 8) + '...', error: err.message };
+    }
   });
 
   // 1b. Export generated websites to React source code
