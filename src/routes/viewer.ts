@@ -979,6 +979,17 @@ export function renderPremiumWebsite(site: SiteConfig, templateId?: string): str
     html = html.split(key).join(value);
   }
 
+  // ────────────────────────────────────────────────────────
+  // STAGE 12: AUTOMATED QA GATE & AUTO-HEALING
+  // ────────────────────────────────────────────────────────
+  const unresolvedPlaceholders = html.match(/\{\{[a-zA-Z0-9_-]+\}\}/g) || [];
+  if (unresolvedPlaceholders.length > 0) {
+    console.warn(`[Live QA Gate] Auto-healing unresolved placeholders: ${Array.from(new Set(unresolvedPlaceholders)).join(', ')}`);
+    unresolvedPlaceholders.forEach(placeholder => {
+      html = html.split(placeholder).join('');
+    });
+  }
+
   return html;
 }
 

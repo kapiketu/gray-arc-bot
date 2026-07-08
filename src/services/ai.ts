@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import { SiteConfig, SiteProduct } from './db';
 import { getCategoryImages, getDefaultCategoryIcons } from '../routes/viewer';
+import { sanitizeSiteConfig } from './contentSanitizer';
 
 dotenv.config();
 
@@ -449,7 +450,8 @@ export async function generateWebsiteConfig(
       console.log('[AI Engine] Critic AI successfully approved the configuration!');
     }
 
-    return siteConfig;
+    const sanitized = sanitizeSiteConfig(siteConfig, category);
+    return sanitized;
 
   } catch (error: any) {
     console.error('[AI Engine] Error generating config with Gemini:', error.message);
