@@ -238,12 +238,14 @@ export async function generateWebsiteConfig(
          - "galleryImagePrompts": exactly 4 distinct prompts highlighting services or products.
     9. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
     10. STATISTICS (STATS): Generate exactly 4 stat items. Value must be short (e.g. "5000+" or "100%"), label must be a short phrase of 1-2 words (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
-    11. TYPOS AND GRAMMAR CORRECTION: Correct all spelling mistakes, grammatical issues, and lowercase names in user inputs (e.g. correct 'chickn' to 'chicken', 'jodhour' to 'Jodhpur', and capitalize business names) across all generated titles, descriptions, and feature blocks.
+    11. TYPOS AND GRAMMAR CORRECTION: Correct all spelling mistakes, grammatical issues, and lowercase names in user inputs (e.g. correct 'chickn' to 'chicken', 'dehraudn' to 'Dehradun', 'bakrs' to 'Bakers', 'jodhour' to 'Jodhpur', and capitalize business names) across all generated titles, descriptions, feature blocks, and fields. Typo correction is mandatory.
     12. BRAND STRATEGY: Define a brand style strategy. Generate 'styleKeywords' (3-4 comma-separated visual style keywords like rustic, elegant, modern) and 'colorAesthetic' (image color scheme description matching theme colors like warm golden, clean neon green).
     13. LOCAL SEO SCHEMA: Determine the correct 'businessType' (e.g., Restaurant, HairSalon, Gym, Dentist, LocalBusiness) and 'priceRange' (e.g., ₹₹).
     
     Output the result EXACTLY matching this JSON structure:
     {
+      "businessName": "corrected and properly capitalized business name (e.g. Badoal Bakers)",
+      "category": "corrected and properly capitalized business category (e.g. Bakery)",
       "theme": {
         "primaryColor": "hex string",
         "secondaryColor": "hex string",
@@ -356,9 +358,9 @@ export async function generateWebsiteConfig(
     const siteConfig: SiteConfig = {
       id: slug,
       phoneNumber,
-      businessName,
-      category,
-      aboutText: about,
+      businessName: (generatedConfig.businessName || cleanName).trim(),
+      category: (generatedConfig.category || cleanCategory).trim(),
+      aboutText: cleanAbout,
       theme: generatedConfig.theme,
       services: verifiedServices,
       contactDetails: generatedConfig.contactDetails,

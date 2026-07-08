@@ -58,7 +58,27 @@ export function sanitizeIcon(icon: string | undefined, category: string): string
 }
 
 export function sanitizeSiteConfig(config: SiteConfig, category: string): SiteConfig {
-  console.log(`[Sanitizer] Enforcing Stage 5 word limits and icon checks...`);
+  console.log(`[Sanitizer] Enforcing Stage 5 word limits, contact overrides, and icon checks...`);
+
+  // 0. Clean and override contact details
+  if (config.contactDetails && config.contactDetails.address) {
+    const rawAddr = config.contactDetails.address;
+    if (rawAddr.includes('📍 Address:') || rawAddr.includes('📞 Phone:') || rawAddr.includes('📧 Email:')) {
+      const addressMatch = rawAddr.match(/📍 Address:\s*(.*?)(?=\n📞|$)/i);
+      const phoneMatch = rawAddr.match(/📞 Phone:\s*(.*?)(?=\n📧|$)/i);
+      const emailMatch = rawAddr.match(/📧 Email:\s*(.*?)$/i);
+
+      if (addressMatch && addressMatch[1]) {
+        config.contactDetails.address = addressMatch[1].trim();
+      }
+      if (phoneMatch && phoneMatch[1]) {
+        config.contactDetails.phone = phoneMatch[1].trim();
+      }
+      if (emailMatch && emailMatch[1]) {
+        config.contactDetails.email = emailMatch[1].trim();
+      }
+    }
+  }
 
   // 1. Hero Subtitle Limit (max 25 words)
   if (config.heroSubtitle) {
@@ -87,12 +107,19 @@ export function sanitizeSiteConfig(config: SiteConfig, category: string): SiteCo
     }));
   }
 
-  // 5. FAQs (answer max 35 words)
+  // 5. FAQs (answer max 35 words, clean up address embeds)
   if (config.faqs) {
-    config.faqs = config.faqs.map(faq => ({
-      ...faq,
-      answer: truncateToWords(faq.answer, 35)
-    }));
+    config.faqs = config.faqs.map(faq => {
+      let cleanAnswer = faq.answer;
+      if (cleanAnswer.includes('📍 Address:') || cleanAnswer.includes('📞 Phone:')) {
+        const cleanAddr = config.contactDetails?.address || 'our store';
+        cleanAnswer = `We are located at ${cleanAddr}. You can contact us at ${config.contactDetails?.phone || config.phoneNumber} or via email at ${config.contactDetails?.email || 'our support email'} for delivery inquiries.`;
+      }
+      return {
+        ...faq,
+        answer: truncateToWords(cleanAnswer, 35)
+      };
+    });
   }
 
   // 6. Testimonials (content max 35 words)
