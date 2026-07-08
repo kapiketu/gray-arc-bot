@@ -1,0 +1,15 @@
+{
+  "template_id": "GA004",
+  "template_name": "Adaptive Premium",
+  "version": "1.0.0",
+  "suitable_business_categories": [
+    "IT Company", "Software Company", "SaaS Company", "AI Company",
+    "Digital Marketing Agency", "Web Development Company", "Mobile App Development Company",
+    "Startup", "Corporate Company", "Consulting Firm", "Financial Company",
+    "Chartered Accountant", "Manufacturer", "Factory", "Import Export Company",
+    "Logistics Company", "B2B Company", "Business Consultant", "Industrial Company",
+    "Technology Company", "Digital marketing", "Biryani Restaurant", "Restaurant", "Cafe",
+    "Gym", "Fitness Center", "Yoga Studio", "Salon", "Hair Salon", "Spa", "Beauty Salon"
+  ],
+  "short_description": "Our flagship dynamic template featuring adaptive component layouts, custom styled image prompts, local schema injection, and visual balance guards."
+}

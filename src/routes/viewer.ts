@@ -5,6 +5,7 @@ import { purchaseDomain, setupDomainDNS } from '../services/domains';
 import { sendCTAUrlMessage, sendTextMessage, sendButtonMessage } from '../services/whatsapp';
 import fs from 'fs';
 import path from 'path';
+import { compileDynamicLayout } from '../services/templateEngine';
 
 export default async function viewerRoutes(fastify: FastifyInstance) {
   
@@ -875,6 +876,10 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
 
   let html = fs.readFileSync(htmlPath, 'utf8');
 
+  // Inject Schema.org JSON-LD structured data
+  const schemaScript = buildSchemaOrgScript(site);
+  html = html.replace('</head>', `${schemaScript}</head>`);
+
   // Inline CSS
   if (fs.existsSync(cssPath)) {
     const css = fs.readFileSync(cssPath, 'utf8');
@@ -885,6 +890,18 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   if (fs.existsSync(jsPath)) {
     const js = fs.readFileSync(jsPath, 'utf8');
     html = html.replace('</body>', `<script>\n${js}\n</script>\n</body>`);
+  }
+
+  // If dynamic layout, stitch section components dynamically
+  if (finalId === 'GA004') {
+    const dynamicSections = compileDynamicLayout(site);
+    html = html.replace('{{dynamic_hero}}', dynamicSections.hero);
+    html = html.replace('{{dynamic_about}}', dynamicSections.about);
+    html = html.replace('{{dynamic_services}}', dynamicSections.services);
+    html = html.replace('{{dynamic_features}}', dynamicSections.features);
+    html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
+    html = html.replace('{{dynamic_faqs}}', dynamicSections.faq);
+    html = html.replace('{{dynamic_footer}}', dynamicSections.footer);
   }
 
   const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
@@ -901,6 +918,11 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{business_name}}': site.businessName,
     '{{category}}': site.category || 'Professional Services',
     '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
+    '{{primary_color}}': site.theme?.primaryColor || '#3b82f6',
+    '{{secondary_color}}': site.theme?.secondaryColor || '#1d4ed8',
+    '{{bg_color}}': site.theme?.bgColor || '#030712',
+    '{{text_color}}': site.theme?.textColor || '#f3f4f6',
+    '{{font_family}}': site.theme?.fontFamily || 'Outfit, sans-serif',
     '{{logo}}': logoHtml,
     '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
     '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
@@ -928,16 +950,16 @@ function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
     '{{gallery_label_2}}': site.services?.[1]?.name || site.category || 'Quality Service',
     '{{gallery_label_3}}': site.services?.[2]?.name || site.category || 'Premium Results',
     '{{gallery_label_4}}': site.services?.[3]?.name || site.category || 'Expert Craft',
-    '{{stat_1_icon}}': stats[0].icon,
+    '{{stat_1_icon}}': validateLucideIcon(stats[0].icon, 'rocket'),
     '{{stat_1_value}}': stats[0].value,
     '{{stat_1_label}}': stats[0].label,
-    '{{stat_2_icon}}': stats[1].icon,
+    '{{stat_2_icon}}': validateLucideIcon(stats[1].icon, 'shield-check'),
     '{{stat_2_value}}': stats[1].value,
     '{{stat_2_label}}': stats[1].label,
-    '{{stat_3_icon}}': stats[2].icon,
+    '{{stat_3_icon}}': validateLucideIcon(stats[2].icon, 'users'),
     '{{stat_3_value}}': stats[2].value,
     '{{stat_3_label}}': stats[2].label,
-    '{{stat_4_icon}}': stats[3].icon,
+    '{{stat_4_icon}}': validateLucideIcon(stats[3].icon, 'award'),
     '{{stat_4_value}}': stats[3].value,
     '{{stat_4_label}}': stats[3].label
   };
@@ -978,7 +1000,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
     let gridItems = '';
     services.forEach((s, idx) => {
       if (idx >= 5) return; // grid-cols-5 row limit
-      const icon = s.icon || defaultIcons[idx % defaultIcons.length];
+      const icon = validateLucideIcon(s.icon || '', defaultIcons[idx % defaultIcons.length]);
       const delay = idx * 100;
       
       const isHighlighted = (idx === 2); // 3rd card Web Development is dark highlighted in reference image
@@ -1036,7 +1058,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
         cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
       }
     }
-    const icon = s.icon || defaultIcons[idx % defaultIcons.length];
+    const icon = validateLucideIcon(s.icon || '', defaultIcons[idx % defaultIcons.length]);
     const delay = idx * 100;
 
     if (idx === 0) {
@@ -1431,4 +1453,58 @@ export function getCategoryStats(category: string): CategoryStats[] {
     { icon: 'users', value: '200+', label: 'Expert Professionals' },
     { icon: 'award', value: '98%', label: 'Client Satisfaction' }
   ];
+}
+
+export function buildSchemaOrgScript(site: SiteConfig): string {
+  const businessType = site.schemaOrg?.businessType || 'LocalBusiness';
+  const priceRange = site.schemaOrg?.priceRange || '₹₹';
+  
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': businessType,
+    'name': site.businessName,
+    'description': site.aboutText || site.heroSubtitle || 'A premium local business.',
+    'url': site.customDomain ? `https://${site.customDomain}` : `https://${site.id}.ai.thegrayarc.com`,
+    'telephone': site.phoneNumber,
+    'priceRange': priceRange,
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': site.contactDetails?.address || 'Available locally & online'
+    },
+    'openingHoursSpecification': [
+      {
+        '@type': 'OpeningHoursSpecification',
+        'dayOfWeek': [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday'
+        ],
+        'opens': '10:00',
+        'closes': '20:00'
+      }
+    ]
+  };
+
+  return `\n<script type="application/ld+json">\n${JSON.stringify(schema, null, 2)}\n</script>\n`;
+}
+
+const VALID_LUCIDE_ICONS = new Set([
+  'utensils', 'coffee', 'cake', 'cookie', 'glass-water', 'shopping-bag',
+  'sparkles', 'scissors', 'gem', 'flower', 'heart', 'smile',
+  'dumbbell', 'flame', 'trophy', 'target', 'activity',
+  'compass', 'map', 'plane', 'globe', 'luggage', 'camera',
+  'stethoscope', 'shield', 'award', 'zap', 'star', 'users', 'rocket',
+  'briefcase', 'code', 'laptop', 'smartphone', 'database', 'cpu', 'terminal',
+  'cloud', 'activity', 'chef-hat', 'smile-plus', 'store', 'phone', 'mail',
+  'map-pin', 'clock', 'check-circle-2', 'check', 'arrow-right', 'instagram',
+  'facebook', 'twitter', 'youtube', 'linkedin', 'chevron-right', 'chevron-left',
+  'quote'
+]);
+
+export function validateLucideIcon(icon: string, fallback: string): string {
+  const clean = (icon || '').trim().toLowerCase();
+  return VALID_LUCIDE_ICONS.has(clean) ? clean : fallback;
 }
