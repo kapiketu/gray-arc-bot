@@ -40,9 +40,14 @@
     <style>
       :root {
         --primary-color: {{primary_color}};
+        --primary-hover: {{primary_hover}};
         --secondary-color: {{secondary_color}};
         --bg-color: {{bg_color}};
+        --surface-color: {{surface_color}};
+        --card-color: {{card_color}};
+        --border-color: {{border_color}};
         --text-color: {{text_color}};
+        --text-secondary: {{text_secondary}};
         --font-family: {{font_family}};
       }
       body {
@@ -55,10 +60,10 @@
         font-family: var(--font-family, 'Outfit'), sans-serif;
       }
       .glass {
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--card-color, rgba(255, 255, 255, 0.03));
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
       }
       .glass-card-hover {
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

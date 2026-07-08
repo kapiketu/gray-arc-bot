@@ -6,6 +6,7 @@ import { sendCTAUrlMessage, sendTextMessage, sendButtonMessage } from '../servic
 import fs from 'fs';
 import path from 'path';
 import { compileDynamicLayout } from '../services/templateEngine';
+import { generateThemePalette } from '../services/colorEngine';
 
 export default async function viewerRoutes(fastify: FastifyInstance) {
   
@@ -913,15 +914,24 @@ export function renderPremiumWebsite(site: SiteConfig, templateId?: string): str
   const imageBase = getCategoryImages(site.category || '');
   const stats = (site.stats && site.stats.length === 4) ? site.stats : getCategoryStats(site.category || '');
 
+  const brandHex = site.theme?.primaryColor || '#3b82f6';
+  const isDark = (site.theme?.bgColor || '#030712') !== '#ffffff';
+  const palette = generateThemePalette(brandHex, isDark);
+
   // Perform substitutions
   const replacements: Record<string, string> = {
     '{{business_name}}': site.businessName,
     '{{category}}': site.category || 'Professional Services',
     '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
-    '{{primary_color}}': site.theme?.primaryColor || '#3b82f6',
-    '{{secondary_color}}': site.theme?.secondaryColor || '#1d4ed8',
-    '{{bg_color}}': site.theme?.bgColor || '#030712',
-    '{{text_color}}': site.theme?.textColor || '#f3f4f6',
+    '{{primary_color}}': palette.primary,
+    '{{primary_hover}}': palette.primaryHover,
+    '{{secondary_color}}': palette.secondary,
+    '{{bg_color}}': palette.background,
+    '{{surface_color}}': palette.surface,
+    '{{card_color}}': palette.card,
+    '{{border_color}}': palette.border,
+    '{{text_color}}': palette.textPrimary,
+    '{{text_secondary}}': palette.textSecondary,
     '{{font_family}}': site.theme?.fontFamily || 'Outfit, sans-serif',
     '{{hours}}': site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM',
     '{{logo}}': logoHtml,

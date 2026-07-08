@@ -130,9 +130,7 @@ const Services_Grid = `
         <p class="text-gray-400 max-w-xl mx-auto">Explore premium plans and professional services custom tailored for your precise requirements.</p>
     </div>
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {{services_items}}
-    </div>
+    {{services_grid_wrapper}}
 </section>
 `;
 
@@ -358,10 +356,15 @@ export function compileDynamicLayout(site: SiteConfig): {
     });
   } else {
     // Compile Grid cards
+    const count = services.length;
     services.forEach((s, idx) => {
       const icon = validateLucideIcon(s.icon || '', 'star');
+      let colSpan = '';
+      if (count === 5) {
+        colSpan = idx < 3 ? 'lg:col-span-2' : 'lg:col-span-3';
+      }
       servicesItemsHtml += `
-        <div class="glass p-8 rounded-3xl border-white/5 flex flex-col justify-between hover:border-white/10 transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden" data-aos="fade-up" data-aos-delay="${idx * 100}">
+        <div class="glass p-8 rounded-3xl border-white/5 flex flex-col justify-between hover:border-white/10 transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden ${colSpan}" data-aos="fade-up" data-aos-delay="${idx * 100}">
           <div class="space-y-4">
             <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
               <i data-lucide="${icon}" class="w-6 h-6"></i>
@@ -378,7 +381,29 @@ export function compileDynamicLayout(site: SiteConfig): {
     });
   }
   
-  let compiledServices = layouts.servicesVariant.replace('{{services_items}}', servicesItemsHtml);
+  let compiledServices = layouts.servicesVariant;
+  if (layouts.servicesVariant === Services_Grid) {
+    const count = services.length;
+    let servicesGridWrapper = '';
+    if (count === 1) {
+      servicesGridWrapper = `<div class="max-w-md mx-auto flex justify-center">{{services_items}}</div>`;
+    } else if (count === 2) {
+      servicesGridWrapper = `<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">{{services_items}}</div>`;
+    } else if (count === 3) {
+      servicesGridWrapper = `<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">{{services_items}}</div>`;
+    } else if (count === 4) {
+      servicesGridWrapper = `<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">{{services_items}}</div>`;
+    } else if (count === 5) {
+      servicesGridWrapper = `<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-6 gap-8">{{services_items}}</div>`;
+    } else {
+      servicesGridWrapper = `<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">{{services_items}}</div>`;
+    }
+    
+    const wrapperWithItems = servicesGridWrapper.replace('{{services_items}}', servicesItemsHtml);
+    compiledServices = compiledServices.replace('{{services_grid_wrapper}}', wrapperWithItems);
+  } else {
+    compiledServices = compiledServices.replace('{{services_items}}', servicesItemsHtml);
+  }
 
   // 4. Compile Features
   let compiledFeatures = layouts.featuresVariant;
