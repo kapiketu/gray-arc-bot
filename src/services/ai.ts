@@ -210,26 +210,26 @@ export async function generateWebsiteConfig(
     - Contact Details / Address (raw input): ${contactRaw}
     
     CRITICAL COPYWRITING DIRECTIVES FOR LENGTH AND DEPTH (VERY IMPORTANT):
-    1. WRITE EXTENSIVE AND LONG PARAGRAPHS: Even if the user provided very sparse input (e.g. description is just "best in town", or services is a short list of words), you MUST expand it heavily into rich, detailed, and highly informative marketing copy. 
-    2. HERO SUBTITLE: Must be an engaging, detailed value-proposition statement of at least 35-50 words (2-3 full sentences) explaining the values and commitment of the business.
-    3. OUR STORY CONTENT: Must be a rich, compelling brand narrative of at least 150-200 words (minimum 2 detailed paragraphs) detailing their foundation, expertise, customer-first standards, community impact, and quality dedication.
+    1. CONCISE MARKETING COPY: Even if the user provided sparse input, expand it into professional, engaging marketing copy. However, you MUST follow the strict word counts specified below to ensure text fits within the styled template sections without overflowing or overlapping.
+    2. HERO SUBTITLE: Must be an engaging, punchy statement of exactly 15-25 words (maximum 30 words) explaining the values and commitment of the business.
+    3. OUR STORY CONTENT: Must be a compelling, brief brand narrative of exactly 60-80 words (maximum 90 words, split into 1 or 2 small paragraphs) detailing their foundation, quality dedication, and client focus.
     4. SERVICES (EXTREMELY IMPORTANT — READ CAREFULLY):
        - The user may list services as comma-separated words (e.g. "gym, yoga, dance"), newline-separated, or with dashes.
        - You MUST split them into SEPARATE individual service objects. NEVER combine multiple services into one.
        - Each service must have a professional name, a price in Rupees (e.g. "₹499" or "₹1,200"). If the user did not provide a price, set price to "Contact Us" (without any currency symbol).
-       - Each service must have a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
+       - Each service must have a concise, engaging descriptive paragraph of exactly 15-20 words (maximum 25 words) explaining what the service involves.
        - Each service must have a specific "imagePrompt" string that is clean, descriptive, vector/photographic style, with no special characters, quotes, or slashes, suitable for generating a background image (e.g., "premium yoga studio class interior with wooden floor").
        - Each service must have a valid lowercase, hyphenated "icon" name from Lucide library that relates specifically to the service (e.g. 'code', 'laptop', 'plane', 'dumbbell', 'utensils', 'scissors', 'stethoscope', 'briefcase', 'shield').
-    5. WHY CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
-    6. FAQs: Generate exactly 3 frequently asked questions and detailed answers (at least 35-50 words or 2-3 complete sentences per answer) providing helpful, concrete information about operating schedules, booking procedures, and locations.
-    7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be at least 45-60 words (3-4 complete sentences) explaining the client's problem, how the business solved it, and their specific satisfaction.
+    5. WHY CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title (1-3 words) and a concise description paragraph of exactly 20-30 words (maximum 35 words).
+    6. FAQs: Generate exactly 3 frequently asked questions and short, helpful answers of exactly 25-35 words (maximum 40 words) per answer.
+    7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be a concise testimonial paragraph of exactly 25-35 words (maximum 40 words).
     8. IMAGE PROMPTS:
        - You must provide clean, vector/photographic image prompts for:
          - "heroImagePrompt": background image showcasing the category or business space.
          - "aboutImagePrompt": team, storefront, or workspace showcase image.
          - "galleryImagePrompts": exactly 4 distinct prompts highlighting services or products.
     9. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
-    10. STATISTICS (STATS): Generate exactly 4 stat items. Each item needs a value (e.g. "5000+" or "100%"), a short label (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
+    10. STATISTICS (STATS): Generate exactly 4 stat items. Value must be short (e.g. "5000+" or "100%"), label must be a short phrase of 1-2 words (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
     
     Output the result EXACTLY matching this JSON structure:
     {
@@ -294,31 +294,23 @@ export async function generateWebsiteConfig(
     };
 
     // Hero image
-    const rawHeroUrl = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
-    const heroOk = await verifyImageUrl(rawHeroUrl);
-    const verifiedHeroImage = heroOk ? rawHeroUrl : (fallbacks.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80');
+    const verifiedHeroImage = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
 
     // About image
-    const rawAboutUrl = buildImgUrl(generatedConfig.aboutImagePrompt || 'office workspace', 1200, 800);
-    const aboutOk = await verifyImageUrl(rawAboutUrl);
-    const verifiedAboutImage = aboutOk ? rawAboutUrl : (fallbacks.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80');
+    const verifiedAboutImage = buildImgUrl(generatedConfig.aboutImagePrompt || 'office workspace', 1200, 800);
 
     const fallbackIcons = getDefaultCategoryIcons(category);
-    const verifiedServices = await Promise.all(
-      (generatedConfig.services || []).map(async (s: any, idx: number) => {
-        const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
-        const ok = await verifyImageUrl(rawUrl);
-        const fallbackProd = fallbacks.products[idx] || fallbacks.products[0] || fallbacks.hero;
-        const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
-        return {
-          name: s.name,
-          price: s.price,
-          description: s.description,
-          image: ok ? rawUrl : fallbackProd,
-          icon: s.icon || fallbackIcon
-        };
-      })
-    );
+    const verifiedServices = (generatedConfig.services || []).map((s: any, idx: number) => {
+      const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
+      const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
+      return {
+        name: s.name,
+        price: s.price,
+        description: s.description,
+        image: rawUrl,
+        icon: s.icon || fallbackIcon
+      };
+    });
 
     // Gallery images
     const verifiedGallery: string[] = [];
@@ -326,9 +318,7 @@ export async function generateWebsiteConfig(
     for (let i = 0; i < 4; i++) {
       const p = galleryPrompts[i] || `gallery item ${i + 1}`;
       const rawUrl = buildImgUrl(p, 1200, 800);
-      const ok = await verifyImageUrl(rawUrl);
-      const fallbackProd = fallbacks.products[i] || fallbacks.products[0] || fallbacks.hero;
-      verifiedGallery.push(ok ? rawUrl : fallbackProd);
+      verifiedGallery.push(rawUrl);
     }
 
     // Assemble unified configuration payload

@@ -1050,7 +1050,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
                     <i data-lucide="${icon}" class="w-7 h-7"></i>
                 </div>
                 <h4 class="text-3xl font-bold text-white mb-3">${s.name}</h4>
-                <p class="text-gray-300 max-w-md">${s.description}</p>
+                <p class="text-gray-300 max-w-md line-clamp-3">${s.description}</p>
                 <div class="flex justify-between items-center mt-6">
                     <span class="text-gold-500 font-extrabold text-xl">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="px-6 py-2 rounded-full bg-gold-500 text-dark-900 font-bold hover:scale-105 transition-all text-sm">Enquire</a>
