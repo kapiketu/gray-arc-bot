@@ -470,31 +470,20 @@ async function handleChatFlow(input: UserInput) {
       return;
     }
 
-    // Template selection
+    // Legacy template selection — auto-redirect to hosting (template step removed)
     if (buttonId && buttonId.startsWith('tpl_')) {
-      if (!session || session.step !== 'AWAITING_TEMPLATE') {
+      if (!session) {
         await sendTextMessage(from, `Something went wrong. Type *'reset'* to start over.`);
         return;
       }
-      const templateKey = buttonId.replace('tpl_', '');
-      let selectedTemplateName = templateKey;
-      try {
-        const metaPath = path.join(__dirname, '../../templates', templateKey, 'metadata.json');
-        if (fs.existsSync(metaPath)) {
-          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-          selectedTemplateName = meta.template_name || meta.name || templateKey;
-        }
-      } catch (e) {
-        console.warn(`[Webhook] Failed to read template metadata:`, e);
-      }
-      session.answers.template = templateKey;
+      // Skip template, go directly to domain choice
       session.step = 'AWAITING_DOMAIN_CHOICE';
       session.lastActive = new Date().toISOString();
       await db.saveSession(session);
 
       await sendButtonMessage(
         from,
-        `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`,
+        `✅ *Great!* The AI will auto-design the best layout for *${session.answers.businessName || 'your business'}*.\n\nHow would you like to host your website?`,
         [
           { id: 'host_buy_custom', title: 'Buy New Domain' },
           { id: 'host_point_custom', title: 'Connect My Domain' },
@@ -766,43 +755,19 @@ async function handleChatFlow(input: UserInput) {
       break;
 
     case 'AWAITING_TEMPLATE':
-      const choice = text.toLowerCase();
-      let templateKey = 'GA001';
-      let selectedTemplateName = 'Service Pro';
-      try {
-        const templatesDir = path.join(__dirname, '../../templates');
-        if (fs.existsSync(templatesDir)) {
-          const folders = fs.readdirSync(templatesDir).filter(f => fs.statSync(path.join(templatesDir, f)).isDirectory());
-          for (const folder of folders) {
-            let name = folder.toLowerCase();
-            const metaPath = path.join(templatesDir, folder, 'metadata.json');
-            if (fs.existsSync(metaPath)) {
-              const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-              name = (meta.template_name || meta.name || folder).toLowerCase();
-            }
-            if (choice.includes(name) || name.includes(choice)) {
-              templateKey = folder;
-              selectedTemplateName = name;
-              break;
-            }
-          }
-        }
-      } catch (err: any) {
-        console.error(`[Webhook] Failed matching text template choice:`, err.message);
-      }
-      session.answers.template = templateKey;
+      // Legacy fallback — users with stuck sessions skip straight to hosting
       session.step = 'AWAITING_DOMAIN_CHOICE';
       await db.saveSession(session);
       await sendButtonMessage(
         from,
-        `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`,
+        `✅ *No need to choose a template!* The AI will auto-design the best layout for *${session.answers.businessName || 'your business'}*.\n\nHow would you like to host your website?`,
         [
           { id: 'host_buy_custom', title: 'Buy New Domain' },
           { id: 'host_point_custom', title: 'Connect My Domain' },
           { id: 'host_free', title: 'Free Subdomain' }
         ],
         'Hosting Option',
-        'Custom domain setup'
+        'Buy new domain: ₹500 one-time'
       );
       break;
 
