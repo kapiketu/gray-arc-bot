@@ -1,0 +1,23 @@
+<section class="hero hero-v2" style="display: flex; align-items: center; padding: 4rem 2rem; background-color: hsl(var(--hue-secondary), 15%, 98%);">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; display: flex; gap: 4rem; flex-wrap: wrap;">
+    <div class="hero-content" style="flex: 1; min-width: 300px;">
+      <h1 style="font-family: var(--font-heading); color: hsl(var(--hue-primary), 40%, 15%); font-size: 3.5rem; margin-bottom: 1rem; line-height: 1.1;">
+        {{headline}}
+      </h1>
+      <p style="font-family: var(--font-body); color: hsl(var(--hue-primary), 20%, 40%); font-size: 1.25rem; margin-bottom: 2rem;">
+        {{subheadline}}
+      </p>
+      <div style="display: flex; gap: 1rem;">
+        <a href="#services" class="btn btn-primary" style="display: inline-block; padding: 1rem 2rem; background-color: hsl(var(--hue-primary), 60%, 50%); color: white; text-decoration: none; border-radius: 8px; font-family: var(--font-body); font-weight: 600;">
+          {{cta_primary}}
+        </a>
+        <a href="#contact" class="btn btn-secondary" style="display: inline-block; padding: 1rem 2rem; background-color: transparent; border: 2px solid hsl(var(--hue-primary), 60%, 50%); color: hsl(var(--hue-primary), 60%, 50%); text-decoration: none; border-radius: 8px; font-family: var(--font-body); font-weight: 600;">
+          {{cta_secondary}}
+        </a>
+      </div>
+    </div>
+    <div class="hero-image" style="flex: 1; min-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+      <img src="https://source.unsplash.com/800x600/?{{image_search_term}}" alt="{{image_alt}}" style="width: 100%; height: auto; display: block;" />
+    </div>
+  </div>
+</section>

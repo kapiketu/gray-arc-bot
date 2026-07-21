@@ -3,8 +3,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
+// Legacy routes (live WhatsApp chatbot flow)
 import webhookRoutes from './routes/webhook';
 import viewerRoutes from './routes/viewer';
+// AI Agency V3 routes
+import whatsappV3Routes from './routes/whatsappV3';
+import dashboardRoutes from './routes/dashboard';
 
 dotenv.config();
 
@@ -18,8 +22,12 @@ server.register(fastifyStatic, {
 });
 
 // Register application routes
+// Legacy routes (currently serving live WhatsApp users)
 server.register(webhookRoutes);
 server.register(viewerRoutes);
+// AI Agency V3 routes
+server.register(whatsappV3Routes);
+server.register(dashboardRoutes);
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 

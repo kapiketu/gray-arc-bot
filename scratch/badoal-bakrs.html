@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakery </title>
+    <meta name="description" content="Best in dehraudn ... Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Manrope', 'sans-serif'] },
+                    colors: {
+                        dark: { 900: '#0a0a0c', 800: '#141417', 700: '#1e1e24' },
+                        gold: { 400: '#f5c342', 500: '#d4af37', 600: '#aa8c2c' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Badoal bakrs ",
+  "description": "Best in dehraudn ",
+  "url": "https://badoal-bakrs.ai.thegrayarc.com",
+  "telephone": "9693186322",
+  "priceRange": "₹₹",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "📍 Address: Hh\n📞 Phone: 9693186322\n📧 Email: Hj@b.c"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "opens": "10:00",
+      "closes": "20:00"
+    }
+  ]
+}
+</script>
+<style>
+/* Base Resets & Utilities */
+html {
+    scroll-padding-top: 100px;
+}
+
+/* Hide scrollbar for cleaner look */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0a0a0c;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e1e24;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #d4af37;
+}
+
+/* Hide scrollbar for slider */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Premium Glassmorphism */
+.glass {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.glass-nav-scrolled {
+    background: rgba(10, 10, 12, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Gradient Button */
+.btn-primary {
+    background: linear-gradient(135deg, #f5c342 0%, #d4af37 100%);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+.btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+</style>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MOCK-TAG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MOCK-TAG');
+  </script>
+  
+</head>
+<body class="bg-dark-900 text-gray-300 font-sans antialiased overflow-x-hidden selection:bg-gold-500 selection:text-dark-900">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-6 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center">
+                <img src="https://image.pollinations.ai/prompt/minimalist%20professional%20logo%20icon%20for%20Badoal%20bakrs%20%20Bakery%20%20business%2C%20clean%20vector%20style%2C%20transparent%20background%2C%20no%20text%2C%20single%20icon?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="Badoal bakrs  Logo">
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8 font-medium text-sm">
+                <a href="#about" class="hover:text-gold-500 transition-colors">About</a>
+                <a href="#services" class="hover:text-gold-500 transition-colors">Services</a>
+                <a href="#portfolio" class="hover:text-gold-500 transition-colors">Work</a>
+                <a href="#testimonials" class="hover:text-gold-500 transition-colors">Reviews</a>
+                <a href="#contact" class="btn-primary px-6 py-2.5 rounded-full text-dark-900 font-bold transition-transform hover:scale-105">Get a Quote</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden text-white">
+                <i data-lucide="menu" class="w-8 h-8"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] pointer-events-none opacity-0 transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div id="mobile-menu-backdrop" class="absolute inset-0 bg-dark-900/90 backdrop-blur-xl"></div>
+        <!-- Menu Content -->
+        <div class="relative z-10 flex flex-col items-center justify-center h-full">
+            <button id="mobile-menu-close" class="absolute top-6 right-6 text-white p-2">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+            <div class="flex flex-col items-center gap-8 text-2xl font-bold">
+                <a href="#about" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">About</a>
+                <a href="#services" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Services</a>
+                <a href="#portfolio" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Work</a>
+                <a href="#testimonials" class="mobile-nav-link text-white hover:text-gold-500 transition-colors">Reviews</a>
+                <a href="#contact" class="mobile-nav-link btn-primary px-8 py-3 rounded-full text-dark-900 text-lg mt-4 transition-transform hover:scale-105">Get a Quote</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex items-center pt-24 pb-12 px-6 lg:px-12 overflow-hidden">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1600&q=80&auto=format&fit=crop" alt="Service Professional" class="w-full h-full object-cover opacity-30 mix-blend-luminosity">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10 items-center">
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 text-gold-500 text-sm font-semibold mb-6">
+                    <span class="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
+                    Available for Emergency Calls
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">Welcome to Badoal bakrs </h1>
+                <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">Best in dehraudn ... Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs.</p>
+                <div class="flex flex-wrap items-center gap-4">
+                    <a href="#contact" class="btn-primary px-8 py-4 rounded-full text-dark-900 font-bold text-lg transition-transform hover:scale-105 flex items-center gap-2">
+                        Book Service <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    <a href="tel:9693186322" class="px-8 py-4 rounded-full glass border border-white/20 text-white font-bold text-lg transition-all hover:bg-white/10 flex items-center gap-2">
+    <i data-lucide="phone" class="w-5 h-5 text-gold-500"></i> 9693186322
+                    </a>
+                </div>
+            </div>
+
+            <!-- Premium Floating Card -->
+            <div class="hidden lg:block relative" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                <div class="glass p-8 rounded-3xl border border-white/10 shadow-2xl relative z-10 ml-auto max-w-md backdrop-blur-xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150&h=150" alt="Lead Technician" class="w-16 h-16 rounded-full border-2 border-gold-500 object-cover">
+                        <div>
+                            <h3 class="text-white font-bold text-lg">Michael R.</h3>
+                            <p class="text-gold-500 text-sm">Lead Service Expert</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Response Time</span>
+                            <span class="text-white font-semibold">Under 30 mins</span>
+                        </div>
+                        <div class="w-full bg-dark-800 rounded-full h-2">
+                            <div class="bg-gold-500 h-2 rounded-full w-11/12"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm pt-2">
+                            <span class="text-gray-400">Client Satisfaction</span>
+                            <span class="text-white font-semibold flex items-center gap-1">
+                                <i data-lucide="star" class="w-4 h-4 text-gold-500 fill-gold-500"></i> 4.9/5
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Decorative Elements -->
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <a href="#trust" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50 hover:opacity-100 transition-opacity">
+            <i data-lucide="mouse" class="w-6 h-6 text-white mb-1"></i>
+            <i data-lucide="chevron-down" class="w-6 h-6 text-white mx-auto"></i>
+        </a>
+    </header>
+
+    <!-- Trust / Counters Section -->
+    <section id="trust" class="py-16 border-y border-white/5 bg-dark-800/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/5">
+                <div class="text-center" data-aos="fade-up" data-aos-delay="0">
+                    <h4 class="text-4xl md:text-5xl font-extrabold text-white mb-2"><span class="counter" data-target="15">0</span>+</h4>
+                    <p class="text-gray-400 text-sm tracking-wide uppercase font-semibold">Years Experience</p>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                    <h4 class="text-4xl md:text-5xl font-extrabold text-white mb-2"><span class="counter" data-target="5000">0</span>+</h4>
+                    <p class="text-gray-400 text-sm tracking-wide uppercase font-semibold">Happy Clients</p>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                    <h4 class="text-4xl md:text-5xl font-extrabold text-white mb-2"><span class="counter" data-target="4.9">0</span></h4>
+                    <p class="text-gray-400 text-sm tracking-wide uppercase font-semibold">Average Rating</p>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="300">
+                    <h4 class="text-4xl md:text-5xl font-extrabold text-white mb-2"><span class="counter" data-target="24">0</span>/7</h4>
+                    <p class="text-gray-400 text-sm tracking-wide uppercase font-semibold">Support Available</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 px-6 lg:px-12 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div class="relative" data-aos="fade-right">
+                <img src="https://images.unsplash.com/photo-1556217477-d325251ece38?w=800&q=80&auto=format&fit=crop" alt="About Us" class="rounded-3xl shadow-2xl relative z-10 w-full object-cover h-[500px]">
+                <div class="absolute -bottom-8 -right-8 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl z-0"></div>
+                <!-- Floating Badge -->
+                <div class="absolute top-8 -left-8 glass p-4 rounded-2xl border border-white/10 z-20 flex items-center gap-4 hidden md:flex animate-float">
+                    <div class="bg-gold-500/20 p-3 rounded-full text-gold-500">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-white font-bold">Certified Pro</p>
+                        <p class="text-xs text-gray-400">Licensed & Insured</p>
+                    </div>
+                </div>
+            </div>
+            <div data-aos="fade-left">
+                <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">About The Company</h2>
+                <h3 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Our Story</h3>
+                <div class="text-gray-400 text-lg mb-8 leading-relaxed space-y-4">
+    <p class="text-gray-400 text-lg leading-relaxed">Best in dehraudn . Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded.</p>
+</div>
+                <ul class="space-y-4 mb-10">
+                    <li class="flex items-center gap-3 text-white">
+                        <i data-lucide="check-circle-2" class="text-gold-500 w-5 h-5"></i> Premium Quality Assurance
+                    </li>
+                    <li class="flex items-center gap-3 text-white">
+                        <i data-lucide="check-circle-2" class="text-gold-500 w-5 h-5"></i> Experienced Specialists
+                    </li>
+                    <li class="flex items-center gap-3 text-white">
+                        <i data-lucide="check-circle-2" class="text-gold-500 w-5 h-5"></i> Client Centric Partnership
+                    </li>
+                </ul>
+                <a href="#services" class="text-gold-500 font-bold hover:text-white transition-colors flex items-center gap-2">
+                    Explore Our Services <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Bento Grid -->
+    <section id="services" class="py-24 px-6 lg:px-12 bg-dark-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">What We Do</h2>
+                <h3 class="text-4xl md:text-5xl font-extrabold text-white">Premium Service Offerings</h3>
+            </div>
+
+            <!-- Bento Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">
+
+        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="0">
+            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80&auto=format&fit=crop" alt="Cake" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
+            <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
+                    <i data-lucide="utensils" class="w-7 h-7"></i>
+                </div>
+                <h4 class="text-3xl font-bold text-white mb-3">Cake</h4>
+                <p class="text-gray-300 max-w-md line-clamp-3">Premium quality cake customized to your needs.</p>
+                <div class="flex justify-between items-center mt-6">
+                    <span class="text-gold-500 font-extrabold text-xl">Contact Us</span>
+                    <a href="https://wa.me/9693186322?text=Hi! I am interested in Cake" target="_blank" class="px-6 py-2 rounded-full bg-gold-500 text-dark-900 font-bold hover:scale-105 transition-all text-sm">Enquire</a>
+                </div>
+            </div>
+        </div>
+      
+        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="100">
+            <img src="https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=600&q=80&auto=format&fit=crop" alt="Cookies" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">
+                    <i data-lucide="coffee" class="w-6 h-6"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-2">Cookies</h4>
+                <p class="text-gray-300 text-sm mb-4 line-clamp-2">Premium quality cookies customized to your needs.</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-gold-500 font-bold text-sm">Contact Us</span>
+                    <a href="https://wa.me/9693186322?text=Hi! I am interested in Cookies" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
+                </div>
+            </div>
+        </div>
+      
+        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="200">
+            <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&auto=format&fit=crop" alt="Bun" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">
+                    <i data-lucide="cake" class="w-6 h-6"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-2">Bun</h4>
+                <p class="text-gray-300 text-sm mb-4 line-clamp-2">Premium quality bun customized to your needs.</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-gold-500 font-bold text-sm">Contact Us</span>
+                    <a href="https://wa.me/9693186322?text=Hi! I am interested in Bun" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
+                </div>
+            </div>
+        </div>
+      
+</div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us & Process (Modern Timeline) -->
+    <section class="py-24 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16">
+            <!-- Why Choose Us text -->
+            <div class="lg:sticky lg:top-24 self-start" data-aos="fade-right">
+                <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">Our Process</h2>
+                <h3 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">How We Deliver Excellence.</h3>
+                <p class="text-gray-400 text-lg mb-8">A streamlined, transparent workflow designed to respect your time and property while delivering unmatched quality.</p>
+                
+                <div class="glass p-6 rounded-2xl border border-white/5 inline-flex items-center gap-6">
+                    <div>
+                        <p class="text-3xl font-bold text-white">48<span class="text-gold-500">hr</span></p>
+                        <p class="text-sm text-gray-400">Project Turnaround</p>
+                    </div>
+                    <div class="w-px h-12 bg-white/10"></div>
+                    <div>
+                        <p class="text-3xl font-bold text-white">100<span class="text-gold-500">%</span></p>
+                        <p class="text-sm text-gray-400">Licensed Crew</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="space-y-12" data-aos="fade-left">
+                <!-- Step 1 -->
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 bottom-0 w-px bg-white/10">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gold-500 shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-3">1. Premium Quality Assurance</h4>
+                    <p class="text-gray-400 leading-relaxed">We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 bottom-0 w-px bg-white/10">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-dark-700 border-2 border-gold-500"></div>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-3">2. Experienced Specialists</h4>
+                    <p class="text-gray-400 leading-relaxed">Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience, specialized skills, and a committed, problem-solving focus to every single project we undertake.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 h-full w-px bg-transparent"> <!-- End line -->
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-dark-700 border-2 border-gold-500"></div>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-3">3. Client Centric Partnership</h4>
+                    <p class="text-gray-400 leading-relaxed">Your goals are our priorities. We take the time to understand your exact requirements, provide transparent progress updates, and offer tailored, flexible solutions designed to guarantee your complete satisfaction.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio / Gallery (Masonry) -->
+    <section id="portfolio" class="py-24 px-6 lg:px-12 bg-dark-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6" data-aos="fade-up">
+                <div>
+                    <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">Recent Work</h2>
+                    <h3 class="text-4xl md:text-5xl font-extrabold text-white">Quality You Can See.</h3>
+                </div>
+                <a href="#" class="text-white hover:text-gold-500 transition-colors font-medium flex items-center gap-2">View Full Gallery <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+
+            <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                <!-- Img 1 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden group relative" data-aos="zoom-in">
+                    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=80&auto=format&fit=crop" alt="Work" class="w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <span class="text-white font-semibold text-lg">Cake</span>
+                    </div>
+                </div>
+                <!-- Img 2 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden group relative" data-aos="zoom-in" data-aos-delay="100">
+                    <img src="https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=600&q=80&auto=format&fit=crop" alt="Work" class="w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <span class="text-white font-semibold text-lg">Cookies</span>
+                    </div>
+                </div>
+                <!-- Img 3 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden group relative" data-aos="zoom-in" data-aos-delay="200">
+                    <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&auto=format&fit=crop" alt="Work" class="w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <span class="text-white font-semibold text-lg">Bun</span>
+                    </div>
+                </div>
+                <!-- Img 4 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden group relative" data-aos="zoom-in" data-aos-delay="300">
+                    <img src="https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=600&q=80&auto=format&fit=crop" alt="Work" class="w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <span class="text-white font-semibold text-lg">Bakery </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-24 px-6 lg:px-12 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-gold-500 font-bold uppercase tracking-widest text-sm mb-3">Client Reviews</h2>
+                <h3 class="text-4xl md:text-5xl font-extrabold text-white">Don't Just Take Our Word.</h3>
+            </div>
+            
+            <!-- Slider Container -->
+            <div class="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory pb-8" id="testimonial-slider">
+
+      <div class="min-w-[100%] md:min-w-[50%] lg:min-w-[33.333%] snap-center">
+          <div class="glass p-8 rounded-3xl border border-white/5 h-full flex flex-col">
+              <div class="flex gap-1 text-gold-500 mb-6">
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+              </div>
+              <p class="text-gray-300 text-lg mb-8 flex-1 italic">"The level of professionalism and care they brought to the table was simply outstanding. They understood my requirements perfectly, kept me informed at every step, and delivered a result that was far better than I could have imagined. I highly recommend them to anyone seeking top-tier service!"</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center text-white font-bold border border-white/10">AM</div>
+                  <div>
+                      <h5 class="text-white font-bold">Aarav Mehta</h5>
+                      <p class="text-sm text-gray-500">Regular Client</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+    
+      <div class="min-w-[100%] md:min-w-[50%] lg:min-w-[33.333%] snap-center">
+          <div class="glass p-8 rounded-3xl border border-white/5 h-full flex flex-col">
+              <div class="flex gap-1 text-gold-500 mb-6">
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+              </div>
+              <p class="text-gray-300 text-lg mb-8 flex-1 italic">"I have been a customer for over a year now, and I can confidently say their consistency is unmatched. From their helpful support to the superb final delivery, every interaction is a pleasant experience. It is rare to find a business that cares this much about its clients."</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center text-white font-bold border border-white/10">PS</div>
+                  <div>
+                      <h5 class="text-white font-bold">Priya Sharma</h5>
+                      <p class="text-sm text-gray-500">Local Customer</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+    
+      <div class="min-w-[100%] md:min-w-[50%] lg:min-w-[33.333%] snap-center">
+          <div class="glass p-8 rounded-3xl border border-white/5 h-full flex flex-col">
+              <div class="flex gap-1 text-gold-500 mb-6">
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+                  <i data-lucide="star" class="w-5 h-5 fill-gold-500"></i>
+              </div>
+              <p class="text-gray-300 text-lg mb-8 flex-1 italic">"They exceeded my expectations in every possible way. The project was completed on time, within budget, and the attention to details was absolutely spectacular. Their team is knowledgeable, responsive, and incredibly dedicated to customer success. Five stars!"</p>
+              <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center text-white font-bold border border-white/10">RG</div>
+                  <div>
+                      <h5 class="text-white font-bold">Rohan Gupta</h5>
+                      <p class="text-sm text-gray-500">Business Owner</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+    
+</div>
+        </div>
+    </section>
+
+    <!-- Luxury CTA / Contact Section -->
+    <section id="contact" class="py-24 px-6 lg:px-12 relative overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10 mix-blend-luminosity"></div>
+        <div class="absolute inset-0 bg-dark-900/80"></div>
+        
+        <div class="max-w-4xl mx-auto relative z-10" data-aos="fade-up">
+            <div class="glass p-10 md:p-16 rounded-[2.5rem] border border-white/10 shadow-2xl text-center backdrop-blur-2xl">
+                <i data-lucide="calendar-check" class="w-12 h-12 text-gold-500 mx-auto mb-6"></i>
+                <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-6">Ready for Premium Service?</h2>
+                <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">Drop your details below and our lead technician will call you within 15 minutes to arrange your consultation.</p>
+                
+                <form id="contact-form" class="max-w-xl mx-auto relative">
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <input type="text" id="name" placeholder="Your Name" required class="flex-1 bg-dark-900/50 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-gold-500 transition-colors placeholder-gray-500">
+                        <input type="tel" id="phone" placeholder="Phone Number" required class="flex-1 bg-dark-900/50 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-gold-500 transition-colors placeholder-gray-500">
+                    </div>
+                    <button type="submit" class="w-full btn-primary px-8 py-4 rounded-2xl text-dark-900 font-bold text-lg transition-transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                        Request Callback <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </form>
+
+                <!-- Success Message (Hidden by default) -->
+                <div id="success-msg" class="hidden mt-8 p-6 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 flex flex-col items-center">
+                    <i data-lucide="check-circle" class="w-10 h-10 mb-2"></i>
+                    <h4 class="font-bold text-xl mb-1">Request Received!</h4>
+                    <p class="text-sm text-green-400/80">We are routing your request to the business owner. Expect a call shortly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-white/5 py-12 px-6 lg:px-12 relative z-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div class="md:col-span-2">
+                <a href="#" class="flex items-center mb-6">
+                    <img src="https://image.pollinations.ai/prompt/minimalist%20professional%20logo%20icon%20for%20Badoal%20bakrs%20%20Bakery%20%20business%2C%20clean%20vector%20style%2C%20transparent%20background%2C%20no%20text%2C%20single%20icon?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="Badoal bakrs  Logo">
+                </a>
+                <p class="text-gray-500 max-w-sm mb-6">The premier choice for Bakery  maintenance, setting the standard for quality and reliability.</p>
+                <div class="flex gap-4">
+                    <!-- Facebook -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <!-- Twitter -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gold-500 transition-all">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-6">Quick Links</h5>
+                <ul class="space-y-3 text-gray-500">
+                    <li><a href="#about" class="hover:text-gold-500 transition-colors">About Us</a></li>
+                    <li><a href="#services" class="hover:text-gold-500 transition-colors">Our Services</a></li>
+                    <li><a href="#portfolio" class="hover:text-gold-500 transition-colors">Recent Work</a></li>
+                    <li><a href="#contact" class="hover:text-gold-500 transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-6">Contact</h5>
+                <ul class="space-y-4 text-gray-500">
+                    <li class="flex items-start gap-3">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-gold-500 shrink-0 mt-0.5"></i>
+                        <span>📍 Address: Hh
+📞 Phone: 9693186322
+📧 Email: Hj@b.c</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="phone" class="w-5 h-5 text-gold-500 shrink-0"></i>
+                        <span>9693186322</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="mail" class="w-5 h-5 text-gold-500 shrink-0"></i>
+                        <span>info@badoal-bakrs.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-600 text-sm">© 2026. All rights reserved.</p>
+            <div class="flex gap-6 text-sm text-gray-600">
+                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="#" class="hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-4">
+        <a href="https://wa.me/9693186322" target="_blank" class="w-12 h-12 glass rounded-full flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white border border-white/10 shadow-xl transition-all hover:scale-110" aria-label="WhatsApp">
+            <!-- FontAwesome SVG for WhatsApp since Lucide doesn't have standard brand icons -->
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        </a>
+        <a href="tel:9693186322" class="w-12 h-12 glass rounded-full flex items-center justify-center text-white hover:bg-gold-500 hover:text-dark-900 border border-white/10 shadow-xl transition-all hover:scale-110" aria-label="Call Us">
+            <i data-lucide="phone" class="w-5 h-5"></i>
+        </a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js"></script>
+<script>
+// Initialize Icons
+lucide.createIcons();
+
+// Initialize AOS (Animate on Scroll)
+AOS.init({ duration: 800, once: true });
+
+// Sticky Navbar Logic
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        navbar.classList.add('glass-nav-scrolled', 'py-4');
+        navbar.classList.remove('py-6');
+    } else {
+        navbar.classList.remove('glass-nav-scrolled', 'py-4');
+        navbar.classList.add('py-6');
+    }
+});
+
+// Mobile Menu Toggle
+const menuBtn = document.getElementById('mobile-menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+function openMobileMenu() {
+    mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+    mobileMenu.classList.add('opacity-100', 'pointer-events-auto');
+    document.body.classList.add('overflow-hidden');
+    // Re-render icons inside menu
+    lucide.createIcons();
+}
+
+function closeMobileMenu() {
+    mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+    document.body.classList.remove('overflow-hidden');
+}
+
+menuBtn.addEventListener('click', openMobileMenu);
+mobileMenuClose.addEventListener('click', closeMobileMenu);
+mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+
+// Close menu when a nav link is clicked
+mobileNavLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+});
+
+// Animated Counters Logic
+const counters = document.querySelectorAll('.counter');
+const speed = 200; // Lower is faster
+
+const animateCounters = () => {
+    counters.forEach(counter => {
+        const updateCount = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const inc = target / speed;
+
+            if (count < target) {
+                // If float, keep decimals
+                if(target % 1 !== 0) {
+                    counter.innerText = (count + inc).toFixed(1);
+                } else {
+                    counter.innerText = Math.ceil(count + inc);
+                }
+                setTimeout(updateCount, 15);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        updateCount();
+    });
+};
+
+// Intersection Observer to trigger counters when visible
+const trustSection = document.getElementById('trust');
+const observer = new IntersectionObserver((entries) => {
+    if(entries[0].isIntersecting) {
+        animateCounters();
+        observer.disconnect();
+    }
+}, { threshold: 0.5 });
+if(trustSection) observer.observe(trustSection);
+
+
+// Testimonial Auto-Slider Logic
+const slider = document.getElementById('testimonial-slider');
+let isDown = false;
+let startX;
+let scrollLeft;
+
+// Optional: Auto scroll functionality
+let autoScrollInt = setInterval(() => {
+    if(slider) {
+        slider.scrollBy({ left: 300, behavior: 'smooth' });
+        // Reset to start if end is reached
+        if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
+            setTimeout(() => { slider.scrollTo({ left: 0, behavior: 'smooth' }); }, 1000);
+        }
+    }
+}, 4000);
+
+// Pause auto-scroll on hover
+if(slider) {
+    slider.addEventListener('mouseenter', () => clearInterval(autoScrollInt));
+}
+
+
+// Contact Form Submission (Simulation)
+const contactForm = document.getElementById('contact-form');
+const successMsg = document.getElementById('success-msg');
+
+contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Grab data
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    
+    // Simulate sending email to business owner
+    console.log(`[System]: Sending lead to owner...`);
+    console.log(`Name: ${name}, Phone: ${phone}`);
+    
+    // UI Updates
+    const btn = contactForm.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Processing...`;
+    lucide.createIcons();
+
+    setTimeout(() => {
+        contactForm.classList.add('hidden');
+        successMsg.classList.remove('hidden');
+        
+        // Optional: Reset form after 5 seconds
+        setTimeout(() => {
+            contactForm.reset();
+            contactForm.classList.remove('hidden');
+            successMsg.classList.add('hidden');
+            btn.innerHTML = originalText;
+            lucide.createIcons();
+        }, 5000);
+        
+    }, 1200); // Simulate network delay
+});
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@ exports.sendButtonMessage = sendButtonMessage;
 exports.sendListMessage = sendListMessage;
 exports.sendCTAUrlMessage = sendCTAUrlMessage;
 exports.sendFlowMessage = sendFlowMessage;
+exports.sendCarouselMessage = sendCarouselMessage;
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -211,5 +212,52 @@ async function sendFlowMessage(toPhoneNumber, bodyText, buttonLabel, flowId, flo
     catch (error) {
         console.error('[WhatsApp Outbound] Error sending Flow:', error.response?.data || error.message);
         throw error;
+    }
+}
+async function sendCarouselMessage(toPhoneNumber, bodyText, cards) {
+    console.log(`[WhatsApp Outbound] Sending Carousel to ${toPhoneNumber} with ${cards.length} cards: [${cards.map(c => c.title).join(', ')}]`);
+    if (isMock()) {
+        console.warn('[WhatsApp Outbound] Mock mode — logging only.');
+        return;
+    }
+    const payload = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: toPhoneNumber,
+        type: 'interactive',
+        interactive: {
+            type: 'carousel',
+            body: { text: bodyText },
+            action: {
+                cards: cards.map((card, idx) => ({
+                    card_index: idx,
+                    type: 'reply',
+                    header: {
+                        type: 'image',
+                        image: {
+                            link: card.imageUrl
+                        }
+                    },
+                    body: {
+                        text: card.description
+                    },
+                    action: {
+                        name: 'reply',
+                        parameters: {
+                            id: card.buttonId,
+                            title: card.buttonTitle
+                        }
+                    }
+                }))
+            }
+        }
+    };
+    try {
+        const response = await axios_1.default.post(API_URL, payload, { headers: getHeaders() });
+        console.log('[WhatsApp Outbound] Carousel sent. ID:', response.data.messages?.[0]?.id);
+    }
+    catch (error) {
+        console.error('[WhatsApp Outbound] Error sending Carousel:', error.response?.data || error.message);
+        throw new Error('Failed to send WhatsApp Carousel message');
     }
 }

@@ -1,0 +1,32 @@
+<section class="contact contact-v1" style="padding: 4rem 2rem; background-color: hsl(var(--hue-primary), 20%, 15%); color: white;">
+  <div class="container" style="max-width: 800px; margin: 0 auto; text-align: center;">
+    <h2 style="font-family: var(--font-heading); font-size: 2.5rem; margin-bottom: 1rem;">
+      {{section_title}}
+    </h2>
+    <p style="font-family: var(--font-body); font-size: 1.125rem; opacity: 0.9; margin-bottom: 2rem;">
+      {{section_subtitle}}
+    </p>
+    <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-body);">
+        <i data-lucide="phone"></i>
+        <span>{{phone}}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-body);">
+        <i data-lucide="mail"></i>
+        <span>{{email}}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-body);">
+        <i data-lucide="map-pin"></i>
+        <span>{{address}}</span>
+      </div>
+    </div>
+    <form style="display: grid; gap: 1rem; max-width: 500px; margin: 0 auto; text-align: left;">
+      <input type="text" placeholder="Name" style="padding: 1rem; border-radius: 8px; border: none; font-family: var(--font-body);" />
+      <input type="email" placeholder="Email" style="padding: 1rem; border-radius: 8px; border: none; font-family: var(--font-body);" />
+      <textarea placeholder="Message" rows="4" style="padding: 1rem; border-radius: 8px; border: none; font-family: var(--font-body);"></textarea>
+      <button type="submit" style="padding: 1rem 2rem; background-color: hsl(var(--hue-secondary), 60%, 50%); color: white; border: none; border-radius: 8px; font-weight: bold; font-family: var(--font-body); cursor: pointer;">
+        {{button_text}}
+      </button>
+    </form>
+  </div>
+</section>

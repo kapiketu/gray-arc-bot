@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gray Arc - AI Agency Command Center</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+        }
+
+        /* Sidebar Elements */
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Views */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1 { margin-top: 0; font-size: 2rem; margin-bottom: 32px; font-weight: 700; letter-spacing: -0.025em; }
+        h2 { font-size: 1.5rem; margin-bottom: 24px; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+
+        /* Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        
+        .status-Execution { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .status-Completed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-Draft { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+        .status-QA { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .status-Requirements { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+
+        /* Forms */
+        .form-group { margin-bottom: 24px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; }
+        input, textarea, select {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Chat Box */
+        .chat-container {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            margin-top: 32px;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 16px 24px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+        .chat-input-area {
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .chat-input-area button {
+            width: auto;
+            margin-top: 0;
+            white-space: nowrap;
+        }
+
+        /* Logs */
+        .logs-container {
+            background: #000;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: #34d399;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .log-entry { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .log-time { color: #64748b; margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">GA</div>
+            Gray Arc AI
+        </div>
+        
+        <div class="nav-item active" onclick="switchView('view-projects')" id="nav-projects">
+            All Projects
+        </div>
+        
+        <button class="btn-primary" onclick="switchView('view-new')">
+            + New Project
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- View: All Projects -->
+        <div id="view-projects" class="view active">
+            <h1>All Projects</h1>
+            <div id="projects-grid" class="projects-grid">
+                <!-- Projects injected here -->
+            </div>
+        </div>
+
+        <!-- View: New Project -->
+        <div id="view-new" class="view">
+            <h1>Start New Project</h1>
+            <div class="project-card" style="max-width: 600px;">
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="clientName" placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Client Phone (WhatsApp)</label>
+                    <input type="text" id="clientPhone" placeholder="e.g. +1234567890">
+                </div>
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" placeholder="e.g. Bella Bakery Website">
+                </div>
+                <div class="form-group">
+                    <label>Project Type</label>
+                    <select id="projectType">
+                        <option value="Website">Website</option>
+                        <option value="SaaS">SaaS Platform</option>
+                        <option value="Mobile App">Mobile App</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Requirements</label>
+                    <textarea id="requirements" rows="5" placeholder="Detailed requirements..."></textarea>
+                </div>
+                <button class="btn-primary" id="btn-submit" onclick="submitProject()">Launch AI Agents</button>
+            </div>
+        </div>
+
+        <!-- View: Project Detail -->
+        <div id="view-detail" class="view">
+            <button class="btn-primary" style="width:auto; margin-top:0; margin-bottom: 24px; background: var(--bg-hover);" onclick="switchView('view-projects')">← Back</button>
+            
+            <h1 id="detail-name">Project Name</h1>
+            <span id="detail-status" class="status-badge status-Draft">Draft</span>
+
+            <h2>AI Brain Logs (Live Memory)</h2>
+            <div id="detail-logs" class="logs-container">
+                <!-- Logs injected here -->
+            </div>
+            
+            <button class="btn-primary" style="width: auto; margin-top: 16px;" onclick="refreshCurrentProject()">↻ Refresh State</button>
+            <button id="btn-preview" class="btn-primary" style="width: auto; margin-top: 16px; margin-left: 12px; background: #10b981; display: none;" onclick="window.open('/preview/' + currentProjectId, '_blank')">🌐 View Live Website</button>
+
+            <!-- PM Chat Box -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    Message AI Project Manager
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="founderNote" placeholder="e.g. Please change the design to use dark colors instead of light...">
+                    <button class="btn-primary" onclick="sendNoteToPM()">Send Instruction</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let currentProjectId = null;
+        let refreshInterval = null;
+
+        // --- Navigation ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            
+            document.getElementById('nav-projects').classList.toggle('active', viewId === 'view-projects');
+            
+            if (viewId === 'view-projects') loadProjects();
+            
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        // --- API: Load All Projects ---
+        async function loadProjects() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = '<div style="color:var(--text-secondary)">Loading projects...</div>';
+            
+            try {
+                const res = await fetch('/v3/dashboard/projects');
+                const data = await res.json();
+                
+                if (data.projects && data.projects.length > 0) {
+                    grid.innerHTML = data.projects.map(p => `
+                        <div class="project-card" onclick="openProject('${p.id}')">
+                            <span class="status-badge status-${p.status}">${p.status}</span>
+                            <h3 style="margin-top:0; margin-bottom:8px;">${p.name}</h3>
+                            <div style="color:var(--text-secondary); font-size:0.875rem;">Type: ${p.type}</div>
+                            <div style="color:var(--text-secondary); font-size:0.875rem; margin-top:4px;">Date: ${new Date(p.created_at).toLocaleDateString()}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<div style="color:var(--text-secondary)">No projects found. Create one!</div>';
+                }
+            } catch (e) {
+                grid.innerHTML = '<div style="color:#ef4444">Error loading projects.</div>';
+            }
+        }
+
+        // --- API: Submit New Project ---
+        async function submitProject() {
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "Launching...";
+            btn.disabled = true;
+
+            const payload = {
+                clientName: document.getElementById('clientName').value,
+                clientPhone: document.getElementById('clientPhone').value,
+                projectName: document.getElementById('projectName').value,
+                projectType: document.getElementById('projectType').value,
+                requirements: document.getElementById('requirements').value
+            };
+
+            try {
+                const res = await fetch('/v3/dashboard/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                if (data.projectId) {
+                    // Clear form
+                    document.getElementById('projectName').value = '';
+                    document.getElementById('requirements').value = '';
+                    // Open it immediately
+                    openProject(data.projectId);
+                } else {
+                    alert('Error: ' + JSON.stringify(data));
+                }
+            } catch (e) {
+                alert('Connection error.');
+            }
+            
+            btn.innerText = "Launch AI Agents";
+            btn.disabled = false;
+        }
+
+        // --- API: Open Project Details ---
+        async function openProject(id) {
+            currentProjectId = id;
+            switchView('view-detail');
+            await refreshCurrentProject();
+            
+            // Auto refresh every 5 seconds while viewing
+            refreshInterval = setInterval(refreshCurrentProject, 5000);
+        }
+
+        async function refreshCurrentProject() {
+            if (!currentProjectId) return;
+            
+            const logsContainer = document.getElementById('detail-logs');
+            
+            try {
+                const res = await fetch(`/v3/dashboard/projects/${currentProjectId}`);
+                const data = await res.json();
+                
+                if (data.project) {
+                    document.getElementById('detail-name').innerText = data.project.name;
+                    
+                    const statusBadge = document.getElementById('detail-status');
+                    statusBadge.innerText = data.project.status;
+                    statusBadge.className = `status-badge status-${data.project.status}`;
+                    // Show or hide Preview button based on whether files are generated
+                    const btnPreview = document.getElementById('btn-preview');
+                    if (data.state && data.state.developerOutput && data.state.developerOutput.generatedFiles && data.state.developerOutput.generatedFiles.length > 0) {
+                        btnPreview.style.display = 'inline-block';
+                    } else {
+                        btnPreview.style.display = 'none';
+                    }
+
+                    // Render Logs (Combine Input Normalizer state logs + actual AI Database logs)
+                    let allLogsHtml = '';
+                    
+                    // Show initial input normalizer log
+                    if (data.state && data.state.logs) {
+                        allLogsHtml += data.state.logs.map(log => {
+                            const time = new Date(log.timestamp).toLocaleTimeString();
+                            return `<div class="log-entry"><span class="log-time">[${time}]</span> ${log.message}</div>`;
+                        }).join('');
+                    }
+
+                    // Show detailed Agent logs from the ai_logs database table
+                    if (data.logs && data.logs.length > 0) {
+                        allLogsHtml += data.logs.map(log => {
+                            const time = new Date(log.created_at).toLocaleTimeString();
+                            let msg = `<strong style="color: #60a5fa">[${log.agent_type}]</strong> ${log.action.replace(/_/g, ' ')}`;
+                            if (log.status === 'Failed') {
+                                msg += ` <span style="color: #ef4444">(Failed)</span>`;
+                            } else if (log.status === 'Retrying') {
+                                msg += ` <span style="color: #f59e0b">(Retrying)</span>`;
+                            } else {
+                                msg += ` <span style="color: #34d399">(Success)</span>`;
+                            }
+                            return `<div class="log-entry"><span class="log-time">[${time}]</span> ${msg}</div>`;
+                        }).join('');
+                    }
+                    
+                    if (allLogsHtml) {
+                        // Show latest at the bottom
+                        logsContainer.innerHTML = allLogsHtml;
+                        // Auto scroll to bottom
+                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                    } else {
+                        logsContainer.innerHTML = 'Waiting for AI initialization...';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- API: Send Note to PM ---
+        async function sendNoteToPM() {
+            if (!currentProjectId) return;
+            
+            const noteInput = document.getElementById('founderNote');
+            const note = noteInput.value;
+            if (!note.trim()) return;
+
+            noteInput.disabled = true;
+            
+            try {
+                // We use the status update endpoint to trigger a change request
+                const res = await fetch(`/v3/dashboard/projects/${currentProjectId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        status: 'Execution', 
+                        founderNote: note 
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    noteInput.value = '';
+                    alert('Instruction sent to AI Project Manager successfully! The AI will analyze your note and adapt its tasks.');
+                    await refreshCurrentProject();
+                } else {
+                    alert('Error: ' + JSON.stringify(data));
+                }
+            } catch (e) {
+                alert('Connection error.');
+            }
+            
+            noteInput.disabled = false;
+        }
+
+        // Init
+        loadProjects();
+
+    </script>
+</body>
+</html>

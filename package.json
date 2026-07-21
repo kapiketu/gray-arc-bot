@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "WhatsApp-based AI Website Generator and Subscription platform",
   "main": "dist/server.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node --experimental-websocket dist/server.js",
     "dev": "ts-node src/server.ts",
     "test:chat": "ts-node src/test-chat.ts",
     "test:verification": "ts-node src/test-verification.ts"
@@ -15,12 +18,13 @@
     "@fastify/static": "^6.10.2",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.108.2",
+    "@types/node": "^20.10.0",
     "axios": "^1.6.2",
     "cheerio": "^1.2.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.24.3",
+    "openai": "^6.47.0",
     "razorpay": "^2.9.6",
-    "@types/node": "^20.10.0",
     "typescript": "^5.3.2"
   },
   "devDependencies": {

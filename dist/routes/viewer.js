@@ -4,11 +4,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = viewerRoutes;
+exports.renderPremiumWebsite = renderPremiumWebsite;
+exports.getDefaultCategoryIcons = getDefaultCategoryIcons;
+exports.getCategoryImages = getCategoryImages;
+exports.getCategoryStats = getCategoryStats;
+exports.buildSchemaOrgScript = buildSchemaOrgScript;
+exports.validateLucideIcon = validateLucideIcon;
 const db_1 = require("../services/db");
 const domains_1 = require("../services/domains");
 const whatsapp_1 = require("../services/whatsapp");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const templateEngine_1 = require("../services/templateEngine");
+const colorEngine_1 = require("../services/colorEngine");
+const publishingEngine_1 = require("../services/publishingEngine");
+const animationEngine_1 = require("../services/animationEngine");
 async function viewerRoutes(fastify) {
     // 1. Render the generated business websites
     // Secret Preview Templates for mock testing
@@ -223,6 +233,376 @@ async function viewerRoutes(fastify) {
       </html>
     `);
     });
+    fastify.get('/preview/:templateId', async (request, reply) => {
+        const { templateId } = request.params;
+        const templatesDir = path_1.default.join(__dirname, '../../templates');
+        const templatePath = path_1.default.join(templatesDir, templateId);
+        if (!fs_1.default.existsSync(templatePath)) {
+            return reply.status(404).send(`Template ${templateId} not found.`);
+        }
+        const nameParam = request.query.name || '';
+        let businessName = nameParam.trim() || 'Elite Business Solutions';
+        let category = 'Corporate Solutions';
+        const phoneParam = (request.query.phone || '').trim().replace(/[^\d]/g, '');
+        let siteConfig = null;
+        if (phoneParam) {
+            // 1. Try to load an already generated site from database
+            siteConfig = await db_1.db.getSiteByPhone(phoneParam);
+            // 2. If no generated site exists yet, generate one on the fly using the onboarding session details
+            if (!siteConfig) {
+                const session = await db_1.db.getSession(phoneParam);
+                if (session) {
+                    try {
+                        console.log(`[Preview Engine] Generating dynamic Gemini preview for phone: ${phoneParam}`);
+                        const { generateWebsiteConfig } = require('../services/ai');
+                        businessName = session.answers.businessName || businessName;
+                        category = session.answers.category || 'Professional Services';
+                        siteConfig = await generateWebsiteConfig(session.answers.phone || phoneParam, businessName, category, session.answers.about || 'A premium local business.', session.answers.services || '', session.answers.contact || '');
+                        if (siteConfig) {
+                            const { slugify } = require('../services/ai');
+                            const siteId = slugify(businessName);
+                            siteConfig.id = siteId;
+                            siteConfig.template = templateId;
+                            await db_1.db.saveSite(siteConfig);
+                            console.log(`[Preview Engine] Cached site preview in DB: ${siteId}`);
+                        }
+                    }
+                    catch (err) {
+                        console.error('[Preview Engine] Failed to generate dynamic AI site config:', err);
+                    }
+                }
+            }
+            else {
+                // Update template on existing site config if different
+                if (siteConfig.template !== templateId) {
+                    siteConfig.template = templateId;
+                    await db_1.db.saveSite(siteConfig);
+                }
+                businessName = siteConfig.businessName;
+                category = siteConfig.category;
+            }
+        }
+        const mockSiteConfig = {
+            id: `preview-${templateId}`,
+            businessName: businessName,
+            category: category,
+            aboutText: 'Leading provider of innovative solutions. Experience industry-defining quality and professional excellence.',
+            phoneNumber: '+91 99999 99999',
+            aboutImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80',
+            heroImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80',
+            heroTitle: `Welcome to ${businessName}`,
+            heroSubtitle: `We design and ship high-converting solutions tailored to expand your market footprint. Driven by innovation, built to scale.`,
+            storyTitle: 'Our Story',
+            storyContent: 'Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship.',
+            billingStatus: 'active',
+            trialEndsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+            template: templateId,
+            customDomain: null,
+            domainStatus: 'none',
+            theme: {
+                bgColor: '#ffffff',
+                textColor: '#0B0E14',
+                fontFamily: 'Inter, sans-serif',
+                primaryColor: '#3b82f6',
+                secondaryColor: '#1e3a8a'
+            },
+            services: [
+                {
+                    name: 'IT Strategy & Consulting',
+                    description: 'Leverage our decades of domain experience to audit, plan, and guide your technological roadmaps.',
+                    price: 'Contact Us',
+                    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80',
+                    icon: 'briefcase'
+                },
+                {
+                    name: 'Custom Software Development',
+                    description: 'Enterprise-grade systems engineered with modern frameworks, built to perform and outlast its first release.',
+                    price: 'Contact Us',
+                    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80',
+                    icon: 'code'
+                },
+                {
+                    name: 'Applied AI Integrations',
+                    description: 'Integrate deep learning, LLMs, and computer vision models directly into real-world business pipelines.',
+                    price: 'Contact Us',
+                    image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&q=80',
+                    icon: 'cpu'
+                },
+                {
+                    name: 'Cloud Operations & Scaling',
+                    description: 'Provisioning, monitoring, and horizontal autoscaling built for high availability and zero downtime.',
+                    price: 'Contact Us',
+                    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80',
+                    icon: 'cloud'
+                },
+                {
+                    name: 'Compliance & Digital Transformation',
+                    description: 'Technical due diligence, system migrations, and audit compliance groundwork for modern businesses.',
+                    price: 'Contact Us',
+                    image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80',
+                    icon: 'shield'
+                }
+            ],
+            features: [
+                {
+                    title: 'Premium Quality Assurance',
+                    description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks.'
+                },
+                {
+                    title: 'Experienced Specialists',
+                    description: 'Our crew consists of highly trained, certified, and passionate professionals with years of experience.'
+                },
+                {
+                    title: 'Client Centric Partnership',
+                    description: 'Your goals are our priorities. We provide transparent updates and custom, flexible solutions.'
+                }
+            ],
+            testimonials: [
+                {
+                    name: 'Sarah Johnson',
+                    role: 'CEO, Tech Corporation',
+                    content: 'They delivered exactly what was in the technical plan. No surprises, no scope creep. Professionalism was stellar.'
+                },
+                {
+                    name: 'Aarav Mehta',
+                    role: 'VP Engineering, Retail Group',
+                    content: 'Rebuilt our core platform during our highest-traffic quarter without a single hour of downtime.'
+                },
+                {
+                    name: 'David Okafor',
+                    role: 'Director of IT, Healthcare',
+                    content: 'Post-launch support was the real difference. They stayed embedded for three months standard.'
+                }
+            ],
+            galleryImages: [
+                'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80'
+            ],
+            contactDetails: {
+                phone: '+91 99999 99999',
+                email: 'hello@corporate.com',
+                address: '12 Parliament St, London, UK',
+                hours: 'Monday - Saturday: 10:00 AM - 8:00 PM'
+            }
+        };
+        const rendered = renderPremiumWebsite(siteConfig || mockSiteConfig, templateId);
+        let finalHtml = rendered;
+        if (phoneParam) {
+            const botPhoneParam = (request.query.botPhone || '919693186322').trim().replace(/[^\d]/g, '');
+            const bannerHtml = `
+        <!-- Floating Apply Design Action Bar -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-zinc-950/85 backdrop-blur-md border border-zinc-800 p-4 rounded-2xl flex items-center justify-between shadow-2xl" style="font-family: system-ui, -apple-system, sans-serif;">
+          <div class="flex flex-col text-left">
+            <span class="text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Custom Preview</span>
+            <span class="text-xs font-bold text-white mt-0.5">${businessName}</span>
+          </div>
+          <button onclick="applyDesignDirectly()" class="px-5 py-2.5 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl text-xs transition shadow-lg">
+            Apply this Design
+          </button>
+        </div>
+        
+        <script>
+          async function applyDesignDirectly() {
+            try {
+              const response = await fetch('/api/select-template', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: "${phoneParam}", templateId: "${templateId}" })
+              });
+              const data = await response.json();
+              if (data.success) {
+                window.location.href = 'https://wa.me/${botPhoneParam}';
+              } else {
+                alert(data.error || 'Failed to apply design.');
+              }
+            } catch (err) {
+              console.error('Error selecting template:', err);
+              alert('A connection error occurred. Please try again.');
+            }
+          }
+        </script>
+      `;
+            // Inject before body close tag
+            finalHtml = finalHtml.replace('</body>', `${bannerHtml}</body>`);
+        }
+        return reply.type('text/html').send(finalHtml);
+    });
+    fastify.get('/catalog', async (request, reply) => {
+        const phone = (request.query.phone || '').trim();
+        const nameParam = (request.query.name || '').trim();
+        const botPhoneParam = (request.query.botPhone || '').trim();
+        const businessName = nameParam || 'Your Business';
+        const botPhone = botPhoneParam.replace(/[^\d]/g, '') || '919693186322';
+        const fallbackScreenshots = {
+            'GA001': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=600&q=80&auto=format&fit=crop',
+            'GA002': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80&auto=format&fit=crop',
+            'GA003': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop',
+        };
+        const templates = [];
+        const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
+        try {
+            const templatesDir = path_1.default.join(__dirname, '../../templates');
+            if (fs_1.default.existsSync(templatesDir)) {
+                const folders = fs_1.default.readdirSync(templatesDir).filter(f => fs_1.default.statSync(path_1.default.join(templatesDir, f)).isDirectory());
+                for (const folder of folders) {
+                    let name = folder;
+                    let description = 'Premium mobile-responsive template layout.';
+                    let imageUrl = fallbackScreenshots[folder] || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80&auto=format&fit=crop';
+                    const metaPath = path_1.default.join(templatesDir, folder, 'metadata.json');
+                    if (fs_1.default.existsSync(metaPath)) {
+                        const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
+                        name = meta.template_name || meta.name || folder;
+                        description = meta.short_description || meta.purpose || description;
+                        if (meta.preview_image) {
+                            imageUrl = meta.preview_image;
+                        }
+                    }
+                    templates.push({
+                        id: folder,
+                        name,
+                        description,
+                        imageUrl,
+                        previewUrl: `/preview/${folder}?name=${encodeURIComponent(businessName)}&phone=${phone}&botPhone=${botPhone}`
+                    });
+                }
+            }
+        }
+        catch (err) {
+            console.error('[Catalog] Error reading templates:', err);
+        }
+        const html = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Select Your Design Style</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+      <style>body { font-family: 'Outfit', sans-serif; }</style>
+    </head>
+    <body class="bg-zinc-950 text-white min-h-screen py-12 px-6">
+      <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-16">
+          <span class="text-xs uppercase tracking-widest text-indigo-400 font-bold bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20">Template Catalog</span>
+          <h1 class="text-4xl font-extrabold mt-6 mb-4 bg-gradient-to-r from-white via-zinc-200 to-zinc-400 text-transparent bg-clip-text">Choose a Design Layout</h1>
+          <p class="text-zinc-400 text-base max-w-lg mx-auto">
+            Select a design to apply to <span class="text-white font-semibold">${businessName}</span>. Your AI assistant will write custom copy and verify images immediately.
+          </p>
+        </header>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${templates.map(tpl => `
+            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-3xl overflow-hidden hover:border-zinc-700 transition duration-300 flex flex-col group">
+              <div class="relative overflow-hidden aspect-video">
+                <img src="${tpl.imageUrl}" alt="${tpl.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent"></div>
+              </div>
+              
+              <div class="p-6 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">${tpl.name}</h3>
+                  <p class="text-zinc-400 text-sm leading-relaxed mb-6">${tpl.description}</p>
+                </div>
+                
+                <div class="space-y-3">
+                  <a href="${tpl.previewUrl}" target="_blank" class="block w-full text-center py-3 bg-zinc-800 hover:bg-zinc-700/80 text-zinc-200 font-semibold rounded-xl text-sm transition">
+                    View Live Preview
+                  </a>
+                  <button onclick="applyTemplate('${tpl.id}')" class="block w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl text-sm transition shadow-lg">
+                    Apply this Design
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Success Screen Modal -->
+      <div id="success-modal" class="fixed inset-0 bg-zinc-950/90 flex items-center justify-center hidden z-50 p-6">
+        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl max-w-sm text-center shadow-2xl">
+          <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">✓</div>
+          <h2 class="text-2xl font-bold mb-3">Design Applied!</h2>
+          <p class="text-zinc-400 text-sm mb-8 leading-relaxed">
+            Layout successfully selected. Please return to your WhatsApp chat to complete your hosting configuration.
+          </p>
+          <button onclick="closeTab()" class="px-8 py-3 bg-white text-zinc-950 font-bold rounded-xl text-sm hover:bg-zinc-200 transition w-full">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <script>
+        const phone = '${phone}';
+
+        async function applyTemplate(templateId) {
+          if (!phone) {
+            alert('Phone number missing in URL context. Please access this page from the link sent to your WhatsApp.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/select-template', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ phone, templateId })
+            });
+            const data = await response.json();
+            if (data.success) {
+              document.getElementById('success-modal').classList.remove('hidden');
+            } else {
+              alert(data.error || 'Failed to apply design.');
+            }
+          } catch (err) {
+            console.error('Error selecting template:', err);
+            alert('A connection error occurred. Please try again.');
+          }
+        }
+
+        function closeTab() {
+          window.close();
+          window.location.href = 'https://wa.me/${botPhone}';
+        }
+      </script>
+    </body>
+    </html>`;
+        return reply.type('text/html').send(html);
+    });
+    fastify.post('/api/select-template', async (request, reply) => {
+        const { phone, templateId } = request.body;
+        if (!phone || !templateId) {
+            return reply.code(400).send({ error: 'Missing phone or templateId' });
+        }
+        const cleanPhone = phone.replace(/[^\d]/g, '');
+        const session = await db_1.db.getSession(cleanPhone);
+        if (!session || session.step !== 'AWAITING_TEMPLATE') {
+            return reply.code(400).send({ error: 'No active session or not in template selection step' });
+        }
+        let selectedTemplateName = templateId;
+        try {
+            const templatesDir = path_1.default.join(__dirname, '../../templates');
+            const metaPath = path_1.default.join(templatesDir, templateId, 'metadata.json');
+            if (fs_1.default.existsSync(metaPath)) {
+                const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
+                selectedTemplateName = meta.template_name || meta.name || templateId;
+            }
+        }
+        catch (e) {
+            console.warn(`[API] Failed to read template metadata:`, e);
+        }
+        session.answers.template = templateId;
+        session.step = 'AWAITING_DOMAIN_CHOICE';
+        session.lastActive = new Date().toISOString();
+        await db_1.db.saveSession(session);
+        await (0, whatsapp_1.sendButtonMessage)(cleanPhone, `Design selected: *${selectedTemplateName}* ✅\\n\\nHow would you like to host your website?`, [
+            { id: 'host_buy_custom', title: 'Buy New Domain' },
+            { id: 'host_point_custom', title: 'Connect My Domain' },
+            { id: 'host_free', title: 'Free Subdomain' }
+        ], 'Hosting Option', 'Buy new domain: ₹500 one-time');
+        return reply.send({ success: true });
+    });
     fastify.get('/site/:siteId', async (request, reply) => {
         const { siteId } = request.params;
         const site = await db_1.db.getSite(siteId);
@@ -238,6 +618,48 @@ async function viewerRoutes(fastify) {
         const { template } = request.query;
         reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
         return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
+    });
+    // Temporary Diagnostic Route to test Gemini API Key directly on the server
+    fastify.get('/test-gemini-key', async (request, reply) => {
+        const key = process.env.GEMINI_API_KEY;
+        if (!key) {
+            return { success: false, error: 'GEMINI_API_KEY is not defined in process.env!' };
+        }
+        try {
+            const { GoogleGenerativeAI } = require('@google/generative-ai');
+            const ai = new GoogleGenerativeAI(key);
+            const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+            const res = await model.generateContent("Respond with 'OK'");
+            const text = res.response.text();
+            return { success: true, keySnippet: key.substring(0, 8) + '...', response: text.trim() };
+        }
+        catch (err) {
+            return { success: false, keySnippet: key.substring(0, 8) + '...', error: err.message };
+        }
+    });
+    // 1b. Export generated websites to React source code
+    fastify.get('/site/:siteId/export/react', async (request, reply) => {
+        const { siteId } = request.params;
+        const site = await db_1.db.getSite(siteId);
+        if (!site) {
+            return reply.code(404).send({ error: 'Site not found' });
+        }
+        const { template } = request.query;
+        const code = (0, publishingEngine_1.exportToReact)(site, template || site.template);
+        reply.header('Content-Disposition', `attachment; filename="${site.id}-component.jsx"`);
+        return reply.type('text/plain').send(code);
+    });
+    // 1c. Export generated websites to Next.js source code
+    fastify.get('/site/:siteId/export/nextjs', async (request, reply) => {
+        const { siteId } = request.params;
+        const site = await db_1.db.getSite(siteId);
+        if (!site) {
+            return reply.code(404).send({ error: 'Site not found' });
+        }
+        const { template } = request.query;
+        const code = (0, publishingEngine_1.exportToNextJS)(site, template || site.template);
+        reply.header('Content-Disposition', `attachment; filename="${site.id}-page.tsx"`);
+        return reply.type('text/plain').send(code);
     });
     // 2. Mock Razorpay Domain Payment Page
     fastify.get('/pay/domain', async (request, reply) => {
@@ -430,6 +852,9 @@ function renderPremiumWebsite(site, templateId) {
     const cssPath = path_1.default.join(dirPath, 'style.css');
     const jsPath = path_1.default.join(dirPath, 'script.js');
     let html = fs_1.default.readFileSync(htmlPath, 'utf8');
+    // Inject Schema.org JSON-LD structured data
+    const schemaScript = buildSchemaOrgScript(site);
+    html = html.replace('</head>', `${schemaScript}</head>`);
     // Inline CSS
     if (fs_1.default.existsSync(cssPath)) {
         const css = fs_1.default.readFileSync(cssPath, 'utf8');
@@ -440,22 +865,50 @@ function renderPremiumWebsite(site, templateId) {
         const js = fs_1.default.readFileSync(jsPath, 'utf8');
         html = html.replace('</body>', `<script>\n${js}\n</script>\n</body>`);
     }
+    // If dynamic layout, stitch section components dynamically
+    if (finalId === 'GA004') {
+        const dynamicSections = (0, templateEngine_1.compileDynamicLayout)(site);
+        html = html.replace('{{dynamic_hero}}', dynamicSections.hero);
+        html = html.replace('{{dynamic_about}}', dynamicSections.about);
+        html = html.replace('{{dynamic_services}}', dynamicSections.services);
+        html = html.replace('{{dynamic_features}}', dynamicSections.features);
+        html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
+        html = html.replace('{{dynamic_faqs}}', dynamicSections.faq);
+        html = html.replace('{{dynamic_footer}}', dynamicSections.footer);
+    }
     const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
-    const testimonialsHtml = renderTestimonialsSlider(site.testimonials || []);
-    const logoHtml = `<img src="https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(site.businessName)}?width=200&height=200&nologo=true" class="w-8 h-8 rounded-lg object-contain bg-white/5 border border-white/10" alt="Logo">`;
+    const testimonialsHtml = renderTestimonialsSlider(site.testimonials || [], site);
+    const logoPrompt = `minimalist professional logo icon for ${site.businessName} ${site.category || ''} business, clean vector style, transparent background, no text, single icon`;
+    const logoHtml = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="${site.businessName} Logo">`;
     const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
     const imageBase = getCategoryImages(site.category || '');
+    const stats = (site.stats && site.stats.length === 4) ? site.stats : getCategoryStats(site.category || '');
+    const brandHex = site.theme?.primaryColor || '#3b82f6';
+    const isDark = (site.theme?.bgColor || '#030712') !== '#ffffff';
+    const palette = (0, colorEngine_1.generateThemePalette)(brandHex, isDark);
     // Perform substitutions
     const replacements = {
         '{{business_name}}': site.businessName,
         '{{category}}': site.category || 'Professional Services',
+        '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
+        '{{primary_color}}': palette.primary,
+        '{{primary_hover}}': palette.primaryHover,
+        '{{secondary_color}}': palette.secondary,
+        '{{bg_color}}': palette.background,
+        '{{surface_color}}': palette.surface,
+        '{{card_color}}': palette.card,
+        '{{border_color}}': palette.border,
+        '{{text_color}}': palette.textPrimary,
+        '{{text_secondary}}': palette.textSecondary,
+        '{{font_family}}': site.theme?.fontFamily || 'Outfit, sans-serif',
+        '{{hours}}': site.contactDetails?.hours || 'Monday - Saturday: 10:00 AM - 8:00 PM',
         '{{logo}}': logoHtml,
         '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
         '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
-        '{{hero_image}}': imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
+        '{{hero_image}}': site.heroImage || imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
         '{{about_title}}': site.storyTitle || 'About Our Company',
         '{{about_content}}': formatParagraphs(site.storyContent || 'We operate at the intersection of traditional craftsmanship and modern technology, ensuring absolute perfection.'),
-        '{{about_image}}': imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
+        '{{about_image}}': site.aboutImage || imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
         '{{phone}}': site.phoneNumber || '',
         '{{phone_clean}}': cleanPhone,
         '{{email}}': site.contactDetails?.email || 'contact@mybusiness.com',
@@ -467,72 +920,178 @@ function renderPremiumWebsite(site, templateId) {
         '{{feature_2_title}}': site.features?.[1]?.title || 'Execution',
         '{{feature_2_desc}}': site.features?.[1]?.description || 'Our certified crew executes the project utilizing high quality tools.',
         '{{feature_3_title}}': site.features?.[2]?.title || 'Walkthrough',
-        '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.'
+        '{{feature_3_desc}}': site.features?.[2]?.description || 'A complete final checklist walkthrough to ensure 100% satisfaction.',
+        '{{gallery_img_1}}': site.galleryImages?.[0] || imageBase.products[0] || imageBase.hero,
+        '{{gallery_img_2}}': site.galleryImages?.[1] || imageBase.products[1] || imageBase.products[0] || imageBase.hero,
+        '{{gallery_img_3}}': site.galleryImages?.[2] || imageBase.products[2] || imageBase.products[0] || imageBase.hero,
+        '{{gallery_img_4}}': site.galleryImages?.[3] || imageBase.products[3] || imageBase.products[0] || imageBase.hero,
+        '{{gallery_label_1}}': site.services?.[0]?.name || site.category || 'Our Work',
+        '{{gallery_label_2}}': site.services?.[1]?.name || site.category || 'Quality Service',
+        '{{gallery_label_3}}': site.services?.[2]?.name || site.category || 'Premium Results',
+        '{{gallery_label_4}}': site.services?.[3]?.name || site.category || 'Expert Craft',
+        '{{stat_1_icon}}': validateLucideIcon(stats[0].icon, 'rocket'),
+        '{{stat_1_value}}': stats[0].value,
+        '{{stat_1_label}}': stats[0].label,
+        '{{stat_2_icon}}': validateLucideIcon(stats[1].icon, 'shield-check'),
+        '{{stat_2_value}}': stats[1].value,
+        '{{stat_2_label}}': stats[1].label,
+        '{{stat_3_icon}}': validateLucideIcon(stats[2].icon, 'users'),
+        '{{stat_3_value}}': stats[2].value,
+        '{{stat_3_label}}': stats[2].label,
+        '{{stat_4_icon}}': validateLucideIcon(stats[3].icon, 'award'),
+        '{{stat_4_value}}': stats[3].value,
+        '{{stat_4_label}}': stats[3].label
     };
     for (const [key, value] of Object.entries(replacements)) {
         html = html.split(key).join(value);
     }
+    // Apply animation engine rules
+    html = (0, animationEngine_1.injectAOSAnimations)(html, 'dynamic');
+    // Inject analytics tracker pixel
+    const analyticsSnippet = `
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MOCK-TAG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MOCK-TAG');
+  </script>
+  `;
+    html = html.replace('</head>', `${analyticsSnippet}\n</head>`);
+    // ────────────────────────────────────────────────────────
+    // STAGE 12: AUTOMATED QA GATE & AUTO-HEALING
+    // ────────────────────────────────────────────────────────
+    const unresolvedPlaceholders = html.match(/\{\{[a-zA-Z0-9_-]+\}\}/g) || [];
+    if (unresolvedPlaceholders.length > 0) {
+        console.warn(`[Live QA Gate] Auto-healing unresolved placeholders: ${Array.from(new Set(unresolvedPlaceholders)).join(', ')}`);
+        unresolvedPlaceholders.forEach(placeholder => {
+            html = html.split(placeholder).join('');
+        });
+    }
     return html;
 }
+function getDefaultCategoryIcons(category) {
+    const cat = category.toLowerCase();
+    if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('food') || cat.includes('restaurant') || cat.includes('cafe')) {
+        return ['utensils', 'coffee', 'cake', 'cookie', 'glass-water', 'shopping-bag'];
+    }
+    if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+        return ['sparkles', 'scissors', 'gem', 'flower', 'heart', 'smile'];
+    }
+    if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+        return ['dumbbell', 'flame', 'trophy', 'target', 'heart', 'activity'];
+    }
+    if (cat.includes('travel') || cat.includes('tour') || cat.includes('holiday') || cat.includes('adventure') || cat.includes('trip') || cat.includes('taxi') || cat.includes('cab')) {
+        return ['compass', 'map', 'plane', 'globe', 'luggage', 'camera'];
+    }
+    if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical')) {
+        return ['stethoscope', 'activity', 'heart', 'shield', 'award', 'sparkles'];
+    }
+    if (cat.includes('tech') || cat.includes('software') || cat.includes('it') || cat.includes('digital') || cat.includes('web') || cat.includes('app') || cat.includes('development') || cat.includes('coding') || cat.includes('programmer')) {
+        return ['code', 'laptop', 'smartphone', 'database', 'cpu', 'terminal'];
+    }
+    return ['zap', 'shield', 'sparkles', 'star', 'award', 'activity'];
+}
 function renderServicesGrid(services, category, phone, site) {
+    if (site && site.template === 'GA003') {
+        const defaultIcons = getDefaultCategoryIcons(category);
+        let gridItems = '';
+        services.forEach((s, idx) => {
+            if (idx >= 5)
+                return; // grid-cols-5 row limit
+            const icon = validateLucideIcon(s.icon || '', defaultIcons[idx % defaultIcons.length]);
+            const delay = idx * 100;
+            const isHighlighted = (idx === 2); // 3rd card Web Development is dark highlighted in reference image
+            if (isHighlighted) {
+                gridItems += `
+          <div class="reveal card-lift bg-slate-950 text-white border border-slate-900 rounded-[2rem] p-8 flex flex-col justify-between h-full shadow-lg" style="transition-delay: ${delay}ms;">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mb-6">
+                <i data-lucide="${icon}" class="w-6 h-6 text-blue-400"></i>
+              </div>
+              <h3 class="font-display font-semibold text-xl text-white mb-3">${s.name}</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">${s.description}</p>
+            </div>
+            <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-900">
+              <span class="text-blue-400 font-bold text-sm">${s.price || 'Contact Us'}</span>
+              <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-all flex items-center gap-1">Read More <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
+          </div>
+        `;
+            }
+            else {
+                gridItems += `
+          <div class="reveal card-lift bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex flex-col justify-between h-full" style="transition-delay: ${delay}ms;">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6">
+                <i data-lucide="${icon}" class="w-6 h-6 text-blue-600"></i>
+              </div>
+              <h3 class="font-display font-semibold text-xl text-slate-900 mb-3">${s.name}</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">${s.description}</p>
+            </div>
+            <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-100">
+              <span class="text-blue-600 font-bold text-sm">${s.price || 'Contact Us'}</span>
+              <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-all flex items-center gap-1">Read More <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+            </div>
+          </div>
+        `;
+            }
+        });
+        return gridItems;
+    }
     if (services.length === 0)
         return '';
+    const defaultIcons = getDefaultCategoryIcons(category);
     let gridItems = '';
     services.forEach((s, idx) => {
-        if (idx >= 4)
+        if (idx >= 6)
             return;
-        const cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(s.name)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+        // Sanitize service name to avoid commas/slashes that break the AI endpoint
+        const cleanName = s.name.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
+        let cardImg = s.image;
+        if (!cardImg) {
+            cardImg = `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(cleanName)}%20for%20${encodeURIComponent(category)}%20business?width=1200&height=800&nologo=true`;
+            if (idx === 1) {
+                cardImg = 'https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=1200&q=80&auto=format&fit=crop';
+            }
+        }
+        const icon = validateLucideIcon(s.icon || '', defaultIcons[idx % defaultIcons.length]);
+        const delay = idx * 100;
         if (idx === 0) {
+            // Featured card — larger span
             gridItems += `
-        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="0">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500 mix-blend-overlay">
+        <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
             <div class="absolute inset-0 p-8 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
-                    <i data-lucide="zap" class="w-7 h-7"></i>
+                    <i data-lucide="${icon}" class="w-7 h-7"></i>
                 </div>
                 <h4 class="text-3xl font-bold text-white mb-3">${s.name}</h4>
-                <p class="text-gray-300 max-w-md">${s.description}</p>
+                <p class="text-gray-300 max-w-md line-clamp-3">${s.description}</p>
                 <div class="flex justify-between items-center mt-6">
-                    <span class="text-gold-500 font-extrabold text-xl">${s.price || '₹Contact Us'}</span>
+                    <span class="text-gold-500 font-extrabold text-xl">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="px-6 py-2 rounded-full bg-gold-500 text-dark-900 font-bold hover:scale-105 transition-all text-sm">Enquire</a>
                 </div>
             </div>
         </div>
       `;
         }
-        else if (idx === 3) {
-            gridItems += `
-        <div class="md:col-span-3 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer flex flex-col md:flex-row items-center p-8 gap-8" data-aos="zoom-in" data-aos-delay="300">
-            <div class="absolute inset-0 bg-gradient-to-r from-dark-800 to-transparent opacity-80 z-0"></div>
-            <div class="bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center text-gold-500 shrink-0 border border-white/10 relative z-10">
-                <i data-lucide="shield" class="w-8 h-8"></i>
-            </div>
-            <div class="relative z-10 flex-1">
-                <h4 class="text-2xl font-bold text-white mb-2">${s.name}</h4>
-                <p class="text-gray-400">${s.description}</p>
-                <p class="text-gold-500 font-extrabold mt-2 text-lg">${s.price || '₹Contact Us'}</p>
-            </div>
-            <div class="relative z-10">
-                <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all">
-                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
-                </a>
-            </div>
-        </div>
-      `;
-        }
         else {
+            // All other cards — same background image treatment
             gridItems += `
-        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer p-8 flex flex-col justify-end" data-aos="zoom-in" data-aos-delay="${idx * 100}">
-            <div class="absolute inset-0 bg-dark-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative z-10">
-                <div class="bg-white/5 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 border border-white/10">
-                    <i data-lucide="${idx === 1 ? 'droplets' : 'thermometer-sun'}" class="w-6 h-6"></i>
+        <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-end">
+                <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">
+                    <i data-lucide="${icon}" class="w-6 h-6"></i>
                 </div>
                 <h4 class="text-xl font-bold text-white mb-2">${s.name}</h4>
-                <p class="text-gray-400 text-sm mb-4">${s.description}</p>
+                <p class="text-gray-300 text-sm mb-4 line-clamp-2">${s.description}</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-gold-500 font-bold text-sm">${s.price || '₹Contact Us'}</span>
+                    <span class="text-gold-500 font-bold text-sm">${s.price || 'Contact Us'}</span>
                     <a href="https://wa.me/${phone.replace(/\D/g, '')}?text=Hi! I am interested in ${encodeURIComponent(s.name)}" target="_blank" class="text-xs border border-white/10 px-3 py-1 rounded-full hover:bg-gold-500 hover:text-dark-900 hover:border-gold-500 transition-all font-semibold">Enquire</a>
                 </div>
             </div>
@@ -542,9 +1101,29 @@ function renderServicesGrid(services, category, phone, site) {
     });
     return `<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">\n${gridItems}\n</div>`;
 }
-function renderTestimonialsSlider(testimonials) {
+function renderTestimonialsSlider(testimonials, site) {
     if (testimonials.length === 0)
         return '';
+    if (site && site.template === 'GA003') {
+        let items = '';
+        testimonials.forEach((t) => {
+            const initials = (t.name || 'C').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            items += `
+        <div class="reveal bg-white border border-line rounded-2xl p-8 text-left shadow-sm">
+          <i data-lucide="quote" class="w-6 h-6 text-indigo mb-5"></i>
+          <p class="text-sm leading-relaxed text-ink/90 mb-6">"${t.content}"</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center font-display font-semibold text-indigo text-sm">${initials}</div>
+            <div>
+              <div class="font-display font-semibold text-sm text-ink">${t.name}</div>
+              <div class="text-xs text-slate">${t.role || 'Verified Client'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+        });
+        return `<div class="grid md:grid-cols-3 gap-6">\n${items}\n</div>`;
+    }
     let items = '';
     testimonials.forEach((t) => {
         const initials = (t.name || 'C').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -793,4 +1372,102 @@ function renderPaymentPage(type, siteId, domain, paymentId, price) {
         <p class="text-center text-xs text-zinc-600 mt-6">🔒 Secured by Razorpay</p>
       </div>
     </body></html>`;
+}
+function getCategoryStats(category) {
+    const cat = category.toLowerCase();
+    if (cat.includes('bakery') || cat.includes('cake') || cat.includes('sweet') || cat.includes('pastry') || cat.includes('restaurant') || cat.includes('food') || cat.includes('cafe') || cat.includes('kitchen') || cat.includes('coffee') || cat.includes('biryani')) {
+        return [
+            { icon: 'heart', value: '5000+', label: 'Happy Foodies' },
+            { icon: 'flame', value: '15+', label: 'Secret Spices' },
+            { icon: 'leaf', value: '100%', label: 'Fresh & Clean' },
+            { icon: 'star', value: '4.9★', label: 'Top Rated' }
+        ];
+    }
+    if (cat.includes('salon') || cat.includes('beauty') || cat.includes('spa') || cat.includes('makeup') || cat.includes('hair')) {
+        return [
+            { icon: 'scissors', value: '8+', label: 'Expert Stylists' },
+            { icon: 'sparkles', value: '1200+', label: 'Makeovers Done' },
+            { icon: 'shield-check', value: '100%', label: 'Organic Products' },
+            { icon: 'smile', value: '4.8★', label: 'Client Reviews' }
+        ];
+    }
+    if (cat.includes('gym') || cat.includes('fitness') || cat.includes('sport') || cat.includes('yoga') || cat.includes('training')) {
+        return [
+            { icon: 'users', value: '12+', label: 'Expert Trainers' },
+            { icon: 'dumbbell', value: '30+', label: 'Modern Workouts' },
+            { icon: 'award', value: '500+', label: 'Active Members' },
+            { icon: 'flame', value: '99%', label: 'Goal Success' }
+        ];
+    }
+    if (cat.includes('travel') || cat.includes('tour') || cat.includes('holiday') || cat.includes('adventure') || cat.includes('trip') || cat.includes('taxi') || cat.includes('cab')) {
+        return [
+            { icon: 'compass', value: '50+', label: 'Guided Packages' },
+            { icon: 'globe', value: '2000+', label: 'Happy Travelers' },
+            { icon: 'shield-check', value: '100%', label: 'Safe Journeys' },
+            { icon: 'star', value: '4.9★', label: 'Travel Rating' }
+        ];
+    }
+    if (cat.includes('clinic') || cat.includes('doctor') || cat.includes('dental') || cat.includes('health') || cat.includes('medical')) {
+        return [
+            { icon: 'stethoscope', value: '15+', label: 'Years of Care' },
+            { icon: 'users', value: '10k+', label: 'Patients Healed' },
+            { icon: 'shield-check', value: '100%', label: 'Certified Clinic' },
+            { icon: 'activity', value: '24/7', label: 'Emergency Support' }
+        ];
+    }
+    return [
+        { icon: 'rocket', value: '10+', label: 'Years of Experience' },
+        { icon: 'shield-check', value: '350+', label: 'Projects Completed' },
+        { icon: 'users', value: '200+', label: 'Expert Professionals' },
+        { icon: 'award', value: '98%', label: 'Client Satisfaction' }
+    ];
+}
+function buildSchemaOrgScript(site) {
+    const businessType = site.schemaOrg?.businessType || 'LocalBusiness';
+    const priceRange = site.schemaOrg?.priceRange || '₹₹';
+    const schema = {
+        '@context': 'https://schema.org',
+        '@type': businessType,
+        'name': site.businessName,
+        'description': site.aboutText || site.heroSubtitle || 'A premium local business.',
+        'url': site.customDomain ? `https://${site.customDomain}` : `https://${site.id}.ai.thegrayarc.com`,
+        'telephone': site.phoneNumber,
+        'priceRange': priceRange,
+        'address': {
+            '@type': 'PostalAddress',
+            'streetAddress': site.contactDetails?.address || 'Available locally & online'
+        },
+        'openingHoursSpecification': [
+            {
+                '@type': 'OpeningHoursSpecification',
+                'dayOfWeek': [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday'
+                ],
+                'opens': '10:00',
+                'closes': '20:00'
+            }
+        ]
+    };
+    return `\n<script type="application/ld+json">\n${JSON.stringify(schema, null, 2)}\n</script>\n`;
+}
+const VALID_LUCIDE_ICONS = new Set([
+    'utensils', 'coffee', 'cake', 'cookie', 'glass-water', 'shopping-bag',
+    'sparkles', 'scissors', 'gem', 'flower', 'heart', 'smile',
+    'dumbbell', 'flame', 'trophy', 'target', 'activity',
+    'compass', 'map', 'plane', 'globe', 'luggage', 'camera',
+    'stethoscope', 'shield', 'award', 'zap', 'star', 'users', 'rocket',
+    'briefcase', 'code', 'laptop', 'smartphone', 'database', 'cpu', 'terminal',
+    'cloud', 'activity', 'chef-hat', 'smile-plus', 'store', 'phone', 'mail',
+    'map-pin', 'clock', 'check-circle-2', 'check', 'arrow-right', 'instagram',
+    'facebook', 'twitter', 'youtube', 'linkedin', 'chevron-right', 'chevron-left',
+    'quote', 'message-circle', 'chevron-down', 'shield-check'
+]);
+function validateLucideIcon(icon, fallback) {
+    const clean = (icon || '').trim().toLowerCase();
+    return VALID_LUCIDE_ICONS.has(clean) ? clean : fallback;
 }

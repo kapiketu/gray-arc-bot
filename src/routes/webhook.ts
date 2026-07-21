@@ -353,13 +353,23 @@ async function handleChatFlow(input: UserInput) {
     
     session.answers.botPhone = input.recipientPhone || '919693186322';
     
-    // Transition directly to template selection!
-    session.step = 'AWAITING_TEMPLATE';
+    // Skip template selection — AI auto-selects the best design based on industry
+    session.step = 'AWAITING_DOMAIN_CHOICE';
     session.lastActive = new Date().toISOString();
     await db.saveSession(session);
 
-    // Send the template selector menu
-    await sendTemplateSelector(from, session);
+    // Go directly to hosting options
+    await sendButtonMessage(
+      from,
+      `✅ *Details received!*\n\nThe AI will automatically design the best layout for *${session.answers.businessName}* based on your industry.\n\nHow would you like to host your website?`,
+      [
+        { id: 'host_buy_custom', title: 'Buy New Domain' },
+        { id: 'host_point_custom', title: 'Connect My Domain' },
+        { id: 'host_free', title: 'Free Subdomain' }
+      ],
+      'Hosting Option',
+      'Buy new domain: ₹500 one-time'
+    );
     return;
   }
 
@@ -739,9 +749,20 @@ async function handleChatFlow(input: UserInput) {
 
     case 'AWAITING_CONTACT':
       session.answers.contact = text;
-      session.step = 'AWAITING_TEMPLATE';
+      // Skip template selection — AI auto-selects the best design
+      session.step = 'AWAITING_DOMAIN_CHOICE';
       await db.saveSession(session);
-      await sendTemplateSelector(from, session);
+      await sendButtonMessage(
+        from,
+        `✅ *Details received!*\n\nThe AI will automatically design the best layout for *${session.answers.businessName || 'your business'}*.\n\nHow would you like to host your website?`,
+        [
+          { id: 'host_buy_custom', title: 'Buy New Domain' },
+          { id: 'host_point_custom', title: 'Connect My Domain' },
+          { id: 'host_free', title: 'Free Subdomain' }
+        ],
+        'Hosting Option',
+        'Buy new domain: ₹500 one-time'
+      );
       break;
 
     case 'AWAITING_TEMPLATE':

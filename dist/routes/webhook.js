@@ -62,12 +62,14 @@ function extractUserInput(value) {
     const from = message.from;
     if (!from)
         return null;
+    const recipientPhone = value?.metadata?.display_phone_number || '';
     // 1. Plain text message
     if (message.type === 'text' && message.text?.body?.trim()) {
         return {
             from,
             text: message.text.body.trim(),
-            type: 'text'
+            type: 'text',
+            recipientPhone
         };
     }
     // 2. Button reply (user tapped a quick reply button)
@@ -76,7 +78,8 @@ function extractUserInput(value) {
             from,
             text: message.interactive.button_reply.title,
             type: 'button_reply',
-            buttonId: message.interactive.button_reply.id
+            buttonId: message.interactive.button_reply.id,
+            recipientPhone
         };
     }
     // 3. List reply (user selected an item from a list menu)
@@ -85,7 +88,8 @@ function extractUserInput(value) {
             from,
             text: message.interactive.list_reply.title,
             type: 'list_reply',
-            buttonId: message.interactive.list_reply.id
+            buttonId: message.interactive.list_reply.id,
+            recipientPhone
         };
     }
     // 4. Flow reply (user submitted a native Flow form)
@@ -104,7 +108,8 @@ function extractUserInput(value) {
             from,
             text: 'Flow submitted',
             type: 'flow_reply',
-            flowData
+            flowData,
+            recipientPhone
         };
     }
     return null;
@@ -135,12 +140,12 @@ async function sendCategoryList(to) {
             ]
         }], 'Step 1 of 5');
 }
-async function sendTemplateSelector(to) {
-    await (0, whatsapp_1.sendButtonMessage)(to, `Almost done! Choose a design style for your website:`, [
-        { id: 'tpl_portfolio', title: 'Nature Portfolio' },
-        { id: 'tpl_grayarc', title: 'Gray Arc v1' },
-        { id: 'tpl_taxi', title: 'Taxi Board' }
-    ], 'Step 5 of 5', 'All designs are mobile-responsive');
+async function sendTemplateSelector(to, session) {
+    const baseUrl = process.env.PUBLIC_URL || 'https://ai.thegrayarc.com';
+    const businessName = session?.answers?.businessName || 'Your Business';
+    const botPhone = session?.answers?.botPhone || '919693186322';
+    const catalogUrl = `${baseUrl}/catalog?phone=${to}&name=${encodeURIComponent(businessName)}&botPhone=${botPhone}`;
+    await (0, whatsapp_1.sendCTAUrlMessage)(to, `Almost done! Tap the button below to browse our template catalog, custom-branded for *${businessName}*. Select your favorite design to initiate the AI build:`, 'Browse Designs', catalogUrl, 'Choose Website Design', 'Catalog includes 10+ layouts');
 }
 async function sendSiteReadyMenu(to, siteUrl) {
     await (0, whatsapp_1.sendCTAUrlMessage)(to, `🎉 *Congratulations! Your website is live!*\n\n🎁 Your *30-Day Free Trial* is now active!\n\nTap below to view your website:`, 'View Live Site', siteUrl);
@@ -267,12 +272,17 @@ async function handleChatFlow(input) {
         session.answers.email = flowData.email || '';
         session.answers.phone = flowData.phone || from;
         session.answers.contact = `📍 Address: ${flowData.address || 'Global'}\n📞 Phone: ${flowData.phone || from}\n📧 Email: ${flowData.email || ''}`;
-        // Transition directly to template selection!
-        session.step = 'AWAITING_TEMPLATE';
+        session.answers.botPhone = input.recipientPhone || '919693186322';
+        // Skip template selection — AI auto-selects the best design based on industry
+        session.step = 'AWAITING_DOMAIN_CHOICE';
         session.lastActive = new Date().toISOString();
         await db_1.db.saveSession(session);
-        // Send the template selector menu
-        await sendTemplateSelector(from);
+        // Go directly to hosting options
+        await (0, whatsapp_1.sendButtonMessage)(from, `✅ *Details received!*\n\nThe AI will automatically design the best layout for *${session.answers.businessName}* based on your industry.\n\nHow would you like to host your website?`, [
+            { id: 'host_buy_custom', title: 'Buy New Domain' },
+            { id: 'host_point_custom', title: 'Connect My Domain' },
+            { id: 'host_free', title: 'Free Subdomain' }
+        ], 'Hosting Option', 'Buy new domain: ₹500 one-time');
         return;
     }
     // ─── HUMAN / DEVELOPER FALLBACK ───
@@ -352,28 +362,22 @@ async function handleChatFlow(input) {
             return;
         }
         // Template selection
-        if (buttonId === 'tpl_astro' || buttonId === 'tpl_classic' || buttonId === 'tpl_portfolio' || buttonId === 'tpl_story' || buttonId === 'tpl_astroship' || buttonId === 'tpl_nimbus' || buttonId === 'tpl_taxi' || buttonId === 'tpl_grayarc') {
+        if (buttonId && buttonId.startsWith('tpl_')) {
             if (!session || session.step !== 'AWAITING_TEMPLATE') {
                 await (0, whatsapp_1.sendTextMessage)(from, `Something went wrong. Type *'reset'* to start over.`);
                 return;
             }
-            let selectedTemplateName = 'Nature Portfolio';
-            let templateKey = 'portfolio';
-            if (buttonId === 'tpl_astroship') {
-                selectedTemplateName = 'Astroship';
-                templateKey = 'astroship';
+            const templateKey = buttonId.replace('tpl_', '');
+            let selectedTemplateName = templateKey;
+            try {
+                const metaPath = path_1.default.join(__dirname, '../../templates', templateKey, 'metadata.json');
+                if (fs_1.default.existsSync(metaPath)) {
+                    const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
+                    selectedTemplateName = meta.template_name || meta.name || templateKey;
+                }
             }
-            else if (buttonId === 'tpl_nimbus') {
-                selectedTemplateName = 'Nimbus (Dark)';
-                templateKey = 'nimbus';
-            }
-            else if (buttonId === 'tpl_taxi') {
-                selectedTemplateName = 'Taxi Board';
-                templateKey = 'taxi';
-            }
-            else if (buttonId === 'tpl_grayarc') {
-                selectedTemplateName = 'Gray Arc v1';
-                templateKey = 'grayarc';
+            catch (e) {
+                console.warn(`[Webhook] Failed to read template metadata:`, e);
             }
             session.answers.template = templateKey;
             session.step = 'AWAITING_DOMAIN_CHOICE';
@@ -574,37 +578,49 @@ async function handleChatFlow(input) {
             break;
         case 'AWAITING_CONTACT':
             session.answers.contact = text;
-            session.step = 'AWAITING_TEMPLATE';
+            // Skip template selection — AI auto-selects the best design
+            session.step = 'AWAITING_DOMAIN_CHOICE';
             await db_1.db.saveSession(session);
-            await sendTemplateSelector(from);
+            await (0, whatsapp_1.sendButtonMessage)(from, `✅ *Details received!*\n\nThe AI will automatically design the best layout for *${session.answers.businessName || 'your business'}*.\n\nHow would you like to host your website?`, [
+                { id: 'host_buy_custom', title: 'Buy New Domain' },
+                { id: 'host_point_custom', title: 'Connect My Domain' },
+                { id: 'host_free', title: 'Free Subdomain' }
+            ], 'Hosting Option', 'Buy new domain: ₹500 one-time');
             break;
         case 'AWAITING_TEMPLATE':
             const choice = text.toLowerCase();
-            let templateKey = 'portfolio';
-            let selectedTemplateName = 'Nature Portfolio';
-            if (choice.includes('astro') || choice.includes('ship')) {
-                templateKey = 'astroship';
-                selectedTemplateName = 'Astroship';
+            let templateKey = 'GA001';
+            let selectedTemplateName = 'Service Pro';
+            try {
+                const templatesDir = path_1.default.join(__dirname, '../../templates');
+                if (fs_1.default.existsSync(templatesDir)) {
+                    const folders = fs_1.default.readdirSync(templatesDir).filter(f => fs_1.default.statSync(path_1.default.join(templatesDir, f)).isDirectory());
+                    for (const folder of folders) {
+                        let name = folder.toLowerCase();
+                        const metaPath = path_1.default.join(templatesDir, folder, 'metadata.json');
+                        if (fs_1.default.existsSync(metaPath)) {
+                            const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
+                            name = (meta.template_name || meta.name || folder).toLowerCase();
+                        }
+                        if (choice.includes(name) || name.includes(choice)) {
+                            templateKey = folder;
+                            selectedTemplateName = name;
+                            break;
+                        }
+                    }
+                }
             }
-            else if (choice.includes('nimbus') || choice.includes('dark')) {
-                templateKey = 'nimbus';
-                selectedTemplateName = 'Nimbus (Dark)';
-            }
-            else if (choice.includes('taxi') || choice.includes('cab')) {
-                templateKey = 'taxi';
-                selectedTemplateName = 'Taxi Board';
-            }
-            else if (choice.includes('gray') || choice.includes('arc') || choice.includes('v1')) {
-                templateKey = 'grayarc';
-                selectedTemplateName = 'Gray Arc v1';
+            catch (err) {
+                console.error(`[Webhook] Failed matching text template choice:`, err.message);
             }
             session.answers.template = templateKey;
             session.step = 'AWAITING_DOMAIN_CHOICE';
             await db_1.db.saveSession(session);
             await (0, whatsapp_1.sendButtonMessage)(from, `Design selected: *${selectedTemplateName}* ✅\n\nHow would you like to host your website?`, [
-                { id: 'host_custom', title: 'Custom Domain' },
+                { id: 'host_buy_custom', title: 'Buy New Domain' },
+                { id: 'host_point_custom', title: 'Connect My Domain' },
                 { id: 'host_free', title: 'Free Subdomain' }
-            ], 'Hosting Option', 'Custom domain: ₹500 one-time');
+            ], 'Hosting Option', 'Custom domain setup');
             break;
         case 'AWAITING_DOMAIN_CHOICE':
             if (text === '1' || text.toLowerCase().includes('custom')) {
@@ -742,11 +758,12 @@ async function handleChatFlow(input) {
 // BUILD & PUBLISH WEBSITE
 // ────────────────────────────────────────────────────────
 async function buildAndPublishSite(from, session, isCustomDomain) {
-    await (0, whatsapp_1.sendTextMessage)(from, `🛠️ *AI is now designing your website...*\nThis takes about 10-15 seconds. Please wait.`);
+    await (0, whatsapp_1.sendTextMessage)(from, `🛠️ *AI is now designing your website...*\nThis takes about 45-60 seconds to ensure a verified, flawless build. Please wait.`);
     try {
         const siteConfig = await (0, ai_1.generateWebsiteConfig)(session.answers.phone || from, session.answers.businessName || 'My Business', session.answers.category || 'Local Shop', session.answers.about || 'A premium local business.', session.answers.services || '', session.answers.contact || '');
         // Pre-generate and cache the logo image using Pollinations AI so it loads instantly for the user
-        const logoUrl = `https://image.pollinations.ai/prompt/minimalist%20clean%20professional%20logo%20for%20${encodeURIComponent(session.answers.businessName || 'Business')}?width=200&height=200&nologo=true`;
+        const logoPrompt = `minimalist professional logo icon for ${session.answers.businessName || 'Business'} ${session.answers.category || ''} business, clean vector style, transparent background, no text, single icon`;
+        const logoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true`;
         console.log(`[Logo Generator] Generating logo at: ${logoUrl}`);
         try {
             await axios_1.default.get(logoUrl, { timeout: 15000 });

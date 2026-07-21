@@ -1,0 +1,62 @@
+Starting Container
+> whatsapp-site-builder@1.0.0 build
+> tsc
+
+npm warn config production Use `--omit=dev` instead.
+
+> whatsapp-site-builder@1.0.0 start
+> node --experimental-websocket dist/server.js
+
+[Server Startup] Starting Gray Arc WhatsApp Website Builder server...
+2026-07-15T17:08:57.651772522Z [INFO] Server listening at http://0.0.0.0:3000 time=1784135337513 pid=34 hostname="31f1cbf54815"
+[Server Startup] Server is online and listening at http://localhost:3000
+npm warn config production Use `--omit=dev` instead.
+
+2026-07-15T17:09:00.315129405Z [INFO] incoming request time=1784135340307 pid=34 hostname="31f1cbf54815" reqId="req-1" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.2","remotePort":28108}
+2026-07-15T17:09:01.298137880Z [INFO] request completed time=1784135341287 pid=34 hostname="31f1cbf54815" reqId="req-1" res={"statusCode":200} responseTime=979.6221542358398
+2026-07-15T17:09:05.309809879Z [INFO] incoming request time=1784135345308 pid=34 hostname="31f1cbf54815" reqId="req-2" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.3","remotePort":22196}
+2026-07-15T17:09:06.268677363Z [INFO] request completed time=1784135346249 pid=34 hostname="31f1cbf54815" reqId="req-2" res={"statusCode":200} responseTime=941.4551181793213
+2026-07-15T17:09:11.228724194Z [INFO] incoming request time=1784135351217 pid=34 hostname="31f1cbf54815" reqId="req-3" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.4","remotePort":22050}
+2026-07-15T17:09:12.220300777Z [INFO] request completed time=1784135352167 pid=34 hostname="31f1cbf54815" reqId="req-3" res={"statusCode":200} responseTime=948.914155960083
+2026-07-15T17:09:16.246524100Z [INFO] incoming request time=1784135356227 pid=34 hostname="31f1cbf54815" reqId="req-4" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":15556}
+2026-07-15T17:09:17.231446562Z [INFO] request completed time=1784135357175 pid=34 hostname="31f1cbf54815" reqId="req-4" res={"statusCode":200} responseTime=947.7995929718018
+2026-07-15T17:09:21.266718588Z [INFO] incoming request time=1784135361216 pid=34 hostname="31f1cbf54815" reqId="req-5" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.6","remotePort":59718}
+2026-07-15T17:09:22.469684987Z [INFO] request completed time=1784135362460 pid=34 hostname="31f1cbf54815" reqId="req-5" res={"statusCode":200} responseTime=1244.5167827606201
+2026-07-15T17:09:26.224549224Z [INFO] incoming request time=1784135366220 pid=34 hostname="31f1cbf54815" reqId="req-6" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.4","remotePort":22672}
+2026-07-15T17:09:27.202304890Z [INFO] request completed time=1784135367159 pid=34 hostname="31f1cbf54815" reqId="req-6" res={"statusCode":200} responseTime=938.419605255127
+2026-07-15T17:09:31.218013234Z [INFO] incoming request time=1784135371216 pid=34 hostname="31f1cbf54815" reqId="req-7" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.7","remotePort":29444}
+2026-07-15T17:09:32.195961567Z [INFO] request completed time=1784135372193 pid=34 hostname="31f1cbf54815" reqId="req-7" res={"statusCode":200} responseTime=976.6147346496582
+2026-07-15T17:09:36.305057666Z [INFO] incoming request time=1784135376222 pid=34 hostname="31f1cbf54815" reqId="req-8" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.7","remotePort":29458}
+2026-07-15T17:09:37.358945020Z [INFO] request completed time=1784135377242 pid=34 hostname="31f1cbf54815" reqId="req-8" res={"statusCode":200} responseTime=1020.0390739440918
+2026-07-15T17:09:40.360385851Z [INFO] incoming request time=1784135380344 pid=34 hostname="31f1cbf54815" reqId="req-9" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":62038}
+2026-07-15T17:09:41.320956146Z [INFO] request completed time=1784135381264 pid=34 hostname="31f1cbf54815" reqId="req-9" res={"statusCode":200} responseTime=920.2363300323486
+2026-07-15T17:09:45.505799154Z [INFO] incoming request time=1784135385499 pid=34 hostname="31f1cbf54815" reqId="req-a" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.8","remotePort":24844}
+2026-07-15T17:09:46.718161978Z [INFO] request completed time=1784135386715 pid=34 hostname="31f1cbf54815" reqId="req-a" res={"statusCode":200} responseTime=1216.2960205078125
+2026-07-15T17:09:50.572853661Z [INFO] incoming request time=1784135390306 pid=34 hostname="31f1cbf54815" reqId="req-b" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.8","remotePort":24844}
+2026-07-15T17:09:51.580804436Z [INFO] request completed time=1784135391247 pid=34 hostname="31f1cbf54815" reqId="req-b" res={"statusCode":200} responseTime=940.548511505127
+2026-07-15T17:09:56.661072246Z [INFO] incoming request time=1784135396219 pid=34 hostname="31f1cbf54815" reqId="req-c" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.9","remotePort":58856}
+2026-07-15T17:09:57.173017722Z [INFO] request completed time=1784135397172 pid=34 hostname="31f1cbf54815" reqId="req-c" res={"statusCode":200} responseTime=952.223180770874
+2026-07-15T17:10:01.216764682Z [INFO] incoming request time=1784135401215 pid=34 hostname="31f1cbf54815" reqId="req-d" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.4","remotePort":24706}
+2026-07-15T17:10:02.181916641Z [INFO] request completed time=1784135402180 pid=34 hostname="31f1cbf54815" reqId="req-d" res={"statusCode":200} responseTime=964.4021453857422
+2026-07-15T17:10:06.220418756Z [INFO] incoming request time=1784135406217 pid=34 hostname="31f1cbf54815" reqId="req-e" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.4","remotePort":24718}
+2026-07-15T17:10:07.171812491Z [INFO] request completed time=1784135407170 pid=34 hostname="31f1cbf54815" reqId="req-e" res={"statusCode":200} responseTime=952.1831817626953
+2026-07-15T17:10:11.291515933Z [INFO] incoming request time=1784135411282 pid=34 hostname="31f1cbf54815" reqId="req-f" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.3","remotePort":26492}
+2026-07-15T17:10:12.331293809Z [INFO] request completed time=1784135412319 pid=34 hostname="31f1cbf54815" reqId="req-f" res={"statusCode":200} responseTime=1037.777048110962
+2026-07-15T17:10:16.256463051Z [INFO] incoming request time=1784135416218 pid=34 hostname="31f1cbf54815" reqId="req-g" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.6","remotePort":28812}
+2026-07-15T17:10:17.253807653Z [INFO] request completed time=1784135417220 pid=34 hostname="31f1cbf54815" reqId="req-g" res={"statusCode":200} responseTime=1001.9747543334961
+2026-07-15T17:10:21.244212725Z [INFO] incoming request time=1784135421243 pid=34 hostname="31f1cbf54815" reqId="req-h" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.3","remotePort":59268}
+2026-07-15T17:10:22.168140112Z [INFO] request completed time=1784135422163 pid=34 hostname="31f1cbf54815" reqId="req-h" res={"statusCode":200} responseTime=919.8465538024902
+2026-07-15T17:10:26.223845084Z [INFO] incoming request time=1784135426215 pid=34 hostname="31f1cbf54815" reqId="req-i" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.2","remotePort":23854}
+2026-07-15T17:10:27.491921330Z [INFO] request completed time=1784135427425 pid=34 hostname="31f1cbf54815" reqId="req-i" res={"statusCode":200} responseTime=1209.9168910980225
+2026-07-15T17:10:31.273022000Z [INFO] incoming request time=1784135431218 pid=34 hostname="31f1cbf54815" reqId="req-j" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":19132}
+2026-07-15T17:10:32.217659586Z [INFO] request completed time=1784135432191 pid=34 hostname="31f1cbf54815" reqId="req-j" res={"statusCode":200} responseTime=972.3410568237305
+2026-07-15T17:10:36.235582577Z [INFO] incoming request time=1784135436217 pid=34 hostname="31f1cbf54815" reqId="req-k" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":62856}
+2026-07-15T17:10:37.224202341Z [INFO] request completed time=1784135437215 pid=34 hostname="31f1cbf54815" reqId="req-k" res={"statusCode":200} responseTime=997.7321605682373
+2026-07-15T17:10:41.223139130Z [INFO] incoming request time=1784135441217 pid=34 hostname="31f1cbf54815" reqId="req-l" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.4","remotePort":43496}
+2026-07-15T17:10:42.408061053Z [INFO] request completed time=1784135442396 pid=34 hostname="31f1cbf54815" reqId="req-l" res={"statusCode":200} responseTime=1178.014181137085
+2026-07-15T17:10:46.228677800Z [INFO] incoming request time=1784135446217 pid=34 hostname="31f1cbf54815" reqId="req-m" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":39620}
+2026-07-15T17:10:47.163777408Z [INFO] request completed time=1784135447154 pid=34 hostname="31f1cbf54815" reqId="req-m" res={"statusCode":200} responseTime=936.68776512146
+2026-07-15T17:10:51.230127596Z [INFO] incoming request time=1784135451215 pid=34 hostname="31f1cbf54815" reqId="req-n" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.5","remotePort":39624}
+2026-07-15T17:10:52.239651085Z [INFO] request completed time=1784135452211 pid=34 hostname="31f1cbf54815" reqId="req-n" res={"statusCode":200} responseTime=995.6955909729004
+2026-07-15T17:11:41.999629655Z [INFO] incoming request time=1784135493217 pid=34 hostname="31f1cbf54815" reqId="req-o" req={"method":"GET","url":"/v3/dashboard/projects/530604ff-0fda-471b-9413-86b470422338","hostname":"gray-arc-ai-powered-production.up.railway.app","remoteAddress":"100.64.0.8","remotePort":28476}
+2026-07-15T17:11:41.999634436Z [INFO] request completed time=1784135494267 pid=34 hostname="31f1cbf54815" reqId="req-o" res={"statusCode":200} responseTime=1049.4790229797363

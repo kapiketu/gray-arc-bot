@@ -3,12 +3,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.verifyImageUrl = verifyImageUrl;
 exports.slugify = slugify;
 exports.generateWebsiteConfig = generateWebsiteConfig;
 exports.modifyWebsiteConfig = modifyWebsiteConfig;
 const generative_ai_1 = require("@google/generative-ai");
 const dotenv_1 = __importDefault(require("dotenv"));
+const axios_1 = __importDefault(require("axios"));
+const viewer_1 = require("../routes/viewer");
+const contentSanitizer_1 = require("./contentSanitizer");
 dotenv_1.default.config();
+async function verifyImageUrl(url) {
+    try {
+        // Using responseType stream to avoid loading entire image payload in memory
+        const res = await axios_1.default.get(url, { timeout: 5000, responseType: 'stream' });
+        return res.status === 200;
+    }
+    catch (err) {
+        console.warn(`[Image Audit] Verification failed for: ${url} - Error: ${err.message}`);
+        return false;
+    }
+}
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // Helper to generate a slug from a business name
 function slugify(text) {
@@ -23,23 +38,40 @@ function slugify(text) {
 // Fallback Mock AI content generator (if API key is missing)
 function getMockWebsiteContent(phoneNumber, businessName, category, about, servicesRaw, contactRaw) {
     const slug = slugify(businessName) || `site-${Math.floor(Math.random() * 10000)}`;
-    // Parse services
+    // Parse services — split by newlines, commas, or semicolons
     const services = [];
-    const lines = servicesRaw.split('\n');
-    for (const line of lines) {
-        if (!line.trim())
+    // First split by newline, then further split by commas if no newline separation
+    let rawItems = servicesRaw.split('\n').map(l => l.trim()).filter(l => l);
+    // If only one line, try splitting by commas or semicolons
+    if (rawItems.length === 1 && (rawItems[0].includes(',') || rawItems[0].includes(';'))) {
+        rawItems = rawItems[0].split(/[,;]/).map(s => s.trim()).filter(s => s);
+    }
+    const fallbacks = (0, viewer_1.getCategoryImages)(category);
+    const fallbackIcons = (0, viewer_1.getDefaultCategoryIcons)(category);
+    for (const [idx, item] of rawItems.entries()) {
+        if (!item)
             continue;
-        const parts = line.split('-');
+        const parts = item.split('-');
         const name = parts[0]?.trim() || 'Service / Product';
-        const price = parts[1]?.trim() || '₹Contact Us';
+        const price = parts.length > 1 ? parts[1]?.trim() : 'Contact Us';
+        const fallbackProd = fallbacks.products[idx] || fallbacks.products[0] || fallbacks.hero;
+        const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
         services.push({
-            name,
-            price,
-            description: `Premium quality ${name.toLowerCase()} customized to your needs.`
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            price: price || 'Contact Us',
+            description: `Premium quality ${name.toLowerCase()} customized to your needs.`,
+            image: fallbackProd,
+            icon: fallbackIcon
         });
     }
     if (services.length === 0) {
-        services.push({ name: 'Standard Product', price: '₹499', description: 'Our signature offering.' });
+        services.push({
+            name: 'Standard Product',
+            price: '₹499',
+            description: 'Our signature offering.',
+            image: fallbacks.products[0] || fallbacks.hero,
+            icon: fallbackIcons[0]
+        });
     }
     // Determine theme based on category
     let theme = {
@@ -104,6 +136,14 @@ function getMockWebsiteContent(phoneNumber, businessName, category, about, servi
         heroSubtitle: about ? `${about.substring(0, 100)}... Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs.` : `Discover unparalleled excellence and client-focused solutions tailored to meet your unique needs. We combine years of specialized experience with a passion for quality to deliver results you can depend on, every single time.`,
         storyTitle: 'Our Story',
         storyContent: about ? `${about}. Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded.` : `Our journey began with a simple yet powerful mission: to provide the community with honest, high-quality, and reliable services. Over the years, we have grown into a trusted industry leader by never compromising on our core values. We believe that every client deserves dedicated attention, transparent communication, and exceptional craftsmanship. Whether you are seeking a consultation, a premium product, or a custom solution, our experienced team works tirelessly to ensure your expectations are not just met, but exceeded. Thank you for trusting us to be your partner; we look forward to serving you with integrity and excellence for years to come.`,
+        heroImage: fallbacks.hero,
+        aboutImage: fallbacks.about,
+        galleryImages: [
+            fallbacks.products[0] || fallbacks.hero,
+            fallbacks.products[1] || fallbacks.products[0] || fallbacks.hero,
+            fallbacks.products[2] || fallbacks.products[0] || fallbacks.hero,
+            fallbacks.products[3] || fallbacks.products[0] || fallbacks.hero
+        ],
         features: [
             { title: 'Premium Quality Assurance', description: 'We source only the finest materials, leverage advanced techniques, and enforce rigorous quality checks to ensure that every single deliverable meets the absolute highest industry standards of excellence, durability, and safety.' },
             { title: 'Experienced Specialists', description: 'Our crew consists of highly trained, certified, and passionate professionals who bring decades of combined experience, specialized skills, and a committed, problem-solving focus to every single project we undertake.' },
@@ -122,42 +162,68 @@ function getMockWebsiteContent(phoneNumber, businessName, category, about, servi
     };
 }
 async function generateWebsiteConfig(phoneNumber, businessName, category, about, servicesRaw, contactRaw) {
-    console.log(`[AI Engine] Generating site config for "${businessName}" (${category})`);
+    // 1. Data Normalization: Clean formatting, capitalize and trim duplicate spaces
+    const cleanName = (businessName || '').trim().replace(/\s+/g, ' ');
+    const cleanCategory = (category || '').trim().replace(/\s+/g, ' ');
+    const cleanAbout = (about || '').trim().replace(/\s+/g, ' ');
+    const cleanServices = (servicesRaw || '').trim().split(/[,\n]+/).map(s => s.trim()).filter(Boolean).join(', ');
+    const cleanContact = (contactRaw || '').trim().replace(/\s+/g, ' ');
+    console.log(`[AI Engine] Generating site config for normalized "${cleanName}" (${cleanCategory})`);
     if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('YOUR_GEMINI')) {
         console.warn('[AI Engine] Gemini API Key is missing. Using local Mock generator.');
-        return getMockWebsiteContent(phoneNumber, businessName, category, about, servicesRaw, contactRaw);
+        return getMockWebsiteContent(phoneNumber, cleanName, cleanCategory, cleanAbout, cleanServices, cleanContact);
     }
     try {
         const ai = new generative_ai_1.GoogleGenerativeAI(GEMINI_API_KEY);
-        // Using gemini-1.5-flash for speed and structured outputs
+        // Using gemini-2.5-flash for speed and structured outputs
         const model = ai.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 responseMimeType: 'application/json'
             }
         });
+        // ──────────────────────────────────────────────────
+        // STAGE 1: RAW GENERATION
+        // ──────────────────────────────────────────────────
         const prompt = `
     You are an expert copywriter and premium website landing page architect. Generate a complete, highly professional, and informative website configuration based on the user's inputs.
     
     USER INPUTS:
-    - Business Name: ${businessName}
-    - Business Category: ${category}
-    - Business Description: ${about}
-    - Services/Products (raw input): ${servicesRaw}
-    - Contact Details / Address (raw input): ${contactRaw}
+    - Business Name: ${cleanName}
+    - Business Category: ${cleanCategory}
+    - Business Description: ${cleanAbout}
+    - Services/Products (raw input): ${cleanServices}
+    - Contact Details / Address (raw input): ${cleanContact}
     
     CRITICAL COPYWRITING DIRECTIVES FOR LENGTH AND DEPTH (VERY IMPORTANT):
-    1. WRITE EXTENSIVE AND LONG PARAGRAPHS: Even if the user provided very sparse input (e.g. description is just "best in town", or services is a short list of words), you MUST expand it heavily into rich, detailed, and highly informative marketing copy. 
-    2. HERO SUBTITLE: Must be an engaging, detailed value-proposition statement of at least 35-50 words (2-3 full sentences) explaining the values and commitment of the business.
-    3. OUR STORY CONTENT: Must be a rich, compelling brand narrative of at least 150-200 words (minimum 2 detailed paragraphs) detailing their foundation, expertise, customer-first standards, community impact, and quality dedication.
-    4. SERVICES: Parse the raw services. Ensure every service has a professional name, a price in Rupees (e.g. "₹499" or "₹1,200", default to "₹Contact Us" only if unclear), and a highly detailed descriptive paragraph of at least 45-60 words (3-4 complete sentences) explaining what the service involves, the process, and the specific benefits.
-    5. why CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title and a detailed explaining description paragraph of at least 35-50 words (2-3 complete sentences).
-    6. FAQs: Generate exactly 3 frequently asked questions and detailed answers (at least 35-50 words or 2-3 complete sentences per answer) providing helpful, concrete information about operating schedules, booking procedures, and locations.
-    7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be at least 45-60 words (3-4 complete sentences) explaining the client's problem, how the business solved it, and their specific satisfaction.
-    8. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
+    1. CONCISE MARKETING COPY: Even if the user provided sparse input, expand it into professional, engaging marketing copy. However, you MUST follow the strict word counts specified below to ensure text fits within the styled template sections without overflowing or overlapping.
+    2. HERO SUBTITLE: Must be an engaging, punchy statement of exactly 15-25 words (maximum 30 words) explaining the values and commitment of the business.
+    3. OUR STORY CONTENT: Must be a compelling, brief brand narrative of exactly 60-80 words (maximum 90 words, split into 1 or 2 small paragraphs) detailing their foundation, quality dedication, and client focus.
+    4. SERVICES (EXTREMELY IMPORTANT — READ CAREFULLY):
+       - The user may list services as comma-separated words (e.g. "gym, yoga, dance"), newline-separated, or with dashes.
+       - You MUST split them into SEPARATE individual service objects. NEVER combine multiple services into one.
+       - Each service must have a professional name, a price in Rupees (e.g. "₹499" or "₹1,200"). If the user did not provide a price, set price to "Contact Us" (without any currency symbol).
+       - Each service must have a concise, engaging descriptive paragraph of exactly 15-20 words (maximum 25 words) explaining what the service involves.
+       - Each service must have a specific "imagePrompt" string that is clean, descriptive, vector/photographic style, with no special characters, quotes, or slashes, suitable for generating a background image (e.g., "premium yoga studio class interior with wooden floor").
+       - Each service must have a valid lowercase, hyphenated "icon" name from Lucide library that relates specifically to the service (e.g. 'code', 'laptop', 'plane', 'dumbbell', 'utensils', 'scissors', 'stethoscope', 'briefcase', 'shield').
+    5. WHY CHOOSE US (FEATURES): Generate exactly 3 feature cards highlighting why clients trust this business. Each feature card needs a strong title (1-3 words) and a concise description paragraph of exactly 20-30 words (maximum 35 words).
+    6. FAQs: Generate exactly 3 frequently asked questions and short, helpful answers of exactly 25-35 words (maximum 40 words) per answer.
+    7. TESTIMONIALS: Generate exactly 3 realistic, highly positive client reviews. Each review content must be a concise testimonial paragraph of exactly 25-35 words (maximum 40 words).
+    8. IMAGE PROMPTS:
+       - You must provide clean, vector/photographic image prompts for:
+         - "heroImagePrompt": background image showcasing the category or business space.
+         - "aboutImagePrompt": team, storefront, or workspace showcase image.
+         - "galleryImagePrompts": exactly 4 distinct prompts highlighting services or products.
+    9. Clean the contact details into structured fields: phone, email, address, and operating hours (default: "Monday - Saturday: 10:00 AM - 8:00 PM" if not specified).
+    10. STATISTICS (STATS): Generate exactly 4 stat items. Value must be short (e.g. "5000+" or "100%"), label must be a short phrase of 1-2 words (e.g. "Happy Diners"), and a related lowercase Lucide icon name (e.g. "heart", "flame", "leaf", "star", "users").
+    11. TYPOS AND GRAMMAR CORRECTION: Correct all spelling mistakes, grammatical issues, and lowercase names in user inputs (e.g. correct 'chickn' to 'chicken', 'dehraudn' to 'Dehradun', 'bakrs' to 'Bakers', 'jodhour' to 'Jodhpur', and capitalize business names) across all generated titles, descriptions, feature blocks, and fields. Typo correction is mandatory.
+    12. BRAND STRATEGY: Define a brand style strategy. Generate 'styleKeywords' (3-4 comma-separated visual style keywords like rustic, elegant, modern) and 'colorAesthetic' (image color scheme description matching theme colors like warm golden, clean neon green).
+    13. LOCAL SEO SCHEMA: Determine the correct 'businessType' (e.g., Restaurant, HairSalon, Gym, Dentist, LocalBusiness) and 'priceRange' (e.g., ₹₹).
     
     Output the result EXACTLY matching this JSON structure:
     {
+      "businessName": "corrected and properly capitalized business name (e.g. Badoal Bakers)",
+      "category": "corrected and properly capitalized business category (e.g. Bakery)",
       "theme": {
         "primaryColor": "hex string",
         "secondaryColor": "hex string",
@@ -166,7 +232,7 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
         "textColor": "hex string"
       },
       "services": [
-        { "name": "service name", "price": "price with currency", "description": "rich description paragraph of at least 45-60 words" }
+        { "name": "service name", "price": "price with currency", "description": "concise description paragraph of exactly 15-20 words", "imagePrompt": "clean photographic prompt", "icon": "lowercase hyphenated Lucide icon name" }
       ],
       "contactDetails": {
         "phone": "phone number",
@@ -175,35 +241,96 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
         "hours": "business hours"
       },
       "heroTitle": "highly engaging main headline",
-      "heroSubtitle": "sub-headline of at least 35-50 words",
+      "heroSubtitle": "sub-headline of exactly 15-25 words",
       "storyTitle": "engaging subtitle for our story section",
-      "storyContent": "richly expanded story narrative of at least 150-200 words",
+      "storyContent": "compelling story narrative of exactly 60-80 words",
+      "heroImagePrompt": "clean photographic prompt",
+      "aboutImagePrompt": "clean photographic prompt",
+      "galleryImagePrompts": [
+        "prompt 1",
+        "prompt 2",
+        "prompt 3",
+        "prompt 4"
+      ],
       "features": [
-        { "title": "feature title", "description": "feature description paragraph of at least 35-50 words" }
+        { "title": "feature title", "description": "feature description paragraph of exactly 20-30 words" }
       ],
       "faqs": [
-        { "question": "faq question", "answer": "faq answer of at least 35-50 words" }
+        { "question": "faq question", "answer": "faq answer of exactly 25-35 words" }
       ],
       "testimonials": [
-        { "name": "client name", "role": "client role", "content": "review testimonial paragraph of at least 45-60 words" }
-      ]
+        { "name": "client name", "role": "client role", "content": "testimonial paragraph of exactly 25-35 words" }
+      ],
+      "stats": [
+        { "value": "value", "label": "label", "icon": "lowercase hyphenated Lucide icon name" }
+      ],
+      "brandPersonality": {
+        "styleKeywords": "comma-separated design style keywords (e.g. elegant, modern, rustic)",
+        "colorAesthetic": "descriptive image color tone matching theme colors (e.g. warm golden, cool neon blue)"
+      },
+      "schemaOrg": {
+        "businessType": "LocalBusiness, Restaurant, HairSalon, Gym, Dentist, etc.",
+        "priceRange": "price tier (e.g. ₹₹)"
+      }
     }
     `;
+        console.log('[AI Engine] Requesting generation from Gemini...');
         const response = await model.generateContent(prompt);
         const resultText = response.response.text();
         const generatedConfig = JSON.parse(resultText);
-        // Generate trial end date (30 days from now)
+        // Get unsplash fallback images for this category
+        const fallbacks = (0, viewer_1.getCategoryImages)(category);
+        // ──────────────────────────────────────────────────
+        // STAGE 2: DYNAMIC IMAGE VERIFICATION & HARMONIZATION
+        // ──────────────────────────────────────────────────
+        console.log('[AI Engine] Auditing generated image prompts...');
+        const buildImgUrl = (promptStr, width = 1200, height = 800) => {
+            const clean = promptStr.replace(/[/,]/g, '').replace(/\s+/g, ' ').trim();
+            const style = (generatedConfig.brandPersonality?.styleKeywords || '').trim();
+            const color = (generatedConfig.brandPersonality?.colorAesthetic || '').trim();
+            const modifiers = [
+                style ? `styled in ${style} design style` : '',
+                color ? `matching a ${color} color scheme` : ''
+            ].filter(Boolean).join(', ');
+            const suffix = modifiers ? ` - ${modifiers}` : '';
+            return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(cleanCategory)}%20business${encodeURIComponent(suffix)}?width=${width}&height=${height}&nologo=true`;
+        };
+        // Hero image
+        const verifiedHeroImage = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
+        // About image
+        const verifiedAboutImage = buildImgUrl(generatedConfig.aboutImagePrompt || 'office workspace', 1200, 800);
+        const fallbackIcons = (0, viewer_1.getDefaultCategoryIcons)(category);
+        const verifiedServices = (generatedConfig.services || []).map((s, idx) => {
+            const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
+            const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
+            return {
+                name: s.name,
+                price: s.price,
+                description: s.description,
+                image: rawUrl,
+                icon: s.icon || fallbackIcon
+            };
+        });
+        // Gallery images
+        const verifiedGallery = [];
+        const galleryPrompts = generatedConfig.galleryImagePrompts || [];
+        for (let i = 0; i < 4; i++) {
+            const p = galleryPrompts[i] || `gallery item ${i + 1}`;
+            const rawUrl = buildImgUrl(p, 1200, 800);
+            verifiedGallery.push(rawUrl);
+        }
+        // Assemble unified configuration payload
         const trialEnds = new Date();
         trialEnds.setDate(trialEnds.getDate() + 30);
         const slug = slugify(businessName) || `site-${Math.floor(Math.random() * 10000)}`;
-        return {
+        const siteConfig = {
             id: slug,
             phoneNumber,
-            businessName,
-            category,
-            aboutText: about,
+            businessName: (generatedConfig.businessName || cleanName).trim(),
+            category: (generatedConfig.category || cleanCategory).trim(),
+            aboutText: cleanAbout,
             theme: generatedConfig.theme,
-            services: generatedConfig.services,
+            services: verifiedServices,
             contactDetails: generatedConfig.contactDetails,
             billingStatus: 'trial',
             trialEndsAt: trialEnds.toISOString(),
@@ -213,10 +340,92 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
             heroSubtitle: generatedConfig.heroSubtitle,
             storyTitle: generatedConfig.storyTitle,
             storyContent: generatedConfig.storyContent,
+            heroImage: verifiedHeroImage,
+            aboutImage: verifiedAboutImage,
+            galleryImages: verifiedGallery,
             features: generatedConfig.features,
             faqs: generatedConfig.faqs,
-            testimonials: generatedConfig.testimonials
+            testimonials: generatedConfig.testimonials,
+            stats: generatedConfig.stats,
+            brandPersonality: generatedConfig.brandPersonality,
+            schemaOrg: generatedConfig.schemaOrg
         };
+        // ──────────────────────────────────────────────────
+        // STAGE 3: CRITIC AI AUDIT & SELF-HEALING LOOP
+        // ──────────────────────────────────────────────────
+        console.log('[AI Engine] Initiating Critic AI verification check...');
+        const criticPrompt = `
+    You are a Quality Control Inspector. Audit the following generated website configuration for a "${category}" business named "${businessName}".
+    
+    CONFIG TO AUDIT:
+    ${JSON.stringify({
+            businessName: siteConfig.businessName,
+            category: siteConfig.category,
+            heroTitle: siteConfig.heroTitle,
+            heroSubtitle: siteConfig.heroSubtitle,
+            storyTitle: siteConfig.storyTitle,
+            storyContent: siteConfig.storyContent,
+            services: siteConfig.services.map(s => ({ name: s.name, price: s.price, description: s.description })),
+            features: siteConfig.features,
+            faqs: siteConfig.faqs,
+            testimonials: siteConfig.testimonials
+        })}
+    
+    Verify the config strictly against these rules:
+    1. Alignment: Do the text, services, and stories align with the category "${category}"? If there is any content mismatch (e.g. bakery copy in a gym website), flag it.
+    2. Placeholders: Are there any unreplaced template placeholders (like "{{about}}", "{{business_name}}", "[Insert Name Here]", "null", "undefined")? If so, flag it.
+    3. Structural Completeness: Make sure all text blocks are detailed (storyContent should have at least 120 words).
+    
+    Output your verification strictly in this JSON format:
+    {
+      "passed": true/false,
+      "issues": ["list of descriptive issues found"],
+      "healedConfig": {
+        // ONLY provide corrected fields here if passed is false (e.g. storyContent, heroSubtitle, or services if they had placeholders or mismatches).
+      }
+    }
+    `;
+        const criticRes = await model.generateContent(criticPrompt);
+        const criticText = criticRes.response.text();
+        const criticOutput = JSON.parse(criticText);
+        if (!criticOutput.passed) {
+            console.warn('[AI Engine] Critic AI flagged validation issues:', criticOutput.issues);
+            if (criticOutput.healedConfig) {
+                console.log('[AI Engine] Self-healing config with Critic corrected fields...');
+                const healed = criticOutput.healedConfig;
+                if (healed.heroTitle)
+                    siteConfig.heroTitle = healed.heroTitle;
+                if (healed.heroSubtitle)
+                    siteConfig.heroSubtitle = healed.heroSubtitle;
+                if (healed.storyTitle)
+                    siteConfig.storyTitle = healed.storyTitle;
+                if (healed.storyContent)
+                    siteConfig.storyContent = healed.storyContent;
+                if (healed.features)
+                    siteConfig.features = healed.features;
+                if (healed.faqs)
+                    siteConfig.faqs = healed.faqs;
+                if (healed.testimonials)
+                    siteConfig.testimonials = healed.testimonials;
+                if (healed.services) {
+                    // Keep verified images while updating healed service copy
+                    siteConfig.services = siteConfig.services.map((orig, i) => {
+                        const h = healed.services[i] || orig;
+                        return {
+                            ...orig,
+                            name: h.name || orig.name,
+                            price: h.price || orig.price,
+                            description: h.description || orig.description
+                        };
+                    });
+                }
+            }
+        }
+        else {
+            console.log('[AI Engine] Critic AI successfully approved the configuration!');
+        }
+        const sanitized = (0, contentSanitizer_1.sanitizeSiteConfig)(siteConfig, category);
+        return sanitized;
     }
     catch (error) {
         console.error('[AI Engine] Error generating config with Gemini:', error.message);
@@ -233,7 +442,7 @@ async function modifyWebsiteConfig(currentConfig, userRequest) {
     try {
         const ai = new generative_ai_1.GoogleGenerativeAI(GEMINI_API_KEY);
         const model = ai.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 responseMimeType: 'application/json'
             }
