@@ -197,6 +197,10 @@ async function webhookRoutes(fastify) {
             return reply.code(403).send('Forbidden');
         }
     });
+    // Diagnostic route to check deployment version
+    fastify.get('/webhook-test', async (request, reply) => {
+        return { status: 'ok', version: 'BLOCK_BASED_ASSEMBLER_ACTIVE_V4', timestamp: new Date().toISOString() };
+    });
     // 2. Incoming Messages Webhook (POST)
     fastify.post('/webhook', async (request, reply) => {
         const body = request.body;
