@@ -22,10 +22,42 @@ function truncateToWords(text, maxWords) {
     if (words.length <= maxWords) {
         return cleanText;
     }
-    let truncated = words.slice(0, maxWords).join(' ');
-    // Ensure it ends clean
+    // 1. Try to split into sentences and fit as many full sentences as possible
+    const sentences = cleanText.match(/[^.!?]+[.!?]+(\s+|$)/g) || [cleanText];
+    let accumulatedText = '';
+    let accumulatedWords = 0;
+    for (const sentence of sentences) {
+        const sentenceWordCount = sentence.trim().split(/\s+/).length;
+        if (accumulatedWords + sentenceWordCount <= maxWords) {
+            accumulatedText += sentence;
+            accumulatedWords += sentenceWordCount;
+        }
+        else {
+            break;
+        }
+    }
+    if (accumulatedText.trim().length > 0) {
+        return accumulatedText.trim();
+    }
+    // 2. If even one sentence exceeds the limit, fallback to word-level truncation
+    let truncatedWords = words.slice(0, maxWords);
+    // Remove common conjunctions and prepositions at the end of the truncated text
+    const trailingStopwords = new Set([
+        'and', 'or', 'but', 'so', 'for', 'with', 'at', 'by', 'from',
+        'to', 'in', 'on', 'of', 'the', 'a', 'an', 'our', 'your', 'my', 'their'
+    ]);
+    while (truncatedWords.length > 0) {
+        const lastWord = truncatedWords[truncatedWords.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+        if (trailingStopwords.has(lastWord)) {
+            truncatedWords.pop();
+        }
+        else {
+            break;
+        }
+    }
+    let truncated = truncatedWords.join(' ');
     truncated = truncated.replace(/[,;:\-\s]+$/, '');
-    if (!truncated.endsWith('.')) {
+    if (!truncated.endsWith('.') && !truncated.endsWith('!') && !truncated.endsWith('?')) {
         truncated += '.';
     }
     return truncated;

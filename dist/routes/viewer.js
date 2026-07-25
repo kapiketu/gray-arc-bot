@@ -233,6 +233,27 @@ async function viewerRoutes(fastify) {
       </html>
     `);
     });
+    // Custom Domain Subpage Router (e.g. example.com/about)
+    fastify.get('/:pageType', async (request, reply) => {
+        const { pageType } = request.params;
+        if (!['services', 'about', 'reviews', 'contact'].includes(pageType)) {
+            // Let Fastify pass it to next matched route (e.g. /preview/:templateId)
+            return reply.callNotFound();
+        }
+        const hostname = request.hostname || request.headers.host || '';
+        const site = await db_1.db.getSiteByDomain(hostname);
+        if (!site) {
+            return reply.callNotFound();
+        }
+        const now = new Date();
+        const trialExpired = site.billingStatus === 'trial' && now > new Date(site.trialEndsAt);
+        const subscriptionInactive = site.billingStatus !== 'trial' && site.billingStatus !== 'active';
+        if (trialExpired || subscriptionInactive) {
+            return reply.type('text/html').send(renderSubscriptionPendingPage(site));
+        }
+        reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+        return reply.type('text/html').send(renderPremiumWebsite(site, site.template, pageType));
+    });
     fastify.get('/preview/:templateId', async (request, reply) => {
         const { templateId } = request.params;
         const templatesDir = path_1.default.join(__dirname, '../../templates');
@@ -617,7 +638,25 @@ async function viewerRoutes(fastify) {
         }
         const { template } = request.query;
         reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-        return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template));
+        return reply.type('text/html').send(renderPremiumWebsite(site, template || site.template, 'home'));
+    });
+    fastify.get('/site/:siteId/:pageType', async (request, reply) => {
+        const { siteId, pageType } = request.params;
+        if (!['services', 'about', 'reviews', 'contact'].includes(pageType)) {
+            return reply.code(404).type('text/html').send(render404Page());
+        }
+        const site = await db_1.db.getSite(siteId);
+        if (!site) {
+            return reply.code(404).type('text/html').send(render404Page());
+        }
+        const now = new Date();
+        const trialExpired = site.billingStatus === 'trial' && now > new Date(site.trialEndsAt);
+        const subscriptionInactive = site.billingStatus !== 'trial' && site.billingStatus !== 'active';
+        if (trialExpired || subscriptionInactive) {
+            return reply.type('text/html').send(renderSubscriptionPendingPage(site));
+        }
+        reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+        return reply.type('text/html').send(renderPremiumWebsite(site, site.template, pageType));
     });
     // Temporary Diagnostic Route to test Gemini API Key directly on the server
     fastify.get('/test-gemini-key', async (request, reply) => {
@@ -828,7 +867,26 @@ async function viewerRoutes(fastify) {
 // ────────────────────────────────────────────────────────
 // PREMIUM WEBSITE TEMPLATE ENGINE (DYNAMIC LOADER)
 // ────────────────────────────────────────────────────────
-function renderPremiumWebsite(site, templateId) {
+function renderSubpageHeader(pageTitle, pageName, homeLink) {
+    return `
+  <section class="py-20 bg-dark-900/60 border-b border-white/5 text-center relative overflow-hidden">
+      <!-- Ambient Glow -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-primary/10 blur-[80px] pointer-events-none"></div>
+      
+      <div class="max-w-7xl mx-auto px-6 relative z-10 space-y-3 pt-8">
+          <nav class="text-xs text-primary font-semibold uppercase tracking-widest">
+              <a href="${homeLink}" class="hover:opacity-80 transition-all">Home</a> 
+              <span class="text-gray-600 mx-2">/</span> 
+              <span class="text-gray-400">${pageName}</span>
+          </nav>
+          <h1 class="text-4xl sm:text-5xl font-extrabold font-display text-white tracking-tight leading-tight">
+              ${pageTitle}
+          </h1>
+      </div>
+  </section>
+  `;
+}
+function renderPremiumWebsite(site, templateId, pageType = 'home') {
     const templatesDir = path_1.default.join(__dirname, '../../templates');
     let finalId = templateId || 'GA004';
     let dirPath = path_1.default.join(templatesDir, finalId);
@@ -868,12 +926,88 @@ function renderPremiumWebsite(site, templateId) {
     // If dynamic layout, stitch section components dynamically
     if (finalId === 'GA004') {
         const dynamicSections = (0, templateEngine_1.compileDynamicLayout)(site);
-        html = html.replace('{{dynamic_hero}}', dynamicSections.hero);
-        html = html.replace('{{dynamic_about}}', dynamicSections.about);
-        html = html.replace('{{dynamic_services}}', dynamicSections.services);
-        html = html.replace('{{dynamic_features}}', dynamicSections.features);
-        html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
-        html = html.replace('{{dynamic_faqs}}', dynamicSections.faq);
+        const homeLink = site.customDomain ? '/' : `/site/${site.id}`;
+        if (pageType === 'home') {
+            html = html.replace('{{dynamic_hero}}', dynamicSections.hero);
+            html = html.replace('{{dynamic_about}}', dynamicSections.about);
+            html = html.replace('{{dynamic_services}}', dynamicSections.services);
+            html = html.replace('{{dynamic_features}}', dynamicSections.features);
+            html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
+            html = html.replace('{{dynamic_faqs}}', dynamicSections.faq);
+        }
+        else if (pageType === 'services') {
+            const header = renderSubpageHeader("Our Services & Solutions", "Services", homeLink);
+            html = html.replace('{{dynamic_hero}}', header);
+            html = html.replace('{{dynamic_about}}', '');
+            html = html.replace('{{dynamic_services}}', dynamicSections.services);
+            html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_testimonials}}', '');
+            html = html.replace('{{dynamic_faqs}}', '');
+        }
+        else if (pageType === 'about') {
+            const header = renderSubpageHeader("Our Story & Commitment", "About Us", homeLink);
+            html = html.replace('{{dynamic_hero}}', header);
+            html = html.replace('{{dynamic_about}}', dynamicSections.about);
+            html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_features}}', dynamicSections.features);
+            html = html.replace('{{dynamic_testimonials}}', '');
+            html = html.replace('{{dynamic_faqs}}', '');
+        }
+        else if (pageType === 'reviews') {
+            const header = renderSubpageHeader("Customer Feedback & Reviews", "Reviews", homeLink);
+            html = html.replace('{{dynamic_hero}}', header);
+            html = html.replace('{{dynamic_about}}', '');
+            html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
+            html = html.replace('{{dynamic_faqs}}', '');
+        }
+        else if (pageType === 'contact') {
+            const header = renderSubpageHeader("Get In Touch", "Contact Us", homeLink);
+            const contactLayout = `
+      <section class="py-24 px-6 relative bg-dark-900/10">
+          <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <!-- Contact Info Card -->
+              <div class="lg:col-span-5 glass p-8 rounded-[2rem] border-white/5 space-y-6 flex flex-col justify-between" data-aos="fade-right">
+                  <div>
+                      <h3 class="text-2xl font-bold text-white font-display">Contact Details</h3>
+                      <p class="text-gray-400 text-sm mt-2 leading-relaxed">Reach out directly via phone, email, or WhatsApp. We are here to help!</p>
+                  </div>
+                  <div class="space-y-4">
+                      <div class="flex items-center gap-4 text-sm text-gray-300">
+                          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><i data-lucide="phone" class="w-5 h-5"></i></div>
+                          <div><p class="font-bold">Phone</p><p class="text-xs text-gray-400">{{phone}}</p></div>
+                      </div>
+                      <div class="flex items-center gap-4 text-sm text-gray-300">
+                          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><i data-lucide="mail" class="w-5 h-5"></i></div>
+                          <div><p class="font-bold">Email</p><p class="text-xs text-gray-400">{{email}}</p></div>
+                      </div>
+                      <div class="flex items-center gap-4 text-sm text-gray-300">
+                          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+                          <div><p class="font-bold">Address</p><p class="text-xs text-gray-400">{{address}}</p></div>
+                      </div>
+                      <div class="flex items-center gap-4 text-sm text-gray-300">
+                          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                          <div><p class="font-bold">Business Hours</p><p class="text-xs text-gray-400">{{hours}}</p></div>
+                      </div>
+                  </div>
+                  <a href="https://wa.me/{{phone_clean}}?text=Hi!" target="_blank" class="w-full py-3.5 rounded-xl bg-primary text-white font-bold text-center text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg"><i data-lucide="message-circle" class="w-5 h-5"></i>Start WhatsApp Chat</a>
+              </div>
+              <!-- FAQ List -->
+              <div class="lg:col-span-7 space-y-6" data-aos="fade-left">
+                  <h3 class="text-2xl font-bold text-white font-display mb-6">Frequently Asked Questions</h3>
+                  \${dynamicSections.faq}
+              </div>
+          </div>
+      </section>
+      `;
+            html = html.replace('{{dynamic_hero}}', header);
+            html = html.replace('{{dynamic_about}}', '');
+            html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_testimonials}}', contactLayout);
+            html = html.replace('{{dynamic_faqs}}', '');
+        }
         html = html.replace('{{dynamic_footer}}', dynamicSections.footer);
     }
     const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
@@ -886,8 +1020,27 @@ function renderPremiumWebsite(site, templateId) {
     const brandHex = site.theme?.primaryColor || '#3b82f6';
     const isDark = (site.theme?.bgColor || '#030712') !== '#ffffff';
     const palette = (0, colorEngine_1.generateThemePalette)(brandHex, isDark);
+    const isCustomDomainMode = !!site.customDomain;
+    const linkPrefix = isCustomDomainMode ? '' : `/site/${site.id}`;
+    const homeLink = isCustomDomainMode ? '/' : `/site/${site.id}`;
+    const servicesLink = `${linkPrefix}/services`;
+    const aboutLink = `${linkPrefix}/about`;
+    const reviewsLink = `${linkPrefix}/reviews`;
+    const contactLink = `${linkPrefix}/contact`;
+    const activeStyle = 'text-primary font-semibold border-b-2 border-primary pb-1';
+    const inactiveStyle = 'text-gray-300 hover:text-white transition-colors';
     // Perform substitutions
     const replacements = {
+        '{{home_link}}': homeLink,
+        '{{services_link}}': servicesLink,
+        '{{about_link}}': aboutLink,
+        '{{reviews_link}}': reviewsLink,
+        '{{contact_link}}': contactLink,
+        '{{home_active}}': pageType === 'home' ? activeStyle : inactiveStyle,
+        '{{services_active}}': pageType === 'services' ? activeStyle : inactiveStyle,
+        '{{about_active}}': pageType === 'about' ? activeStyle : inactiveStyle,
+        '{{reviews_active}}': pageType === 'reviews' ? activeStyle : inactiveStyle,
+        '{{contact_active}}': pageType === 'contact' ? activeStyle : inactiveStyle,
         '{{business_name}}': site.businessName,
         '{{category}}': site.category || 'Professional Services',
         '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
@@ -906,9 +1059,11 @@ function renderPremiumWebsite(site, templateId) {
         '{{hero_title}}': site.heroTitle || `Premium ${site.category || 'Service'} Options`,
         '{{hero_subtitle}}': site.heroSubtitle || `We deliver top-tier ${site.category || 'solutions'} tailored for homes and commercial spaces.`,
         '{{hero_image}}': site.heroImage || imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
+        '{{hero_fallback}}': imageBase.hero || 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&q=80',
         '{{about_title}}': site.storyTitle || 'About Our Company',
         '{{about_content}}': formatParagraphs(site.storyContent || 'We operate at the intersection of traditional craftsmanship and modern technology, ensuring absolute perfection.'),
         '{{about_image}}': site.aboutImage || imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
+        '{{about_fallback}}': imageBase.about || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80',
         '{{phone}}': site.phoneNumber || '',
         '{{phone_clean}}': cleanPhone,
         '{{email}}': site.contactDetails?.email || 'contact@mybusiness.com',
