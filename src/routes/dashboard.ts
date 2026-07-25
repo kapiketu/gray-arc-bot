@@ -441,9 +441,9 @@ export default async function dashboardRoutes(fastify: FastifyInstance): Promise
   };
 
   // Redirect without trailing slash to ensure relative assets (like styles.css) resolve correctly
-  fastify.get('/preview/:id', async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    return reply.redirect(301, `/preview/${request.params.id}/`);
+  fastify.get('/project-preview/:id', async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    return reply.redirect(301, `/project-preview/${request.params.id}/`);
   });
   
-  fastify.get('/preview/:id/*', previewHandler);
+  fastify.get('/project-preview/:id/*', previewHandler);
 }

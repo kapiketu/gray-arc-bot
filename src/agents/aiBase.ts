@@ -10,7 +10,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const AI_PROVIDER = process.env.AI_PROVIDER || 'openai'; // 'openai' or 'deepseek'
-const AI_API_KEY = process.env.AI_API_KEY || '';
+const AI_API_KEY = process.env.AI_API_KEY || 'dummy_key_to_prevent_startup_crash';
 
 if (!AI_API_KEY) {
   console.warn(`[AIBase] AI_API_KEY is not set for provider ${AI_PROVIDER}. AI agents will fail.`);

@@ -42,19 +42,20 @@ ${context}
 TASK: Generate the implementation specification for this ${req.projectType} project.
 
 Important rules:
-- For a Website: DO NOT generate raw HTML. Instead, generate a structured block schema. Use pre-defined block layouts (e.g. hero_v1, hero_v2, services_v1, services_v2, contact_v1, testimonials_v1) and provide the JSON content.
+- For a Website: DO NOT generate raw HTML. Instead, generate a structured block schema. Use pre-defined block layouts (e.g. hero_v1, hero_v2, hero_v3, services_v1, services_v2, contact_v1, testimonials_v1) and provide the JSON content.
 - For a SaaS or Mobile App: generate the core Fastify route files and React/TypeScript components in 'generatedFiles'.
 
 Return a JSON object matching this EXACT schema:
 {
   "implementationSummary": "What was built and key implementation decisions",
   "siteSchema": {
-    "layout": ["hero_v1", "services_v2", "contact_v1"],
+    "layout": ["hero_v3", "services_v2", "contact_v1"],
     "content": {
-      "hero_v1": {
+      "hero_v3": {
         "headline": "...",
         "subheadline": "...",
-        "cta_text": "..."
+        "cta_primary": "Explore Services",
+        "cta_secondary": "Contact Us"
       },
       "services_v2": {
         "section_title": "...",

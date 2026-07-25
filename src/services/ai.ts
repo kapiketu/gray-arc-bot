@@ -241,6 +241,12 @@ export async function generateWebsiteConfig(
     11. TYPOS AND GRAMMAR CORRECTION: Correct all spelling mistakes, grammatical issues, and lowercase names in user inputs (e.g. correct 'chickn' to 'chicken', 'dehraudn' to 'Dehradun', 'bakrs' to 'Bakers', 'jodhour' to 'Jodhpur', and capitalize business names) across all generated titles, descriptions, feature blocks, and fields. Typo correction is mandatory.
     12. BRAND STRATEGY: Define a brand style strategy. Generate 'styleKeywords' (3-4 comma-separated visual style keywords like rustic, elegant, modern) and 'colorAesthetic' (image color scheme description matching theme colors like warm golden, clean neon green).
     13. LOCAL SEO SCHEMA: Determine the correct 'businessType' (e.g., Restaurant, HairSalon, Gym, Dentist, LocalBusiness) and 'priceRange' (e.g., ₹₹).
+    14. PREMIUM COLORS AND TYPOGRAPHY (CRITICAL):
+        - primaryColor: Generate a curated, rich premium hex color (avoid plain red/blue/green). Examples: Emerald (#10b981), Indigo/Blue (#4f46e5 or #3b82f6), Amber/Gold (#d97706 or #f59e0b), Teal (#0d9488), Violet/Lavender (#8b5cf6), Clean Slate (#475569).
+        - secondaryColor: Complementary color to primaryColor.
+        - bgColor: Either '#ffffff' (light mode) OR '#030712' / '#09090b' (modern dark mode). Dark mode is highly recommended for tech, gym, lounge, bakery, and creative categories; light mode for healthcare, consulting, law.
+        - textColor: '#18181b' (zinc-900) for light mode, or '#f4f4f5' (zinc-100) for dark mode.
+        - fontFamily: Curated modern font family string. Pick from: 'Outfit, sans-serif' (modern/premium), 'Space Grotesk, sans-serif' (bold/creative), 'Plus Jakarta Sans, sans-serif' (elegant), 'Playfair Display, serif' (classic/luxury), 'Inter, sans-serif' (clean/neutral).
     
     Output the result EXACTLY matching this JSON structure:
     {

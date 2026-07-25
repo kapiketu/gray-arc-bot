@@ -40,7 +40,7 @@ const Hero_01 = `
         <div class="lg:col-span-5 relative" data-aos="fade-left">
             <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5">
                 <div class="relative aspect-[4/5] rounded-[1.5rem] overflow-hidden">
-                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x1000?text=Premium+Services';">
+                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/800x1000?text=Premium+Services';">
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@ const Hero_02 = `
 <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden py-32 px-6">
     <!-- Visual Image Background -->
     <div class="absolute inset-0 z-0">
-        <img src="{{hero_image}}" alt="{{business_name}} Background" class="w-full h-full object-cover opacity-30 scale-105 filter blur-[2px]" onerror="this.onerror=null;this.src='https://via.placeholder.com/1600x900?text=Premium+Background';">
+        <img src="{{hero_image}}" alt="{{business_name}} Background" class="w-full h-full object-cover opacity-30 scale-105 filter blur-[2px]" onerror="this.onerror=null;this.src='https://placehold.co/1600x900?text=Premium+Background';">
         <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-dark-900/50"></div>
     </div>
 
@@ -89,7 +89,7 @@ const About_01 = `
         <div class="lg:col-span-5 relative" data-aos="fade-right">
             <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5">
                 <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
-                    <img src="{{about_image}}" alt="Our Space" class="w-full h-full object-cover hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x800?text=Our+Space';">
+                    <img src="{{about_image}}" alt="Our Space" class="w-full h-full object-cover hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/800x800?text=Our+Space';">
                 </div>
             </div>
         </div>
@@ -255,6 +255,43 @@ const Footer_Standard = `
     </div>
 </footer>
 `;
+const Hero_03 = `
+<section id="hero" class="relative min-h-[95vh] flex items-center justify-center overflow-hidden py-32 px-6 bg-dark-950">
+    <!-- Glowing Background Radial Blobs -->
+    <div class="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/20 blur-[140px] pointer-events-none animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[160px] pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto text-center relative z-10 space-y-8" data-aos="zoom-in">
+        <span class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass border border-white/10 text-xs font-semibold uppercase tracking-widest text-primary shadow-inner">
+            <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+            {{category}}
+        </span>
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold font-display leading-[1.08] tracking-tight text-white bg-gradient-to-r from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
+            {{hero_title}}
+        </h1>
+        <p class="text-gray-400 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-sans">
+            {{hero_subtitle}}
+        </p>
+        <div class="flex flex-wrap justify-center gap-5 pt-6">
+            <a href="https://wa.me/{{phone_clean}}?text=Hi! I am interested in your services." target="_blank" class="px-9 py-4 rounded-full bg-primary text-white font-bold text-base hover:scale-105 transition-all shadow-xl shadow-primary/30 flex items-center gap-3">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                <span>Get Started on WhatsApp</span>
+            </a>
+            <a href="#services" class="px-9 py-4 rounded-full glass text-white font-bold text-base hover:bg-white/10 transition-all border border-white/10 backdrop-blur-xl">
+                Explore Services
+            </a>
+        </div>
+        <!-- Hero Featured Media Card -->
+        <div class="pt-12 max-w-4xl mx-auto">
+            <div class="relative rounded-3xl overflow-hidden glass p-3 border border-white/10 shadow-2xl">
+                <div class="relative aspect-[16/9] rounded-2xl overflow-hidden">
+                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/1600x900?text=Premium+Experience';">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+`;
 // ─────────────────────────────────────────────────────────────────────────────
 // ADAPTIVE SELECTOR & COMPILING FUNCTIONS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -262,14 +299,27 @@ function selectOptimalVariants(site) {
     const category = (site.category || '').toLowerCase();
     const servicesCount = site.services?.length || 0;
     // 1. Hero Variant Selection
-    // Food & consumer categories benefit from centered full-width glowing cards
-    const isConsumerCategory = category.includes('restaurant') ||
+    let heroVariant = Hero_01;
+    if (category.includes('gym') ||
+        category.includes('fitness') ||
+        category.includes('tech') ||
+        category.includes('software') ||
+        category.includes('startup') ||
+        category.includes('digital') ||
+        category.includes('app') ||
+        category.includes('lounge') ||
+        category.includes('creative')) {
+        heroVariant = Hero_03;
+    }
+    else if (category.includes('restaurant') ||
         category.includes('food') ||
         category.includes('cafe') ||
         category.includes('bar') ||
         category.includes('salon') ||
-        category.includes('spa');
-    const heroVariant = isConsumerCategory ? Hero_02 : Hero_01;
+        category.includes('spa') ||
+        category.includes('bakery')) {
+        heroVariant = Hero_02;
+    }
     // 2. Services Variant Selection
     // If user has many services, grid looks cluttered. Automatically switch to list accordions.
     const servicesVariant = servicesCount > 4 ? Services_Accordion : Services_Grid;

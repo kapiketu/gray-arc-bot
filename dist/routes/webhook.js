@@ -751,7 +751,7 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
                         const metaPath = path_1.default.join(templatesDir, folder, 'metadata.json');
                         if (fs_1.default.existsSync(metaPath)) {
                             const meta = JSON.parse(fs_1.default.readFileSync(metaPath, 'utf8'));
-                            const industries = meta.industries || meta.suitable_business_categories;
+                            const industries = meta.supported_industries || meta.industries || meta.suitable_business_categories;
                             if (Array.isArray(industries)) {
                                 const match = industries.some((ind) => categoryLower.includes(ind.toLowerCase()));
                                 if (match) {
@@ -768,7 +768,7 @@ async function buildAndPublishSite(from, session, isCustomDomain) {
                 console.error(`[Auto-Match] Failed to match template via metadata:`, err.message);
             }
         }
-        siteConfig.template = selectedTemplate || 'GA001';
+        siteConfig.template = selectedTemplate || 'GA004';
         await db_1.db.saveSite(siteConfig);
         await db_1.db.deleteSession(from);
         const subdomainUrl = `${BASE_URL}/site/${siteConfig.id}`;

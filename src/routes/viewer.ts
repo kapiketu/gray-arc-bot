@@ -903,7 +903,7 @@ export default async function viewerRoutes(fastify: FastifyInstance) {
 
 export function renderPremiumWebsite(site: SiteConfig, templateId?: string): string {
   const templatesDir = path.join(__dirname, '../../templates');
-  let finalId = templateId || 'GA001';
+  let finalId = templateId || 'GA004';
 
   let dirPath = path.join(templatesDir, finalId);
   if (!fs.existsSync(dirPath) || !fs.existsSync(path.join(dirPath, 'index.html'))) {
@@ -959,7 +959,7 @@ export function renderPremiumWebsite(site: SiteConfig, templateId?: string): str
   const servicesGridHtml = renderServicesGrid(site.services || [], site.category || 'Local Shop', site.phoneNumber || '', site);
   const testimonialsHtml = renderTestimonialsSlider(site.testimonials || [], site);
   const logoPrompt = `minimalist professional logo icon for ${site.businessName} ${site.category || ''} business, clean vector style, transparent background, no text, single icon`;
-  const logoHtml = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="${site.businessName} Logo">`;
+  const logoHtml = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(logoPrompt)}?width=512&height=512&nologo=true" class="w-10 h-10 rounded-full object-cover" alt="${site.businessName} Logo" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=${encodeURIComponent(site.businessName.substring(0,2).toUpperCase())}';">`;
   const cleanPhone = (site.phoneNumber || '').replace(/\D/g, '');
 
   const imageBase = getCategoryImages(site.category || '');
@@ -1154,7 +1154,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
       // Featured card — larger span
       gridItems += `
         <div class="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://placehold.co/1200x800?text=No+Image';">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
             <div class="absolute inset-0 p-8 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-gold-500 mb-6 backdrop-blur-md">
@@ -1173,7 +1173,7 @@ function renderServicesGrid(services: Array<{ name: string; description: string;
       // All other cards — same background image treatment
       gridItems += `
         <div class="group relative rounded-3xl overflow-hidden glass border border-white/5 transition-transform duration-500 hover:-translate-y-2 cursor-pointer" data-aos="zoom-in" data-aos-delay="${delay}">
-            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x800?text=No+Image';">
+            <img src="${cardImg}" alt="${s.name}" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" onerror="this.onerror=null;this.src='https://placehold.co/1200x800?text=No+Image';">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-900/30"></div>
             <div class="absolute inset-0 p-6 flex flex-col justify-end">
                 <div class="bg-gold-500/20 w-12 h-12 rounded-2xl flex items-center justify-center text-gold-500 mb-4 backdrop-blur-md">

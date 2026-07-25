@@ -973,7 +973,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
             const metaPath = path.join(templatesDir, folder, 'metadata.json');
             if (fs.existsSync(metaPath)) {
               const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-              const industries = meta.industries || meta.suitable_business_categories;
+              const industries = meta.supported_industries || meta.industries || meta.suitable_business_categories;
               if (Array.isArray(industries)) {
                 const match = industries.some((ind: string) => categoryLower.includes(ind.toLowerCase()));
                 if (match) {
@@ -990,7 +990,7 @@ async function buildAndPublishSite(from: string, session: Session, isCustomDomai
       }
     }
 
-    siteConfig.template = selectedTemplate || 'GA001';
+    siteConfig.template = selectedTemplate || 'GA004';
 
     await db.saveSite(siteConfig);
     await db.deleteSession(from);
