@@ -328,8 +328,7 @@ export async function generateWebsiteConfig(
       return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(cleanCategory)}%20business${encodeURIComponent(suffix)}?width=${width}&height=${height}&nologo=true`;
     };
 
-    // Sourced pre-selected stock images for fallbacks
-    const fallbacks = getCategoryImages(category);
+
 
     // Hero image (Dynamic AI Generated)
     const verifiedHeroImage = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
