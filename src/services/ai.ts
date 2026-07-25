@@ -328,32 +328,34 @@ export async function generateWebsiteConfig(
       return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(cleanCategory)}%20business${encodeURIComponent(suffix)}?width=${width}&height=${height}&nologo=true`;
     };
 
-    // Hero image
+    // Sourced pre-selected stock images for fallbacks
+    const fallbacks = getCategoryImages(category);
+
+    // Hero image (Dynamic AI Generated)
     const verifiedHeroImage = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
 
-    // About image
+    // About image (Dynamic AI Generated)
     const verifiedAboutImage = buildImgUrl(generatedConfig.aboutImagePrompt || 'office workspace', 1200, 800);
 
     const fallbackIcons = getDefaultCategoryIcons(category);
     const verifiedServices = (generatedConfig.services || []).map((s: any, idx: number) => {
-      const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
+      // Use pre-selected high-resolution category stock photos for service cards to guarantee instant loads
+      const fallbackImg = fallbacks.products[idx % fallbacks.products.length] || fallbacks.hero;
       const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
       return {
         name: s.name,
         price: s.price,
         description: s.description,
-        image: rawUrl,
+        image: fallbackImg,
         icon: s.icon || fallbackIcon
       };
     });
 
-    // Gallery images
+    // Gallery images (Sourced from high-res curated stock photos)
     const verifiedGallery: string[] = [];
-    const galleryPrompts = generatedConfig.galleryImagePrompts || [];
     for (let i = 0; i < 4; i++) {
-      const p = galleryPrompts[i] || `gallery item ${i + 1}`;
-      const rawUrl = buildImgUrl(p, 1200, 800);
-      verifiedGallery.push(rawUrl);
+      const fallbackImg = fallbacks.products[(i + 1) % fallbacks.products.length] || fallbacks.about;
+      verifiedGallery.push(fallbackImg);
     }
 
     // Assemble unified configuration payload
