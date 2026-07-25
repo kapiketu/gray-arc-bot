@@ -459,6 +459,10 @@ export async function generateWebsiteConfig(
     }
 
     const sanitized = sanitizeSiteConfig(siteConfig, category);
+    
+    // Trigger background pre-warming of all generated images so they are cached when the user opens the page
+    preWarmSiteImages(sanitized);
+    
     return sanitized;
 
   } catch (error: any) {
@@ -467,6 +471,33 @@ export async function generateWebsiteConfig(
     return getMockWebsiteContent(phoneNumber, businessName, category, about, servicesRaw, contactRaw);
   }
 }
+
+/**
+ * Fires background requests to all generated image URLs to pre-warm the Pollinations AI cache.
+ * This prevents the user's browser from timing out on first load and falling back to placeholders.
+ */
+export function preWarmSiteImages(config: SiteConfig): void {
+  const urls: string[] = [];
+  if (config.heroImage) urls.push(config.heroImage);
+  if (config.aboutImage) urls.push(config.aboutImage);
+  if (config.services) {
+    config.services.forEach(s => {
+      if (s.image) urls.push(s.image);
+    });
+  }
+  if (config.galleryImages) {
+    config.galleryImages.forEach(img => urls.push(img));
+  }
+
+  console.log(`[Image Pre-Warm] Triggering background pre-warming for ${urls.length} images...`);
+  
+  urls.forEach(url => {
+    axios.get(url, { timeout: 45000, responseType: 'stream' })
+      .then(() => console.log(`[Image Pre-Warm] Successfully pre-warmed & cached: ${url.substring(0, 80)}...`))
+      .catch(err => console.warn(`[Image Pre-Warm] Pre-warm completed or timed out for: ${url.substring(0, 80)}...`));
+  });
+}
+
 
 // ────────────────────────────────────────────────────────
 // AI-POWERED WEBSITE EDITING
