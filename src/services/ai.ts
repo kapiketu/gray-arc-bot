@@ -489,12 +489,14 @@ export function preWarmSiteImages(config: SiteConfig): void {
     config.galleryImages.forEach(img => urls.push(img));
   }
 
-  console.log(`[Image Pre-Warm] Triggering background pre-warming for ${urls.length} images...`);
+  console.log(`[Image Pre-Warm] Triggering background pre-warming for ${urls.length} images (staggered by 2.5s)...`);
   
-  urls.forEach(url => {
-    axios.get(url, { timeout: 45000, responseType: 'stream' })
-      .then(() => console.log(`[Image Pre-Warm] Successfully pre-warmed & cached: ${url.substring(0, 80)}...`))
-      .catch(err => console.warn(`[Image Pre-Warm] Pre-warm completed or timed out for: ${url.substring(0, 80)}...`));
+  urls.forEach((url, idx) => {
+    setTimeout(() => {
+      axios.get(url, { timeout: 45000, responseType: 'stream' })
+        .then(() => console.log(`[Image Pre-Warm] [${idx + 1}/${urls.length}] Successfully pre-warmed & cached: ${url.substring(0, 70)}...`))
+        .catch(err => console.warn(`[Image Pre-Warm] [${idx + 1}/${urls.length}] Pre-warm failed or timed out: ${url.substring(0, 70)}... Error: ${err.message}`));
+    }, idx * 2500);
   });
 }
 
