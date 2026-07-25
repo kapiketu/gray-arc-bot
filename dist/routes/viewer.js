@@ -887,6 +887,15 @@ function renderSubpageHeader(pageTitle, pageName, homeLink) {
   `;
 }
 function renderPremiumWebsite(site, templateId, pageType = 'home') {
+    if (site.generatedHtml) {
+        let html = site.generatedHtml;
+        // Inject Schema.org JSON-LD structured data if not already present
+        if (!html.includes('application/ld+json')) {
+            const schemaScript = buildSchemaOrgScript(site);
+            html = html.replace('</head>', `${schemaScript}</head>`);
+        }
+        return html;
+    }
     const templatesDir = path_1.default.join(__dirname, '../../templates');
     let finalId = templateId || 'GA004';
     let dirPath = path_1.default.join(templatesDir, finalId);

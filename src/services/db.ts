@@ -102,6 +102,7 @@ export interface SiteConfig {
     businessType?: string;
     priceRange?: string;
   };
+  generatedHtml?: string;
 }
 
 export const db = {

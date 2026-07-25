@@ -8,6 +8,7 @@ exports.slugify = slugify;
 exports.generateWebsiteConfig = generateWebsiteConfig;
 exports.preWarmSiteImages = preWarmSiteImages;
 exports.modifyWebsiteConfig = modifyWebsiteConfig;
+exports.generateWebsiteHtml = generateWebsiteHtml;
 const generative_ai_1 = require("@google/generative-ai");
 const dotenv_1 = __importDefault(require("dotenv"));
 const axios_1 = __importDefault(require("axios"));
@@ -431,6 +432,15 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
             console.log('[AI Engine] Critic AI successfully approved the configuration!');
         }
         const sanitized = (0, contentSanitizer_1.sanitizeSiteConfig)(siteConfig, category);
+        // Stage 4: AI Frontend Coder (Tailwind/HTML Code-Gen from Scratch)
+        try {
+            const customHtml = await generateWebsiteHtml(sanitized);
+            sanitized.generatedHtml = customHtml;
+            console.log('[AI Engine] Custom HTML generation from scratch completed successfully!');
+        }
+        catch (err) {
+            console.error('[AI Engine] Failed to compile bespoke HTML from scratch:', err.message);
+        }
         // Trigger background pre-warming of all generated images so they are cached when the user opens the page
         preWarmSiteImages(sanitized);
         return sanitized;
@@ -692,4 +702,136 @@ function getMockEditResult(currentConfig, userRequest) {
         summary: `I couldn't understand what you'd like to change. Try something like:\n\n• "Change phone number to 9876543210"\n• "Add product: Vanilla Cake - ₹450"\n• "Remove Croissant"\n• "Change heading to Best Bakery in Town"\n• "Update address to MG Road, Bangalore"`,
         updatedConfig: {}
     };
+}
+/**
+ * Generates bespoke frontend code for a business in a single HTML file from scratch using Gemini.
+ */
+async function generateWebsiteHtml(config) {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('YOUR_GEMINI')) {
+        console.warn('[AI HTML Coder] Gemini API Key is missing. Using static HTML fallback.');
+        return getFallbackHtml(config);
+    }
+    try {
+        const ai = new generative_ai_1.GoogleGenerativeAI(GEMINI_API_KEY);
+        const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const prompt = `
+    You are Antigravity, an elite Principal Frontend Developer and UI/UX Designer.
+    Your task is to build a complete, state-of-the-art, fully responsive website in a single HTML file from scratch for the business "${config.businessName}" (${config.category}).
+
+    DO NOT USE PLAIN OR GENERIC WEB TEMPLATES. Design a premium visual identity featuring:
+    - Glowing gradients, smooth micro-animations, glassmorphic card overlays, radial background light blobs, and hover state transitions.
+    - Curated modern typography matching the font family '${config.theme.fontFamily}'.
+    - Vibrant HSL/HEX colors based on primary: '${config.theme.primaryColor}', secondary: '${config.theme.secondaryColor}', bg: '${config.theme.bgColor}', text: '${config.theme.textColor}'.
+
+    BUSINESS SPECIFICATION DETAILS:
+    ${JSON.stringify(config, null, 2)}
+
+    REQUIRED CORE PAGES/VIEWS IN THE HTML (Single Page Application architecture):
+    The website must implement a client-side JavaScript router that listens to URL pathnames and toggles visibility of the following section containers (e.g. style.display='block' / style.display='none'):
+    1. 'home': Welcome landing view (Stunning Hero, Features Bento Grid, Story intro with Image, Services highlights, call-to-actions).
+    2. 'services': Full catalog layout with beautiful cards for each service, showing description, price, and matching icon/image.
+    3. 'about': Rich narrative, team showcase, values, and dynamic stats grid.
+    4. 'reviews': Wall of client testimonials with custom star ratings.
+    5. 'contact': Comprehensive FAQ accordion, physical map mock, hours, business information, and a contact/inquiry form.
+
+    LIBRARIES TO INCLUDE:
+    - Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+    - Lucide Icons CDN: <script src="https://unpkg.com/lucide@latest"></script>
+    - AOS Animation library: 
+      <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+      <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    INTERACTIVE NAVIGATION DIRECTIVES:
+    - Navbar links must trigger a JavaScript function (e.g. 'window.history.pushState' and trigger custom view transitions) to change the view context instantly without browser reload.
+    - Path navigation must match paths like: '/services', '/about', '/reviews', '/contact'.
+    - On load or popstate, the script should check 'window.location.pathname' (supporting paths like '/site/site-id/services' as well as '/services' for custom domains) and mount the active page container.
+    - Ensure Lucide icons are initialized using 'lucide.createIcons()' on load and every page/view transition.
+    - Implement a fully functional mobile hamburger menu that slides open/close with transition animations.
+    - Setup AOS.init() inside the router initialization.
+
+    OUTPUT INSTRUCTIONS:
+    - Output ONLY valid, clean, well-formed HTML code.
+    - Do NOT wrap the HTML code inside markdown code blocks (like \`\`\`html ... \`\`\`). Return the raw HTML string starting with <!DOCTYPE html> and ending with </html>.
+    `;
+        console.log(`[AI HTML Coder] Generating bespoke frontend code for "${config.businessName}"...`);
+        const response = await model.generateContent(prompt);
+        let html = response.response.text().trim();
+        // Clean up code blocks if the LLM wraps it despite instructions
+        if (html.startsWith('```html')) {
+            html = html.substring(7);
+        }
+        if (html.endsWith('```')) {
+            html = html.substring(0, html.length - 3);
+        }
+        html = html.trim();
+        return html;
+    }
+    catch (error) {
+        console.error('[AI HTML Coder] Error compiling custom HTML with Gemini:', error.message);
+        return getFallbackHtml(config);
+    }
+}
+/**
+ * Standalone fallback HTML template in case HTML generation fails.
+ */
+function getFallbackHtml(config) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>\${config.businessName} - \${config.category}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --primary: \${config.theme.primaryColor || '#4f46e5'};
+      --secondary: \${config.theme.secondaryColor || '#8b5cf6'};
+      --bg: \${config.theme.bgColor || '#030712'};
+      --text: \${config.theme.textColor || '#f4f4f5'};
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: \${config.theme.fontFamily || 'Inter, sans-serif'};
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+  <!-- Fallback Shell Navigation -->
+  <header class="border-b border-zinc-800 py-4 px-6 sticky top-0 bg-zinc-950/80 backdrop-blur-md z-50">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <h1 class="text-xl font-bold tracking-tight text-white">\${config.businessName}</h1>
+      <nav class="hidden md:flex gap-6 text-sm">
+        <a href="#home" class="text-white font-semibold">Home</a>
+        <a href="#services" class="text-zinc-400 hover:text-white">Services</a>
+        <a href="#about" class="text-zinc-400 hover:text-white">About</a>
+        <a href="#contact" class="text-zinc-400 hover:text-white">Contact</a>
+      </nav>
+      <a href="https://wa.me/\${config.phoneNumber}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
+        <i data-lucide="message-square"></i> WhatsApp Us
+      </a>
+    </div>
+  </header>
+
+  <!-- Main View -->
+  <main class="flex-grow max-w-4xl mx-auto py-16 px-6 text-center">
+    <h2 class="text-4xl md:text-5xl font-black tracking-tight text-white mb-6">\${config.heroTitle}</h2>
+    <p class="text-zinc-400 text-lg mb-8 max-w-xl mx-auto">\${config.heroSubtitle}</p>
+    <div class="inline-flex gap-4">
+      <a href="#services" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold">Our Services</a>
+      <a href="#about" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-lg font-semibold">Our Story</a>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-800 py-8 px-6 text-center text-sm text-zinc-500">
+    <p>&copy; \${new Date().getFullYear()} \${config.businessName}. All rights reserved.</p>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>`;
 }

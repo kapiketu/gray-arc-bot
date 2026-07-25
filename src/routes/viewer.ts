@@ -977,6 +977,16 @@ export function renderPremiumWebsite(
   templateId?: string,
   pageType: 'home' | 'services' | 'about' | 'reviews' | 'contact' = 'home'
 ): string {
+  if (site.generatedHtml) {
+    let html = site.generatedHtml;
+    // Inject Schema.org JSON-LD structured data if not already present
+    if (!html.includes('application/ld+json')) {
+      const schemaScript = buildSchemaOrgScript(site);
+      html = html.replace('</head>', `${schemaScript}</head>`);
+    }
+    return html;
+  }
+
   const templatesDir = path.join(__dirname, '../../templates');
   let finalId = templateId || 'GA004';
 
