@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyImageUrl = verifyImageUrl;
 exports.slugify = slugify;
 exports.generateWebsiteConfig = generateWebsiteConfig;
+exports.preWarmSiteImages = preWarmSiteImages;
 exports.modifyWebsiteConfig = modifyWebsiteConfig;
 const generative_ai_1 = require("@google/generative-ai");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -301,29 +302,28 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
             const suffix = modifiers ? ` - ${modifiers}` : '';
             return `https://image.pollinations.ai/prompt/premium%20hd%20photography%20of%20${encodeURIComponent(clean)}%20for%20${encodeURIComponent(cleanCategory)}%20business${encodeURIComponent(suffix)}?width=${width}&height=${height}&nologo=true`;
         };
-        // Hero image
+        // Hero image (Dynamic AI Generated)
         const verifiedHeroImage = buildImgUrl(generatedConfig.heroImagePrompt || 'hero background', 1600, 900);
-        // About image
+        // About image (Dynamic AI Generated)
         const verifiedAboutImage = buildImgUrl(generatedConfig.aboutImagePrompt || 'office workspace', 1200, 800);
         const fallbackIcons = (0, viewer_1.getDefaultCategoryIcons)(category);
         const verifiedServices = (generatedConfig.services || []).map((s, idx) => {
-            const rawUrl = buildImgUrl(s.imagePrompt || s.name, 1200, 800);
+            // Use pre-selected high-resolution category stock photos for service cards to guarantee instant loads
+            const fallbackImg = fallbacks.products[idx % fallbacks.products.length] || fallbacks.hero;
             const fallbackIcon = fallbackIcons[idx % fallbackIcons.length];
             return {
                 name: s.name,
                 price: s.price,
                 description: s.description,
-                image: rawUrl,
+                image: fallbackImg,
                 icon: s.icon || fallbackIcon
             };
         });
-        // Gallery images
+        // Gallery images (Sourced from high-res curated stock photos)
         const verifiedGallery = [];
-        const galleryPrompts = generatedConfig.galleryImagePrompts || [];
         for (let i = 0; i < 4; i++) {
-            const p = galleryPrompts[i] || `gallery item ${i + 1}`;
-            const rawUrl = buildImgUrl(p, 1200, 800);
-            verifiedGallery.push(rawUrl);
+            const fallbackImg = fallbacks.products[(i + 1) % fallbacks.products.length] || fallbacks.about;
+            verifiedGallery.push(fallbackImg);
         }
         // Assemble unified configuration payload
         const trialEnds = new Date();
@@ -431,6 +431,8 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
             console.log('[AI Engine] Critic AI successfully approved the configuration!');
         }
         const sanitized = (0, contentSanitizer_1.sanitizeSiteConfig)(siteConfig, category);
+        // Trigger background pre-warming of all generated images so they are cached when the user opens the page
+        preWarmSiteImages(sanitized);
         return sanitized;
     }
     catch (error) {
@@ -438,6 +440,34 @@ async function generateWebsiteConfig(phoneNumber, businessName, category, about,
         console.warn('[AI Engine] Falling back to local Mock generator.');
         return getMockWebsiteContent(phoneNumber, businessName, category, about, servicesRaw, contactRaw);
     }
+}
+/**
+ * Fires background requests to all generated image URLs to pre-warm the Pollinations AI cache.
+ * This prevents the user's browser from timing out on first load and falling back to placeholders.
+ */
+function preWarmSiteImages(config) {
+    const urls = [];
+    if (config.heroImage)
+        urls.push(config.heroImage);
+    if (config.aboutImage)
+        urls.push(config.aboutImage);
+    if (config.services) {
+        config.services.forEach(s => {
+            if (s.image)
+                urls.push(s.image);
+        });
+    }
+    if (config.galleryImages) {
+        config.galleryImages.forEach(img => urls.push(img));
+    }
+    console.log(`[Image Pre-Warm] Triggering background pre-warming for ${urls.length} images (staggered by 2.5s)...`);
+    urls.forEach((url, idx) => {
+        setTimeout(() => {
+            axios_1.default.get(url, { timeout: 45000, responseType: 'stream' })
+                .then(() => console.log(`[Image Pre-Warm] [${idx + 1}/${urls.length}] Successfully pre-warmed & cached: ${url.substring(0, 70)}...`))
+                .catch(err => console.warn(`[Image Pre-Warm] [${idx + 1}/${urls.length}] Pre-warm failed or timed out: ${url.substring(0, 70)}... Error: ${err.message}`));
+        }, idx * 2500);
+    });
 }
 async function modifyWebsiteConfig(currentConfig, userRequest) {
     console.log(`[AI Editor] Processing edit request for "${currentConfig.businessName}": "${userRequest}"`);

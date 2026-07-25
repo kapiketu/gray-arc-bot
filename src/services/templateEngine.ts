@@ -39,7 +39,7 @@ const Hero_01 = `
         <div class="lg:col-span-5 relative" data-aos="fade-left">
             <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5">
                 <div class="relative aspect-[4/5] rounded-[1.5rem] overflow-hidden">
-                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/800x1000?text=Premium+Services';">
+                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='{{hero_fallback}}';">
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@ const Hero_02 = `
 <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden py-32 px-6">
     <!-- Visual Image Background -->
     <div class="absolute inset-0 z-0">
-        <img src="{{hero_image}}" alt="{{business_name}} Background" class="w-full h-full object-cover opacity-30 scale-105 filter blur-[2px]" onerror="this.onerror=null;this.src='https://placehold.co/1600x900?text=Premium+Background';">
+        <img src="{{hero_image}}" alt="{{business_name}} Background" class="w-full h-full object-cover opacity-30 scale-105 filter blur-[2px]" onerror="this.onerror=null;this.src='{{hero_fallback}}';">
         <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-dark-900/50"></div>
     </div>
 
@@ -91,7 +91,7 @@ const About_01 = `
         <div class="lg:col-span-5 relative" data-aos="fade-right">
             <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5">
                 <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
-                    <img src="{{about_image}}" alt="Our Space" class="w-full h-full object-cover hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/800x800?text=Our+Space';">
+                    <img src="{{about_image}}" alt="Our Space" class="w-full h-full object-cover hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='{{about_fallback}}';">
                 </div>
             </div>
         </div>
@@ -299,7 +299,7 @@ const Hero_03 = `
         <div class="pt-12 max-w-4xl mx-auto">
             <div class="relative rounded-3xl overflow-hidden glass p-3 border border-white/10 shadow-2xl">
                 <div class="relative aspect-[16/9] rounded-2xl overflow-hidden">
-                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='https://placehold.co/1600x900?text=Premium+Experience';">
+                    <img src="{{hero_image}}" alt="{{business_name}} Hero" class="w-full h-full object-cover transform hover:scale-105 transition-all duration-700" onerror="this.onerror=null;this.src='{{hero_fallback}}';">
                 </div>
             </div>
         </div>
