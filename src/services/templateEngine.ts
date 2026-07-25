@@ -364,6 +364,8 @@ export function compileDynamicLayout(site: SiteConfig): {
   testimonials: string;
   faq: string;
   footer: string;
+  pricing: string;
+  gallery: string;
 } {
   const layouts = selectOptimalVariants(site);
   

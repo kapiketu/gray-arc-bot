@@ -931,16 +931,20 @@ function renderPremiumWebsite(site, templateId, pageType = 'home') {
             html = html.replace('{{dynamic_hero}}', dynamicSections.hero);
             html = html.replace('{{dynamic_about}}', dynamicSections.about);
             html = html.replace('{{dynamic_services}}', dynamicSections.services);
+            html = html.replace('{{dynamic_pricing}}', dynamicSections.pricing);
             html = html.replace('{{dynamic_features}}', dynamicSections.features);
+            html = html.replace('{{dynamic_gallery}}', dynamicSections.gallery);
             html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
             html = html.replace('{{dynamic_faqs}}', dynamicSections.faq);
         }
         else if (pageType === 'services') {
-            const header = renderSubpageHeader("Our Services & Solutions", "Services", homeLink);
+            const header = renderSubpageHeader("Our Services & Offerings", "Services", homeLink);
             html = html.replace('{{dynamic_hero}}', header);
             html = html.replace('{{dynamic_about}}', '');
             html = html.replace('{{dynamic_services}}', dynamicSections.services);
+            html = html.replace('{{dynamic_pricing}}', dynamicSections.pricing);
             html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_gallery}}', '');
             html = html.replace('{{dynamic_testimonials}}', '');
             html = html.replace('{{dynamic_faqs}}', '');
         }
@@ -949,7 +953,9 @@ function renderPremiumWebsite(site, templateId, pageType = 'home') {
             html = html.replace('{{dynamic_hero}}', header);
             html = html.replace('{{dynamic_about}}', dynamicSections.about);
             html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_pricing}}', '');
             html = html.replace('{{dynamic_features}}', dynamicSections.features);
+            html = html.replace('{{dynamic_gallery}}', dynamicSections.gallery);
             html = html.replace('{{dynamic_testimonials}}', '');
             html = html.replace('{{dynamic_faqs}}', '');
         }
@@ -958,7 +964,9 @@ function renderPremiumWebsite(site, templateId, pageType = 'home') {
             html = html.replace('{{dynamic_hero}}', header);
             html = html.replace('{{dynamic_about}}', '');
             html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_pricing}}', '');
             html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_gallery}}', '');
             html = html.replace('{{dynamic_testimonials}}', dynamicSections.testimonials);
             html = html.replace('{{dynamic_faqs}}', '');
         }
@@ -1004,7 +1012,9 @@ function renderPremiumWebsite(site, templateId, pageType = 'home') {
             html = html.replace('{{dynamic_hero}}', header);
             html = html.replace('{{dynamic_about}}', '');
             html = html.replace('{{dynamic_services}}', '');
+            html = html.replace('{{dynamic_pricing}}', '');
             html = html.replace('{{dynamic_features}}', '');
+            html = html.replace('{{dynamic_gallery}}', '');
             html = html.replace('{{dynamic_testimonials}}', contactLayout);
             html = html.replace('{{dynamic_faqs}}', '');
         }
@@ -1044,6 +1054,12 @@ function renderPremiumWebsite(site, templateId, pageType = 'home') {
         '{{business_name}}': site.businessName,
         '{{category}}': site.category || 'Professional Services',
         '{{about}}': site.aboutText || site.heroSubtitle || 'A premium local business.',
+        '{{plan_service_1}}': site.services?.[0]?.name || 'Starter Plan Option',
+        '{{plan_service_2}}': site.services?.[1]?.name || 'Standard Pro Option',
+        '{{plan_service_3}}': site.services?.[2]?.name || 'VIP Client Care Suite',
+        '{{plan_basic_price}}': site.services?.[0]?.price || 'Contact Us',
+        '{{plan_pro_price}}': site.services?.[1]?.price || 'Recommended',
+        '{{plan_elite_price}}': site.services?.[2]?.price || 'Contact Us',
         '{{primary_color}}': palette.primary,
         '{{primary_hover}}': palette.primaryHover,
         '{{secondary_color}}': palette.secondary,
