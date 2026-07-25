@@ -499,6 +499,132 @@ export function compileDynamicLayout(site: SiteConfig): {
   // 7. Compile Footer
   let compiledFooter = layouts.footerVariant;
 
+  // 8. Dynamic Pricing plans Template
+  const compiledPricing = `
+  <section id="pricing" class="py-24 px-6 relative bg-dark-900/40 border-t border-white/5">
+      <div class="max-w-7xl mx-auto text-center space-y-4 mb-16">
+          <span class="text-sm font-semibold uppercase tracking-wider text-primary">Pricing Plans</span>
+          <h2 class="text-3xl sm:text-5xl font-bold font-display text-white">Simple, Transparent Plans</h2>
+          <p class="text-gray-400 max-w-xl mx-auto">Choose the perfect plan tailored for your requirements and start immediately.</p>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Plan 1 -->
+          <div class="glass p-8 rounded-3xl border-white/5 flex flex-col justify-between hover:border-white/10 transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+              <div class="space-y-6">
+                  <div>
+                      <h3 class="text-lg font-bold text-gray-400 font-display uppercase tracking-widest">Starter</h3>
+                      <div class="flex items-baseline gap-1 mt-4">
+                          <span class="text-4xl font-extrabold text-white">{{plan_basic_price}}</span>
+                          <span class="text-xs text-gray-500">/ One-time</span>
+                      </div>
+                      <p class="text-gray-400 text-xs mt-2">Essential services package to get you started quickly.</p>
+                  </div>
+                  <ul class="space-y-3 text-sm text-gray-300 border-t border-white/5 pt-6">
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_1}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Custom Consultation</li>
+                      <li class="flex items-center gap-3 text-gray-500"><i data-lucide="check" class="w-4 h-4 text-gray-700"></i> Full Premium Support</li>
+                  </ul>
+              </div>
+              <a href="https://wa.me/{{phone_clean}}?text=Hi! I am interested in the Starter Plan." target="_blank" class="w-full py-3 mt-8 rounded-full border border-white/10 hover:bg-white/5 text-white font-bold text-center text-sm transition-all">Choose Plan</a>
+          </div>
+
+          <!-- Plan 2 (Highlighted) -->
+          <div class="glass p-8 rounded-3xl border-primary/20 flex flex-col justify-between hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden ring-2 ring-primary/20 bg-dark-900/60" data-aos="fade-up" data-aos-delay="200">
+              <div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest">Most Popular</div>
+              <div class="space-y-6">
+                  <div>
+                      <h3 class="text-lg font-bold text-primary font-display uppercase tracking-widest">Premium / Pro</h3>
+                      <div class="flex items-baseline gap-1 mt-4">
+                          <span class="text-4xl font-extrabold text-white">{{plan_pro_price}}</span>
+                          <span class="text-xs text-gray-400">/ Recommended</span>
+                      </div>
+                      <p class="text-gray-400 text-xs mt-2">Our flagship full-service standard package.</p>
+                  </div>
+                  <ul class="space-y-3 text-sm text-gray-300 border-t border-white/5 pt-6">
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_1}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_2}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Custom Consultation</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Standard Support</li>
+                  </ul>
+              </div>
+              <a href="https://wa.me/{{phone_clean}}?text=Hi! I am interested in the Pro Plan." target="_blank" class="w-full py-3 mt-8 rounded-full bg-primary hover:opacity-90 text-white font-bold text-center text-sm transition-all shadow-lg shadow-primary/20">Choose Plan</a>
+          </div>
+
+          <!-- Plan 3 -->
+          <div class="glass p-8 rounded-3xl border-white/5 flex flex-col justify-between hover:border-white/10 transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+              <div class="space-y-6">
+                  <div>
+                      <h3 class="text-lg font-bold text-gray-400 font-display uppercase tracking-widest">Elite / VIP</h3>
+                      <div class="flex items-baseline gap-1 mt-4">
+                          <span class="text-4xl font-extrabold text-white">{{plan_elite_price}}</span>
+                          <span class="text-xs text-gray-500">/ One-time</span>
+                      </div>
+                      <p class="text-gray-400 text-xs mt-2">Complete all-inclusive custom tailored premium tier.</p>
+                  </div>
+                  <ul class="space-y-3 text-sm text-gray-300 border-t border-white/5 pt-6">
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_1}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_2}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> {{plan_service_3}}</li>
+                      <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-primary"></i> Priority 24/7 Support</li>
+                  </ul>
+              </div>
+              <a href="https://wa.me/{{phone_clean}}?text=Hi! I am interested in the VIP Plan." target="_blank" class="w-full py-3 mt-8 rounded-full border border-white/10 hover:bg-white/5 text-white font-bold text-center text-sm transition-all">Choose Plan</a>
+          </div>
+      </div>
+  </section>
+  `;
+
+  // 9. Dynamic Gallery Showcase Template
+  const compiledGallery = `
+  <section id="gallery" class="py-24 px-6 relative border-t border-white/5">
+      <div class="max-w-7xl mx-auto text-center space-y-4 mb-16">
+          <span class="text-sm font-semibold uppercase tracking-wider text-primary">Gallery & Showcase</span>
+          <h2 class="text-3xl sm:text-5xl font-bold font-display text-white">Visual Experience</h2>
+          <p class="text-gray-400 max-w-xl mx-auto">Browse through our storefront, work portfolio, and luxury facilities.</p>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Image 1 -->
+          <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5 group hover:border-white/15 transition-all duration-300" data-aos="zoom-in" data-aos-delay="100">
+              <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
+                  <img src="{{gallery_img_1}}" alt="Gallery 1" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700">
+                  <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-80 transition-all duration-300 flex items-end p-6">
+                      <span class="text-white font-semibold text-sm font-display">{{gallery_label_1}}</span>
+                  </div>
+              </div>
+          </div>
+          <!-- Image 2 -->
+          <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5 group hover:border-white/15 transition-all duration-300" data-aos="zoom-in" data-aos-delay="200">
+              <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
+                  <img src="{{gallery_img_2}}" alt="Gallery 2" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700">
+                  <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-80 transition-all duration-300 flex items-end p-6">
+                      <span class="text-white font-semibold text-sm font-display">{{gallery_label_2}}</span>
+                  </div>
+              </div>
+          </div>
+          <!-- Image 3 -->
+          <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5 group hover:border-white/15 transition-all duration-300" data-aos="zoom-in" data-aos-delay="300">
+              <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
+                  <img src="{{gallery_img_3}}" alt="Gallery 3" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700">
+                  <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-80 transition-all duration-300 flex items-end p-6">
+                      <span class="text-white font-semibold text-sm font-display">{{gallery_label_3}}</span>
+                  </div>
+              </div>
+          </div>
+          <!-- Image 4 -->
+          <div class="relative rounded-3xl overflow-hidden glass p-2 border-white/5 group hover:border-white/15 transition-all duration-300" data-aos="zoom-in" data-aos-delay="400">
+              <div class="relative aspect-square rounded-[1.5rem] overflow-hidden">
+                  <img src="{{gallery_img_4}}" alt="Gallery 4" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700">
+                  <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-80 transition-all duration-300 flex items-end p-6">
+                      <span class="text-white font-semibold text-sm font-display">{{gallery_label_4}}</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  `;
+
   return {
     hero: compiledHero,
     about: compiledAbout,
@@ -506,6 +632,8 @@ export function compileDynamicLayout(site: SiteConfig): {
     features: compiledFeatures,
     testimonials: compiledTestimonials,
     faq: compiledFAQ,
-    footer: compiledFooter
+    footer: compiledFooter,
+    pricing: compiledPricing,
+    gallery: compiledGallery
   };
 }
